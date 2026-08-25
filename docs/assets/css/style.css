@@ -1243,13 +1243,47 @@ body.dashboard-page {
     width: 34px;
     height: 34px;
     flex: 0 0 34px;
+
     display: grid;
     place-items: center;
-    border-radius: 11px;
-    background: #efe8f7;
-    color: #80659e;
+
+    border-radius: 12px;
+
+    background: #f7f3f8;
+    color: #665a70;
+
     font-size: 9px;
     font-weight: 900;
+
+    border: 1px solid rgba(255, 255, 255, .7);
+}
+
+/* =========================================
+   AVATARES DE PACIENTES — PALETA CONSULTORIO
+   ========================================= */
+
+/* Rosa */
+.appointment:nth-child(1) .patient-avatar {
+    background: #f9e3e8;
+    color: #b66f81;
+}
+
+/* Azul cielo */
+.appointment:nth-child(2) .patient-avatar {
+    background: #e2f1f6;
+    color: #6595aa;
+}
+
+/* Amarillo mantequilla */
+.appointment:nth-child(3) .patient-avatar {
+    background: #fff2c9;
+    color: #aa8730;
+}
+
+/* Lavanda */
+.appointment:nth-child(4) .patient-avatar {
+    background: #eee6f6;
+    color: #886aa5;
 }
 
 .patient strong,
@@ -1358,11 +1392,14 @@ body.dashboard-page {
 }
 
 .follow-dot {
-    width: 7px;
-    height: 7px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    background: #b79bd8;
-    box-shadow: 0 0 0 5px #f2edf8;
+
+    background: #e8b9c4;
+
+    box-shadow:
+        0 0 0 5px #faeaee;
 }
 
 .follow-copy strong,
@@ -1563,16 +1600,15 @@ body.dashboard-page {
 /* =========================================================
    KPI PASTEL
    ========================================================= */
-/* 1 — LAVANDA / LOGO */
+/* 1 — ROSA DURAZNO */
 .kpi-card:nth-child(1) {
     background:
         linear-gradient(145deg,
-            #f3edf9 0%,
-            #e8def4 100%);
+            #fff1ed 0%,
+            #f9dfd8 100%);
 
-    border-color: #ddceeb;
+    border-color: #f1d0c8;
 }
-
 
 /* 2 — ROSA DEL CONSULTORIO */
 .kpi-card:nth-child(2) {
@@ -1607,8 +1643,8 @@ body.dashboard-page {
 }
 
 .kpi-card:nth-child(1) .kpi-icon {
-    background: rgba(255, 255, 255, .62);
-    color: #9171b3;
+    background: rgba(255, 255, 255, .65);
+    color: #c77f72;
 }
 
 .kpi-card:nth-child(2) .kpi-icon {
@@ -2148,5 +2184,393 @@ body.dashboard-page {
 
     .dashboard-page .appt-time strong {
         font-size: 12px;
+    }
+}
+
+/* =========================================================
+   PAGE LOADER — SAMANTHA'S STUDIO LAB
+   ========================================================= */
+
+.page-loader {
+    position: fixed;
+    inset: 0;
+
+    display: grid;
+    place-items: center;
+
+    background:
+        radial-gradient(circle at 20% 20%,
+            rgba(232, 185, 196, .34),
+            transparent 28%),
+        radial-gradient(circle at 82% 20%,
+            rgba(185, 216, 229, .40),
+            transparent 28%),
+        radial-gradient(circle at 75% 85%,
+            rgba(242, 212, 111, .28),
+            transparent 25%),
+        linear-gradient(145deg,
+            #fffdfb 0%,
+            #f7f0fb 50%,
+            #f4f8fa 100%);
+
+    z-index: 9999;
+
+    overflow: hidden;
+
+    transition:
+        opacity .55s ease,
+        visibility .55s ease;
+}
+
+.page-loader.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+
+/* ===============================
+   CONTENIDO CENTRAL
+   =============================== */
+
+.loader-content {
+    position: relative;
+    z-index: 5;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    text-align: center;
+
+    animation:
+        loaderAppear .7s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+
+/* ===============================
+   LOGO
+   =============================== */
+
+.loader-logo-wrap {
+    position: relative;
+
+    width: 116px;
+    height: 116px;
+
+    display: grid;
+    place-items: center;
+
+    margin-bottom: 24px;
+}
+
+.loader-logo {
+    width: 94px;
+    height: 94px;
+
+    position: relative;
+    z-index: 2;
+
+    filter:
+        drop-shadow(0 18px 28px rgba(126, 96, 152, .20));
+
+    animation:
+        loaderFloat 2.2s ease-in-out infinite;
+}
+
+
+/* aro animado */
+
+.loader-ring {
+    position: absolute;
+    inset: 0;
+
+    border-radius: 50%;
+
+    border:
+        2px solid rgba(203, 187, 226, .40);
+
+    animation:
+        loaderRing 2s ease-out infinite;
+}
+
+
+/* ===============================
+   MARCA
+   =============================== */
+
+.loader-brand strong {
+    display: block;
+
+    font-size: 22px;
+    font-weight: 800;
+
+    color: #5d4c70;
+
+    letter-spacing: -.02em;
+
+    text-transform: lowercase;
+}
+
+.loader-brand span {
+    display: block;
+
+    margin-top: 6px;
+
+    font-size: 10px;
+
+    text-transform: uppercase;
+
+    letter-spacing: .18em;
+
+    color: #9a86ac;
+}
+
+
+/* ===============================
+   BARRA DE CARGA
+   =============================== */
+
+.loader-line {
+    width: 180px;
+    height: 4px;
+
+    margin-top: 28px;
+
+    overflow: hidden;
+
+    border-radius: 999px;
+
+    background:
+        rgba(203, 187, 226, .20);
+}
+
+.loader-line span {
+    display: block;
+
+    width: 40%;
+    height: 100%;
+
+    border-radius: inherit;
+
+    background:
+        linear-gradient(90deg,
+            #e8b9c4,
+            #cbbbe2,
+            #b9d8e5,
+            #f2d46f);
+
+    animation:
+        loaderProgress 1.45s ease-in-out infinite;
+}
+
+
+/* ===============================
+   TEXTO
+   =============================== */
+
+.loader-content p {
+    margin:
+        16px 0 0;
+
+    font-size: 11px;
+
+    letter-spacing: .04em;
+
+    color: #8f8795;
+}
+
+
+/* ===============================
+   BURBUJAS PASTEL
+   =============================== */
+
+.loader-orb {
+    position: absolute;
+
+    border-radius: 50%;
+
+    filter: blur(2px);
+
+    opacity: .65;
+
+    animation:
+        loaderDrift 5s ease-in-out infinite alternate;
+}
+
+.loader-orb-1 {
+    width: 190px;
+    height: 190px;
+
+    top: -50px;
+    left: -40px;
+
+    background:
+        rgba(232, 185, 196, .42);
+}
+
+.loader-orb-2 {
+    width: 220px;
+    height: 220px;
+
+    right: -70px;
+    top: 18%;
+
+    background:
+        rgba(185, 216, 229, .45);
+
+    animation-delay: -1.2s;
+}
+
+.loader-orb-3 {
+    width: 170px;
+    height: 170px;
+
+    left: 12%;
+    bottom: -50px;
+
+    background:
+        rgba(242, 212, 111, .32);
+
+    animation-delay: -2.4s;
+}
+
+
+/* ===============================
+   ANIMACIONES
+   =============================== */
+
+@keyframes loaderAppear {
+    from {
+        opacity: 0;
+        transform:
+            translateY(16px) scale(.96);
+    }
+
+    to {
+        opacity: 1;
+        transform:
+            translateY(0) scale(1);
+    }
+}
+
+@keyframes loaderFloat {
+
+    0%,
+    100% {
+        transform:
+            translateY(0) rotate(-1deg);
+    }
+
+    50% {
+        transform:
+            translateY(-7px) rotate(1deg);
+    }
+}
+
+@keyframes loaderRing {
+    0% {
+        transform: scale(.78);
+        opacity: .55;
+    }
+
+    100% {
+        transform: scale(1.35);
+        opacity: 0;
+    }
+}
+
+@keyframes loaderProgress {
+    0% {
+        transform:
+            translateX(-120%);
+    }
+
+    50% {
+        transform:
+            translateX(120%);
+    }
+
+    100% {
+        transform:
+            translateX(280%);
+    }
+}
+
+@keyframes loaderDrift {
+    from {
+        transform:
+            translate3d(0, 0, 0) scale(1);
+    }
+
+    to {
+        transform:
+            translate3d(20px, 18px, 0) scale(1.08);
+    }
+}
+
+
+/* ===============================
+   MOBILE
+   =============================== */
+
+@media (max-width: 560px) {
+
+    .loader-logo-wrap {
+        width: 100px;
+        height: 100px;
+
+        margin-bottom: 20px;
+    }
+
+    .loader-logo {
+        width: 80px;
+        height: 80px;
+    }
+
+    .loader-brand strong {
+        font-size: 18px;
+    }
+
+    .loader-brand span {
+        font-size: 9px;
+    }
+
+    .loader-line {
+        width: 150px;
+        margin-top: 24px;
+    }
+
+    .loader-content p {
+        font-size: 10px;
+    }
+
+    .loader-orb-1 {
+        width: 150px;
+        height: 150px;
+    }
+
+    .loader-orb-2 {
+        width: 170px;
+        height: 170px;
+    }
+
+    .loader-orb-3 {
+        width: 130px;
+        height: 130px;
+    }
+}
+
+
+/* accesibilidad */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .loader-logo,
+    .loader-ring,
+    .loader-line span,
+    .loader-orb,
+    .loader-content {
+        animation: none !important;
     }
 }
