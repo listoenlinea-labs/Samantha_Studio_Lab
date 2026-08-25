@@ -1,16 +1,53 @@
 :root {
+    /* =========================================
+       IDENTIDAD SAMANTHA'S STUDIO LAB
+       ========================================= */
+
+    /* Color principal - logo */
+    --primary: #cbbbe2;
+    --primary-dark: #9d83bd;
+    --primary-deep: #715a8d;
+    --primary-soft: #eee7f6;
+    --primary-light: #f8f4fc;
+
+    /* Colores del consultorio */
+    --clinic-blue: #b9d8e5;
+    --clinic-blue-soft: #eaf5f8;
+
+    --clinic-pink: #e8b9c4;
+    --clinic-pink-soft: #faeaee;
+
+    --clinic-yellow: #f2d46f;
+    --clinic-yellow-soft: #fff6d9;
+
+    --clinic-lilac: #cbbbe2;
+    --clinic-lilac-soft: #f0e9f8;
+
+    /* Neutros cálidos */
+    --cream: #fffaf6;
+    --surface: #fffdfb;
+    --white: #ffffff;
+
+    /* Texto */
+    --ink: #40384c;
+    --ink-soft: #746d7c;
+    --ink-muted: #9b93a1;
+
+    /* Estados */
+    --success: #6f9f8b;
+    --warning: #c49754;
+
+    /* Compatibilidad con estilos anteriores */
     --lavender-50: #fbf9fe;
     --lavender-100: #f4effb;
     --lavender-200: #e9e0f6;
     --lavender-300: #d8c9ed;
-    --lavender-400: #c8b4e3;
+    --lavender-400: #cbbbe2;
     --lavender-500: #b79bd8;
-    --lavender-600: #9a7bbd;
-    --ink: #31415b;
-    --ink-soft: #6d7890;
-    --white: #ffffff;
-    --success: #6ea990;
-    --shadow: 0 28px 80px rgba(81, 63, 111, 0.18);
+    --lavender-600: #9d83bd;
+
+    --shadow:
+        0 24px 60px rgba(105, 82, 126, .13);
 }
 
 * {
@@ -31,9 +68,19 @@ body.login-page {
     font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     color: var(--ink);
     background:
-        radial-gradient(circle at 14% 14%, rgba(216, 201, 237, .75), transparent 28%),
-        radial-gradient(circle at 86% 82%, rgba(236, 225, 248, .95), transparent 30%),
-        linear-gradient(145deg, #fdfcff 0%, #f5f0fb 48%, #efe8f7 100%);
+        radial-gradient(circle at 10% 15%,
+            rgba(203, 187, 226, .62),
+            transparent 28%),
+        radial-gradient(circle at 88% 18%,
+            rgba(185, 216, 229, .52),
+            transparent 27%),
+        radial-gradient(circle at 80% 86%,
+            rgba(232, 185, 196, .38),
+            transparent 28%),
+        linear-gradient(145deg,
+            #fffdfb 0%,
+            #f9f5fb 45%,
+            #f5f9fa 100%);
     overflow-x: hidden;
 }
 
@@ -120,9 +167,19 @@ body.login-page {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+
     background:
-        linear-gradient(155deg, rgba(216, 201, 237, .92), rgba(244, 239, 251, .88)),
-        #eee8f8;
+        radial-gradient(circle at 90% 10%,
+            rgba(185, 216, 229, .70),
+            transparent 28%),
+        radial-gradient(circle at 8% 92%,
+            rgba(232, 185, 196, .52),
+            transparent 30%),
+        linear-gradient(145deg,
+            #d8c9ed 0%,
+            #eee5f5 50%,
+            #f9eef1 100%);
+
     overflow: hidden;
 }
 
@@ -404,13 +461,24 @@ input::placeholder {
     border: 0;
     border-radius: 16px;
     cursor: pointer;
-    background: linear-gradient(135deg, #bda7d9, #9b7cbd);
+
+    background:
+        linear-gradient(135deg,
+            #cbbbe2 0%,
+            #aa8aca 100%);
+
     color: white;
     font-size: 14px;
     font-weight: 800;
     letter-spacing: .02em;
-    box-shadow: 0 14px 24px rgba(151, 119, 188, .24);
-    transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+
+    box-shadow:
+        0 14px 26px rgba(157, 131, 189, .28);
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        filter .2s ease;
 }
 
 .submit:hover {
@@ -596,9 +664,20 @@ body.dashboard-page {
     min-height: 100vh;
     display: block;
     padding: 0;
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
     color: var(--ink);
-    background: #f8f6fb;
+
+    background: #faf9f8;
+
     overflow-x: hidden;
 }
 
@@ -628,14 +707,26 @@ body.dashboard-page {
     position: sticky;
     top: 0;
     height: 100vh;
+
     display: flex;
     flex-direction: column;
+
     padding: 26px 18px 20px;
+
     background:
-        radial-gradient(circle at 20% 10%, rgba(255, 255, 255, .14), transparent 26%),
-        linear-gradient(180deg, #6f588c 0%, #59456f 100%);
+        radial-gradient(circle at 15% 8%,
+            rgba(255, 255, 255, .18),
+            transparent 25%),
+        linear-gradient(180deg,
+            #9d83bd 0%,
+            #80649f 48%,
+            #69517f 100%);
+
     color: #fff;
-    box-shadow: 10px 0 35px rgba(72, 52, 96, .10);
+
+    box-shadow:
+        10px 0 35px rgba(91, 70, 111, .12);
+
     z-index: 30;
 }
 
@@ -778,9 +869,15 @@ body.dashboard-page {
 .main-area {
     min-width: 0;
     min-height: 100vh;
+
     background:
-        radial-gradient(circle at 90% 0%, rgba(216, 201, 237, .25), transparent 22%),
-        #f8f7fb;
+        radial-gradient(circle at 95% 2%,
+            rgba(185, 216, 229, .22),
+            transparent 24%),
+        radial-gradient(circle at 5% 96%,
+            rgba(232, 185, 196, .16),
+            transparent 25%),
+        #faf9f8;
 }
 
 .topbar {
@@ -856,18 +953,30 @@ body.dashboard-page {
 
 .primary-action {
     height: 40px;
+
     display: inline-flex;
     align-items: center;
     gap: 8px;
+
     padding: 0 15px;
+
     border: 0;
     border-radius: 12px;
-    background: linear-gradient(135deg, #bda7d9, #9b7cbd);
+
+    background:
+        linear-gradient(135deg,
+            #cbbbe2,
+            #9d83bd);
+
     color: #fff;
+
     font-size: 12px;
     font-weight: 800;
+
     cursor: pointer;
-    box-shadow: 0 9px 20px rgba(151, 119, 188, .20);
+
+    box-shadow:
+        0 9px 20px rgba(157, 131, 189, .25);
 }
 
 /* Content */
@@ -880,13 +989,28 @@ body.dashboard-page {
 .welcome-card {
     position: relative;
     overflow: hidden;
+
     padding: 30px 32px;
-    border: 1px solid #e9e2f1;
+
+    border:
+        1px solid rgba(203, 187, 226, .42);
+
     border-radius: 24px;
+
     background:
-        radial-gradient(circle at 94% 18%, rgba(203, 187, 226, .65), transparent 26%),
-        linear-gradient(135deg, #ffffff 0%, #f5f0fb 100%);
-    box-shadow: 0 14px 38px rgba(86, 64, 111, .07);
+        radial-gradient(circle at 94% 18%,
+            rgba(185, 216, 229, .60),
+            transparent 25%),
+        radial-gradient(circle at 75% 100%,
+            rgba(232, 185, 196, .35),
+            transparent 28%),
+        linear-gradient(135deg,
+            #fffdfb 0%,
+            #f7f1fb 55%,
+            #fff8ed 100%);
+
+    box-shadow:
+        0 14px 38px rgba(90, 68, 105, .07);
 }
 
 .welcome-card::after {
@@ -1439,44 +1563,67 @@ body.dashboard-page {
 /* =========================================================
    KPI PASTEL
    ========================================================= */
+/* 1 — LAVANDA / LOGO */
 .kpi-card:nth-child(1) {
-    background: linear-gradient(145deg, #f4edfb 0%, #eee3f8 100%);
-    border-color: #e2d4f0;
+    background:
+        linear-gradient(145deg,
+            #f3edf9 0%,
+            #e8def4 100%);
+
+    border-color: #ddceeb;
 }
 
+
+/* 2 — ROSA DEL CONSULTORIO */
 .kpi-card:nth-child(2) {
-    background: linear-gradient(145deg, #eef8f4 0%, #e5f3ed 100%);
-    border-color: #d6ebe2;
+    background:
+        linear-gradient(145deg,
+            #fceff2 0%,
+            #f5dfe5 100%);
+
+    border-color: #efd1d9;
 }
 
+
+/* 3 — AMARILLO MANTEQUILLA */
 .kpi-card:nth-child(3) {
-    background: linear-gradient(145deg, #fff5ec 0%, #fcebdd 100%);
-    border-color: #f3dfcf;
+    background:
+        linear-gradient(145deg,
+            #fff9e7 0%,
+            #faefc8 100%);
+
+    border-color: #f2e2a8;
 }
 
+
+/* 4 — AZUL CIELO */
 .kpi-card:nth-child(4) {
-    background: linear-gradient(145deg, #eef4fc 0%, #e5eef9 100%);
-    border-color: #d8e4f2;
+    background:
+        linear-gradient(145deg,
+            #eef8fb 0%,
+            #dceef4 100%);
+
+    border-color: #cce3ec;
 }
 
 .kpi-card:nth-child(1) .kpi-icon {
-    background: rgba(255, 255, 255, .58);
-    color: #9272b7;
+    background: rgba(255, 255, 255, .62);
+    color: #9171b3;
 }
 
 .kpi-card:nth-child(2) .kpi-icon {
-    background: rgba(255, 255, 255, .58);
-    color: #6f9f8b;
+    background: rgba(255, 255, 255, .62);
+    color: #c47f91;
 }
 
 .kpi-card:nth-child(3) .kpi-icon {
-    background: rgba(255, 255, 255, .58);
-    color: #c18c67;
+    background: rgba(255, 255, 255, .62);
+    color: #b89536;
 }
 
 .kpi-card:nth-child(4) .kpi-icon {
-    background: rgba(255, 255, 255, .58);
-    color: #7896bd;
+    background: rgba(255, 255, 255, .62);
+    color: #6f9eb2;
 }
 
 .kpi-card .kpi-trend {
