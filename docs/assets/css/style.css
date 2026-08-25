@@ -1651,9 +1651,18 @@ body.dashboard-page {
         display: block;
         padding: 0;
         overflow-x: hidden;
+
         background:
-            radial-gradient(circle at 15% 8%, rgba(216, 201, 237, .72), transparent 28%),
-            linear-gradient(180deg, #f8f4fc 0%, #fdfcff 100%);
+            radial-gradient(circle at 15% 8%,
+                rgba(203, 187, 226, .55),
+                transparent 28%),
+            radial-gradient(circle at 90% 35%,
+                rgba(185, 216, 229, .28),
+                transparent 30%),
+            radial-gradient(circle at 15% 90%,
+                rgba(232, 185, 196, .20),
+                transparent 28%),
+            #fffaf6;
     }
 
     .login-page .ambient {
@@ -1676,9 +1685,18 @@ body.dashboard-page {
         min-height: auto;
         padding: 28px 24px 24px;
         border-radius: 0 0 28px 28px;
+
         background:
-            radial-gradient(circle at 90% 5%, rgba(255, 255, 255, .46), transparent 25%),
-            linear-gradient(145deg, #d9cbed 0%, #eee7f7 100%);
+            radial-gradient(circle at 90% 5%,
+                rgba(185, 216, 229, .65),
+                transparent 26%),
+            radial-gradient(circle at 8% 95%,
+                rgba(232, 185, 196, .42),
+                transparent 28%),
+            linear-gradient(145deg,
+                #d8c9ed 0%,
+                #eee5f5 55%,
+                #fff5e4 100%);
     }
 
     .login-page .brand-wrap {
