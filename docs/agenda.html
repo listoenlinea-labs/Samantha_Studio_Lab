@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#5f4b78" />
+    <title>Samantha's Studio Lab | Agenda</title>
+    <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+
+<body class="dashboard-page">
+    <div class="page-loader" id="pageLoader">
+        <div class="loader-orb loader-orb-1"></div>
+        <div class="loader-orb loader-orb-2"></div>
+        <div class="loader-orb loader-orb-3"></div>
+
+        <div class="loader-content">
+            <div class="loader-logo-wrap">
+                <svg class="loader-logo" viewBox="0 0 100 100" aria-hidden="true">
+                    <circle cx="50" cy="50" r="47" fill="#cbbbe2" />
+
+                    <g fill="none" stroke="#fff" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round">
+
+                        <path d="M44 23c-8 2-12 12-12 25 0 11 3 19 8 25 3 4 3 11 4 18" />
+                        <path d="M49 21c13-2 20 10 20 28 0 13-3 23-8 30-2 3-2 7-1 14" />
+                        <path d="M35 30l-14 2M34 39l-15 2M34 49l-14 3M36 59l-13 4M39 68l-10 5" />
+                        <path d="M50 54c3 3 8 4 12 2 3-2 5-5 6-9" stroke-width="4.4" />
+
+                        <circle cx="58" cy="43" r="2.6" fill="#fff" stroke="none" />
+                    </g>
+                </svg>
+
+                <span class="loader-ring"></span>
+            </div>
+
+            <div class="loader-brand">
+                <strong>samantha's studio lab</strong>
+                <span>odontopediatría</span>
+            </div>
+
+            <div class="loader-line">
+                <span></span>
+            </div>
+
+            <p>Preparando la agenda...</p>
+        </div>
+    </div>
+    <div class="dashboard-app">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <svg class="mini-logo" viewBox="0 0 100 100" aria-hidden="true">
+                    <circle cx="50" cy="50" r="47" fill="#cbbbe2" />
+                    <g fill="none" stroke="#fff" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M44 23c-8 2-12 12-12 25 0 11 3 19 8 25 3 4 3 11 4 18" />
+                        <path d="M49 21c13-2 20 10 20 28 0 13-3 23-8 30-2 3-2 7-1 14" />
+                        <path d="M35 30l-14 2M34 39l-15 2M34 49l-14 3M36 59l-13 4M39 68l-10 5" />
+                        <path d="M50 54c3 3 8 4 12 2 3-2 5-5 6-9" stroke-width="4.4" />
+                        <circle cx="58" cy="43" r="2.6" fill="#fff" stroke="none" />
+                    </g>
+                </svg>
+                <div><strong>samantha's studio lab</strong><span>odontopediatría</span></div>
+            </div>
+
+            <div class="nav-label">Principal</div>
+            <nav class="sidebar-nav">
+                <a class="nav-item" href="index.html">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                        <path d="M4 13h6V4H4v9Zm0 7h6v-4H4v4Zm10 0h6v-9h-6v9Zm0-16v4h6V4h-6Z" />
+                    </svg>
+                    Inicio
+                </a>
+                <a class="nav-item active" href="agenda.html">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                        <rect x="3" y="5" width="18" height="16" rx="2" />
+                        <path d="M7 3v4M17 3v4M3 10h18" />
+                    </svg>
+                    Agenda <span class="badge">8</span>
+                </a>
+                <a class="nav-item" href="#">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                    Pacientes
+                </a>
+                <a class="nav-item" href="#">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z" />
+                    </svg>
+                    Tratamientos
+                </a>
+                <a class="nav-item" href="#">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                        <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z" />
+                        <path d="M8 9h8M8 13h5" />
+                    </svg>
+                    Seguimientos <span class="badge">3</span>
+                </a>
+            </nav>
+
+            <div class="nav-label">Administración</div>
+            <nav class="sidebar-nav">
+                <a class="nav-item" href="#">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                        <path d="M3 3v18h18" />
+                        <path d="m7 16 4-5 3 3 5-7" />
+                    </svg>
+                    Reportes
+                </a>
+                <a class="nav-item" href="#">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                        <circle cx="12" cy="12" r="3" />
+                        <path
+                            d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.09A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.1 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H2.3v-4h.09A1.7 1.7 0 0 0 4.1 8.5a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 8.5 4.1a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V2.3h4v.09A1.7 1.7 0 0 0 15 4.1a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 8.5c.11.39.32.74.6 1 .3.27.68.41 1.1.4h.09v4h-.09A1.7 1.7 0 0 0 19.4 15Z" />
+                    </svg>
+                    Configuración
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-profile">
+                    <div class="avatar">SS</div>
+                    <div><strong>Dra. Samantha</strong><span>Propietaria · Administrador</span></div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-area">
+            <header class="topbar">
+                <div style="display:flex;align-items:center;gap:12px;min-width:0">
+                    <button class="icon-btn mobile-menu" id="menuBtn" aria-label="Abrir menú">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                            <path d="M4 7h16M4 12h16M4 17h16" />
+                        </svg>
+                    </button>
+                    <div class="page-title"><small>Organización clínica</small><strong>Agenda del consultorio</strong>
+                    </div>
+                </div>
+                <div class="top-actions">
+                    <button class="icon-btn" aria-label="Buscar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="m20 20-3.5-3.5" />
+                        </svg>
+                    </button>
+                    <button class="icon-btn" aria-label="Notificaciones">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />
+                        </svg>
+                    </button>
+                    <button class="primary-action">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                            <path d="M12 5v14M5 12h14" />
+                        </svg>
+                        <span>Nueva cita</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="dashboard-content agenda-content">
+                <section class="agenda-hero">
+                    <div>
+                        <p class="eyebrow">Agenda clínica</p>
+                        <h1>Organiza el día sin perder de vista a ningún paciente.</h1>
+                        <p>Consulta horarios, estados, tratamientos y disponibilidad del equipo desde una sola vista.
+                        </p>
+                    </div>
+                    <div class="agenda-hero-actions">
+                        <button class="agenda-secondary-btn" id="todayBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                                <path d="M12 8v4l3 2" />
+                                <circle cx="12" cy="12" r="9" />
+                            </svg>
+                            Hoy
+                        </button>
+                        <button class="primary-action agenda-new-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                                <path d="M12 5v14M5 12h14" />
+                            </svg>
+                            <span>Nueva cita</span>
+                        </button>
+                    </div>
+                </section>
+
+                <section class="agenda-summary-grid">
+                    <article class="agenda-summary-card peach">
+                        <span class="agenda-summary-icon">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <rect x="3.5" y="5.5" width="17" height="15" rx="3"></rect>
+                                <path d="M7.5 3.5v4M16.5 3.5v4M3.5 9.5h17"></path>
+                                <path d="M8 13h3M8 16.5h5"></path>
+                            </svg>
+                        </span>
+
+                        <div>
+                            <strong>8</strong>
+                            <span>Citas del día</span>
+                        </div>
+                    </article>
+
+                    <article class="agenda-summary-card pink">
+                        <span class="agenda-summary-icon">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="8.5"></circle>
+                                <path d="m8.5 12 2.3 2.3 4.8-5"></path>
+                            </svg>
+                        </span>
+
+                        <div>
+                            <strong>6</strong>
+                            <span>Confirmadas</span>
+                        </div>
+                    </article>
+
+                    <article class="agenda-summary-card yellow">
+                        <span class="agenda-summary-icon">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="8.5"></circle>
+                                <path d="M12 7.5v5l3.2 2"></path>
+                            </svg>
+                        </span>
+
+                        <div>
+                            <strong>2</strong>
+                            <span>Por confirmar</span>
+                        </div>
+                    </article>
+
+                    <article class="agenda-summary-card blue">
+                        <span class="agenda-summary-icon">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <circle cx="9" cy="8" r="3"></circle>
+                                <path d="M3.5 19v-1.3A4.2 4.2 0 0 1 7.7 13.5h2.6a4.2 4.2 0 0 1 4.2 4.2V19"></path>
+                                <circle cx="17.2" cy="8.8" r="2.2"></circle>
+                                <path d="M16 13.8h1.7a3 3 0 0 1 3 3V18"></path>
+                            </svg>
+                        </span>
+
+                        <div>
+                            <strong>3</strong>
+                            <span>Profesionales</span>
+                        </div>
+                    </article>
+                </section>
+
+                <section class="agenda-toolbar">
+                    <div class="agenda-date-nav">
+                        <button class="agenda-icon-btn" id="prevDay" aria-label="Día anterior">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="m14.5 6-6 6 6 6"></path>
+                            </svg>
+                        </button>
+                        <div class="agenda-date-copy"><small id="agendaWeekday">Miércoles</small><strong
+                                id="agendaFullDate">26 de agosto de 2026</strong></div>
+                        <button class="agenda-icon-btn" id="nextDay" aria-label="Día siguiente">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="m9.5 6 6 6-6 6"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="agenda-toolbar-right">
+                        <label class="agenda-filter">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                                <circle cx="11" cy="11" r="7" />
+                                <path d="m20 20-3.5-3.5" />
+                            </svg>
+                            <input type="search" placeholder="Buscar paciente...">
+                        </label>
+                        <select class="agenda-select">
+                            <option>Todo el equipo</option>
+                            <option>Dra. Samantha</option>
+                            <option>Dra. Mariana</option>
+                            <option>Dra. Sofía</option>
+                        </select>
+                    </div>
+                </section>
+
+                <section class="agenda-layout">
+                    <article class="agenda-day-panel">
+                        <div class="agenda-day-head">
+                            <div>
+                                <h2>Agenda del día</h2>
+                                <p>Horarios disponibles y citas programadas</p>
+                            </div>
+                            <span class="agenda-capacity">62% ocupado</span>
+                        </div>
+                        <div class="day-schedule">
+                            <div class="time-row">
+                                <div class="schedule-time"><strong>08:00</strong><span>Disponible</span></div>
+                                <div class="schedule-slot empty"><span class="empty-line"></span><span>Horario
+                                        disponible</span></div>
+                            </div>
+                            <div class="time-row">
+                                <div class="schedule-time"><strong>09:00</strong><span>45 min</span></div>
+                                <div class="schedule-slot appointment-card rose">
+                                    <div class="schedule-patient">
+                                        <div class="patient-avatar">AV</div>
+                                        <div><strong>Ana Valeria López</strong><span>Tutor: Laura López</span></div>
+                                    </div>
+                                    <div class="schedule-service"><strong>Limpieza dental</strong><span>Dra.
+                                            Samantha</span></div><span
+                                        class="status-pill confirmed">Confirmada</span><button
+                                        class="schedule-menu">•••</button>
+                                </div>
+                            </div>
+                            <div class="time-row">
+                                <div class="schedule-time"><strong>10:15</strong><span>30 min</span></div>
+                                <div class="schedule-slot appointment-card blue">
+                                    <div class="schedule-patient">
+                                        <div class="patient-avatar">MR</div>
+                                        <div><strong>Mateo Ramírez</strong><span>Tutor: Carlos Ramírez</span></div>
+                                    </div>
+                                    <div class="schedule-service"><strong>Revisión posterior</strong><span>Dra.
+                                            Samantha</span></div><span class="status-pill waiting">Por
+                                        confirmar</span><button class="schedule-menu" aria-label="Más opciones">
+                                        <svg viewBox="0 0 24 24" fill="none">
+                                            <circle cx="5" cy="12" r="1.4"></circle>
+                                            <circle cx="12" cy="12" r="1.4"></circle>
+                                            <circle cx="19" cy="12" r="1.4"></circle>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="time-row">
+                                <div class="schedule-time"><strong>11:30</strong><span>60 min</span></div>
+                                <div class="schedule-slot appointment-card yellow">
+                                    <div class="schedule-patient">
+                                        <div class="patient-avatar">SO</div>
+                                        <div><strong>Sofía Ortega</strong><span>Tutor: Daniela Ortega</span></div>
+                                    </div>
+                                    <div class="schedule-service"><strong>Aplicación de flúor</strong><span>Dra.
+                                            Samantha</span></div><span
+                                        class="status-pill confirmed">Confirmada</span><button
+                                        class="schedule-menu">•••</button>
+                                </div>
+                            </div>
+                            <div class="time-row">
+                                <div class="schedule-time"><strong>12:30</strong><span>Disponible</span></div>
+                                <div class="schedule-slot empty"><span class="empty-line"></span><span>Horario
+                                        disponible</span></div>
+                            </div>
+                            <div class="time-row current">
+                                <div class="schedule-time"><strong>13:00</strong><span>45 min</span></div>
+                                <div class="schedule-slot appointment-card lilac">
+                                    <div class="schedule-patient">
+                                        <div class="patient-avatar">LE</div>
+                                        <div><strong>Leonardo Esparza</strong><span>Tutor: Fernanda Silva</span></div>
+                                    </div>
+                                    <div class="schedule-service"><strong>Control de ortodoncia</strong><span>Dra.
+                                            Samantha</span></div><span class="status-pill done">En
+                                        consulta</span><button class="schedule-menu" aria-label="Más opciones">
+                                        <svg viewBox="0 0 24 24" fill="none">
+                                            <circle cx="5" cy="12" r="1.4"></circle>
+                                            <circle cx="12" cy="12" r="1.4"></circle>
+                                            <circle cx="19" cy="12" r="1.4"></circle>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="time-row">
+                                <div class="schedule-time"><strong>14:00</strong><span>Comida</span></div>
+                                <div class="schedule-slot blocked"><span>Bloque no disponible</span></div>
+                            </div>
+                            <div class="time-row">
+                                <div class="schedule-time"><strong>15:30</strong><span>45 min</span></div>
+                                <div class="schedule-slot appointment-card rose">
+                                    <div class="schedule-patient">
+                                        <div class="patient-avatar">EM</div>
+                                        <div><strong>Emiliano Mendoza</strong><span>Tutor: Natalia Mendoza</span></div>
+                                    </div>
+                                    <div class="schedule-service"><strong>Primera valoración</strong><span>Dra.
+                                            Mariana</span></div><span
+                                        class="status-pill confirmed">Confirmada</span><button
+                                        class="schedule-menu">•••</button>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <aside class="agenda-side">
+                        <article class="panel agenda-mini-calendar">
+                            <div class="panel-head">
+                                <div>
+                                    <h2>Agosto 2026</h2>
+                                    <p>Selecciona una fecha</p>
+                                </div>
+                            </div>
+                            <div class="mini-calendar-weekdays">
+                                <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
+                            </div>
+                            <div class="mini-calendar-days">
+                                <span class="muted">27</span><span class="muted">28</span><span
+                                    class="muted">29</span><span class="muted">30</span><span
+                                    class="muted">31</span><span>1</span><span>2</span>
+                                <span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>
+                                <span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span>
+                                <span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span>
+                                <span>24</span><span>25</span><span
+                                    class="selected">26</span><span>27</span><span>28</span><span>29</span><span>30</span>
+                                <span>31</span><span class="muted">1</span><span class="muted">2</span><span
+                                    class="muted">3</span><span class="muted">4</span><span class="muted">5</span><span
+                                    class="muted">6</span>
+                            </div>
+                        </article>
+                        <article class="panel">
+                            <div class="panel-head">
+                                <div>
+                                    <h2>Disponibilidad del equipo</h2>
+                                    <p>Turnos del día</p>
+                                </div>
+                            </div>
+                            <div class="doctor-list">
+                                <div class="doctor-row"><span class="doctor-avatar pink">SR</span>
+                                    <div><strong>Dra. Samantha</strong><span>09:00 — 19:00</span></div><span
+                                        class="doctor-status active">Disponible</span>
+                                </div>
+                                <div class="doctor-row"><span class="doctor-avatar blue">MM</span>
+                                    <div><strong>Dra. Mariana</strong><span>10:00 — 17:00</span></div><span
+                                        class="doctor-status active">Disponible</span>
+                                </div>
+                                <div class="doctor-row"><span class="doctor-avatar yellow">SP</span>
+                                    <div><strong>Dra. Sofía</strong><span>13:00 — 19:00</span></div><span
+                                        class="doctor-status later">13:00</span>
+                                </div>
+                            </div>
+                        </article>
+                        <article class="agenda-note-card">
+                            <div class="agenda-note-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path
+                                        d="M20 14.5a4 4 0 0 1-4 4H9l-5 2.5v-5.2A4.5 4.5 0 0 1 3 13V7.5A4.5 4.5 0 0 1 7.5 3h8A4.5 4.5 0 0 1 20 7.5Z">
+                                    </path>
+                                    <path d="M8 9h8M8 12.5h5"></path>
+                                </svg>
+                            </div>
+                            <div><strong>2 citas requieren confirmación</strong><span>Podrán enviarse recordatorios por
+                                    WhatsApp cuando conectemos la automatización.</span></div>
+                        </article>
+                    </aside>
+                </section>
+                <div class="notice"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M12 8v4M12 16h.01" />
+                    </svg>Esta vista utiliza información de demostración. Más adelante la agenda se conectará con
+                    pacientes, tratamientos, dentistas y disponibilidad real.</div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        const menuBtn = document.getElementById('menuBtn');
+        menuBtn?.addEventListener('click', () => document.body.classList.toggle('nav-open'));
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 900 && document.body.classList.contains('nav-open') && !e.target.closest('.sidebar') && !e.target.closest('#menuBtn')) {
+                document.body.classList.remove('nav-open');
+            }
+        });
+
+        const pageLoader = document.getElementById('pageLoader');
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                pageLoader?.classList.add('is-hidden');
+                setTimeout(() => pageLoader?.remove(), 600);
+            }, 900);
+        });
+
+        const weekdayTarget = document.getElementById('agendaWeekday');
+        const fullDateTarget = document.getElementById('agendaFullDate');
+        let selectedDate = new Date(2026, 7, 26);
+
+        function renderAgendaDate() {
+            const weekday = new Intl.DateTimeFormat('es-MX', { weekday: 'long' }).format(selectedDate);
+            weekdayTarget.textContent = weekday.charAt(0).toUpperCase() + weekday.slice(1);
+            fullDateTarget.textContent = new Intl.DateTimeFormat('es-MX', { day: 'numeric', month: 'long', year: 'numeric' }).format(selectedDate);
+        }
+
+        document.getElementById('prevDay')?.addEventListener('click', () => { selectedDate.setDate(selectedDate.getDate() - 1); renderAgendaDate(); });
+        document.getElementById('nextDay')?.addEventListener('click', () => { selectedDate.setDate(selectedDate.getDate() + 1); renderAgendaDate(); });
+        document.getElementById('todayBtn')?.addEventListener('click', () => { selectedDate = new Date(); renderAgendaDate(); });
+        renderAgendaDate();
+    </script>
+</body>
+
+</html>

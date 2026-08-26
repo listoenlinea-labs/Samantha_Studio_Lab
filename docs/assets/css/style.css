@@ -1529,6 +1529,15 @@ body.dashboard-page {
         display: none;
     }
 
+    .agenda-summary-icon svg {
+        width: 17px;
+        height: 17px;
+    }
+
+    .agenda-summary-card {
+        min-height: 112px;
+    }
+
     .primary-action span {
         display: none;
     }
@@ -2573,4 +2582,1725 @@ body.dashboard-page {
     .loader-content {
         animation: none !important;
     }
+}
+
+
+/* =========================================================
+   AGENDA
+   ========================================================= */
+.agenda-content {
+    padding-top: 26px
+}
+
+.agenda-hero {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 28px 30px;
+    border: 1px solid rgba(203, 187, 226, .34);
+    border-radius: 24px;
+    background: radial-gradient(circle at 92% 18%, rgba(185, 216, 229, .48), transparent 26%), radial-gradient(circle at 72% 100%, rgba(232, 185, 196, .26), transparent 25%), linear-gradient(135deg, #fffdfb 0%, #f8f3fb 58%, #fff9ea 100%);
+    box-shadow: 0 14px 38px rgba(90, 68, 105, .06)
+}
+
+.agenda-hero h1 {
+    margin: 0;
+    max-width: 760px;
+    color: #43394f;
+    font-size: clamp(28px, 3vw, 40px);
+    line-height: 1.06;
+    letter-spacing: -.035em
+}
+
+.agenda-hero>div:first-child>p:not(.eyebrow) {
+    max-width: 720px;
+    margin: 12px 0 0;
+    color: var(--ink-soft);
+    font-size: 13px;
+    line-height: 1.6
+}
+
+.agenda-hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 0 0 auto
+}
+
+.agenda-secondary-btn,
+.agenda-icon-btn {
+    border: 1px solid #e6deeb;
+    background: rgba(255, 255, 255, .9);
+    color: #766683;
+    cursor: pointer;
+    transition: .2s ease
+}
+
+.agenda-secondary-btn {
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 14px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 800
+}
+
+.agenda-secondary-btn svg {
+    width: 17px;
+    height: 17px;
+    stroke: currentColor
+}
+
+.agenda-secondary-btn:hover,
+.agenda-icon-btn:hover {
+    border-color: var(--primary);
+    background: var(--primary-light)
+}
+
+.agenda-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 16px
+}
+
+.agenda-summary-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+
+    gap: 12px;
+
+    min-height: 122px;
+
+    padding: 16px 18px;
+
+    border: 1px solid;
+    border-radius: 18px;
+}
+
+.agenda-summary-card.peach {
+    background: linear-gradient(145deg, #fff1ed, #f9dfd8);
+    border-color: #f1d0c8
+}
+
+.agenda-summary-card.pink {
+    background: linear-gradient(145deg, #fceff2, #f5dfe5);
+    border-color: #efd1d9
+}
+
+.agenda-summary-card.yellow {
+    background: linear-gradient(145deg, #fff9e7, #faefc8);
+    border-color: #f2e2a8
+}
+
+.agenda-summary-card.blue {
+    background: linear-gradient(145deg, #eef8fb, #dceef4);
+    border-color: #cce3ec
+}
+
+.agenda-summary-icon {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 13px;
+
+    background: rgba(255, 255, 255, .72);
+    border: 1px solid rgba(255, 255, 255, .88);
+
+    box-shadow:
+        0 5px 14px rgba(78, 61, 102, .05);
+}
+
+.agenda-summary-icon svg {
+    width: 20px;
+    height: 20px;
+
+    display: block;
+
+    stroke: currentColor;
+    stroke-width: 1.65;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* =========================================
+   COLORES DE ICONOS — AGENDA
+   ========================================= */
+
+/* Citas del día — durazno */
+.agenda-summary-card.peach .agenda-summary-icon {
+    color: #c77f72;
+    background: rgba(255, 255, 255, .68);
+}
+
+/* Confirmadas — rosa */
+.agenda-summary-card.pink .agenda-summary-icon {
+    color: #c47f91;
+    background: rgba(255, 255, 255, .68);
+}
+
+/* Por confirmar — amarillo */
+.agenda-summary-card.yellow .agenda-summary-icon {
+    color: #b89536;
+    background: rgba(255, 255, 255, .68);
+}
+
+/* Profesionales — azul */
+.agenda-summary-card.blue .agenda-summary-icon {
+    color: #6f9eb2;
+    background: rgba(255, 255, 255, .68);
+}
+
+.agenda-summary-card strong,
+.agenda-summary-card span {
+    display: block
+}
+
+.agenda-summary-card strong {
+    color: #40384c;
+    font-size: 26px;
+    line-height: 1;
+    letter-spacing: -.035em;
+}
+
+.agenda-summary-card div>span {
+    margin-top: 6px;
+    color: #7e7486;
+    font-size: 10px;
+    line-height: 1.3;
+}
+
+.agenda-toolbar {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 15px 17px;
+    border: 1px solid #ebe6ef;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, .90);
+    box-shadow: 0 9px 25px rgba(72, 52, 96, .04)
+}
+
+.agenda-date-nav {
+    display: flex;
+    align-items: center;
+    gap: 11px
+}
+
+.agenda-icon-btn {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    font-size: 22px
+}
+
+.agenda-date-copy {
+    min-width: 190px
+}
+
+.agenda-date-copy small,
+.agenda-date-copy strong {
+    display: block
+}
+
+.agenda-date-copy small {
+    color: #a18cae;
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .12em
+}
+
+.agenda-date-copy strong {
+    margin-top: 3px;
+    color: #443b4e;
+    font-size: 14px
+}
+
+.agenda-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 9px
+}
+
+.agenda-filter {
+    position: relative;
+    width: 220px;
+    margin: 0
+}
+
+.agenda-filter svg {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    stroke: #9888a5;
+    pointer-events: none
+}
+
+.agenda-filter input {
+    width: 100%;
+    height: 38px;
+    padding: 0 13px 0 36px;
+    border: 1px solid #e9e3ed;
+    border-radius: 11px;
+    background: #fcfbfd;
+    color: #554b5d;
+    outline: none;
+    font-size: 11px
+}
+
+.agenda-select {
+    height: 38px;
+    padding: 0 32px 0 12px;
+    border: 1px solid #e9e3ed;
+    border-radius: 11px;
+    background: #fcfbfd;
+    color: #62586a;
+    outline: none;
+    font-size: 11px
+}
+
+.agenda-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(300px, .65fr);
+    gap: 16px;
+    margin-top: 16px
+}
+
+.agenda-day-panel {
+    min-width: 0;
+    padding: 20px;
+    border: 1px solid #ebe7ef;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, .94);
+    box-shadow: 0 10px 28px rgba(72, 52, 96, .05)
+}
+
+.agenda-day-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px
+}
+
+.agenda-day-head h2 {
+    margin: 0;
+    color: #403849;
+    font-size: 15px
+}
+
+.agenda-day-head p {
+    margin: 4px 0 0;
+    color: #9a929f;
+    font-size: 10px
+}
+
+.agenda-capacity {
+    padding: 6px 9px;
+    border-radius: 999px;
+    background: var(--primary-light);
+    color: var(--primary-deep);
+    font-size: 9px;
+    font-weight: 800
+}
+
+.day-schedule {
+    display: grid
+}
+
+.time-row {
+    display: grid;
+    grid-template-columns: 82px minmax(0, 1fr);
+    gap: 12px;
+    min-height: 78px;
+    padding: 10px 0;
+    border-top: 1px solid #f0edf2
+}
+
+.time-row:first-child {
+    border-top: 0
+}
+
+.schedule-time {
+    padding-top: 8px
+}
+
+.schedule-time strong,
+.schedule-time span {
+    display: block
+}
+
+.schedule-time strong {
+    color: #483f51;
+    font-size: 12px
+}
+
+.schedule-time span {
+    margin-top: 3px;
+    color: #a39aa8;
+    font-size: 8px
+}
+
+.schedule-slot {
+    min-width: 0;
+    border-radius: 15px
+}
+
+.schedule-slot.empty {
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    border: 1px dashed #ddd5e2;
+    color: #a59ca9;
+    font-size: 9px
+}
+
+.empty-line {
+    width: 24px;
+    height: 1px;
+    background: #d9d0df
+}
+
+.schedule-slot.blocked {
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    background: #f5f3f5;
+    color: #a59da7;
+    font-size: 9px
+}
+
+.appointment-card {
+    min-height: 66px;
+    display: grid;
+    grid-template-columns: minmax(170px, 1.35fr) minmax(150px, .9fr) auto 28px;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 12px;
+    border: 1px solid transparent
+}
+
+.appointment-card.rose {
+    background: #fff6f7;
+    border-color: #f4dde2
+}
+
+.appointment-card.blue {
+    background: #f4fafc;
+    border-color: #dcecf2
+}
+
+.appointment-card.yellow {
+    background: #fffaf0;
+    border-color: #f2e6bc
+}
+
+.appointment-card.lilac {
+    background: #faf7fd;
+    border-color: #e7def0
+}
+
+.schedule-patient {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0
+}
+
+.schedule-patient strong,
+.schedule-patient span,
+.schedule-service strong,
+.schedule-service span {
+    display: block
+}
+
+.schedule-patient strong,
+.schedule-service strong {
+    color: #4d4455;
+    font-size: 10px
+}
+
+.schedule-patient span,
+.schedule-service span {
+    margin-top: 3px;
+    color: #9c949f;
+    font-size: 8px
+}
+
+.schedule-menu {
+    width: 30px;
+    height: 30px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid rgba(218, 208, 224, .70);
+    border-radius: 10px;
+
+    background: rgba(255, 255, 255, .72);
+
+    color: #96889f;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        color .2s ease,
+        transform .2s ease;
+}
+
+.schedule-menu svg {
+    width: 17px;
+    height: 17px;
+
+    fill: currentColor;
+}
+
+.time-row.current .schedule-time strong {
+    color: var(--primary-deep)
+}
+
+.schedule-menu:hover {
+    background: #ffffff;
+    color: var(--primary-deep);
+    transform: translateY(-1px);
+}
+
+.time-row.current .schedule-slot {
+    box-shadow: inset 3px 0 0 var(--primary-dark)
+}
+
+.agenda-side {
+    display: grid;
+    gap: 16px;
+    align-content: start
+}
+
+.agenda-mini-calendar {
+    padding: 18px
+}
+
+.mini-calendar-weekdays,
+.mini-calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    text-align: center
+}
+
+.mini-calendar-weekdays {
+    margin-bottom: 7px
+}
+
+.mini-calendar-weekdays span {
+    color: #a89dac;
+    font-size: 8px;
+    font-weight: 800
+}
+
+.mini-calendar-days span {
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+    color: #5f5567;
+    font-size: 9px;
+    cursor: pointer
+}
+
+.mini-calendar-days span:hover {
+    background: var(--primary-light)
+}
+
+.mini-calendar-days .muted {
+    color: #c8c0ca
+}
+
+.mini-calendar-days .selected {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    font-weight: 900;
+    box-shadow: 0 7px 14px rgba(157, 131, 189, .20)
+}
+
+.doctor-list {
+    display: grid
+}
+
+.doctor-row {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 9px;
+    min-height: 56px;
+    border-top: 1px solid #f0edf2
+}
+
+.doctor-row:first-child {
+    border-top: 0
+}
+
+.doctor-avatar {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    font-size: 8px;
+    font-weight: 900
+}
+
+.doctor-avatar.pink {
+    background: #f9e3e8;
+    color: #b66f81
+}
+
+.doctor-avatar.blue {
+    background: #e2f1f6;
+    color: #6595aa
+}
+
+.doctor-avatar.yellow {
+    background: #fff2c9;
+    color: #aa8730
+}
+
+.doctor-row div strong,
+.doctor-row div span {
+    display: block
+}
+
+.doctor-row div strong {
+    color: #514758;
+    font-size: 9px
+}
+
+.doctor-row div span {
+    margin-top: 3px;
+    color: #a199a6;
+    font-size: 8px
+}
+
+.doctor-status {
+    padding: 5px 7px;
+    border-radius: 999px;
+    font-size: 7px;
+    font-weight: 800
+}
+
+.doctor-status.active {
+    background: #edf6f2;
+    color: #557e6d
+}
+
+.doctor-status.later {
+    background: #fff6d9;
+    color: #9d8034
+}
+
+.agenda-note-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 15px;
+    border: 1px solid #f0dfe4;
+    border-radius: 17px;
+    background: linear-gradient(145deg, #fff7f9, #fffdfb)
+}
+
+.agenda-note-icon {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 12px;
+
+    background:
+        linear-gradient(145deg,
+            #fae7eb,
+            #f8dce3);
+
+    color: #ba7486;
+
+    border: 1px solid #f0d4dc;
+}
+
+.agenda-note-icon svg {
+    width: 18px;
+    height: 18px;
+
+    stroke: currentColor;
+    stroke-width: 1.65;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.agenda-note-card strong,
+.agenda-note-card span {
+    display: block
+}
+
+.agenda-note-card strong {
+    color: #554b5d;
+    font-size: 9px
+}
+
+.agenda-note-card span {
+    margin-top: 4px;
+    color: #968d9c;
+    font-size: 8px;
+    line-height: 1.5
+}
+
+@media(max-width:1180px) {
+    .agenda-layout {
+        grid-template-columns: 1fr
+    }
+
+    .agenda-side {
+        grid-template-columns: repeat(2, minmax(0, 1fr))
+    }
+
+    .agenda-note-card {
+        grid-column: 1/-1
+    }
+}
+
+@media(max-width:900px) {
+    .agenda-hero {
+        align-items: flex-start
+    }
+
+    .agenda-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr))
+    }
+
+    .agenda-toolbar {
+        align-items: stretch;
+        flex-direction: column
+    }
+
+    .agenda-toolbar-right {
+        width: 100%
+    }
+
+    .agenda-filter {
+        flex: 1;
+        width: auto
+    }
+}
+
+@media(max-width:680px) {
+    .agenda-hero {
+        flex-direction: column;
+        padding: 22px 18px
+    }
+
+    .agenda-hero h1 {
+        font-size: 29px
+    }
+
+    .agenda-hero-actions {
+        width: 100%
+    }
+
+    .agenda-secondary-btn,
+    .agenda-new-btn {
+        flex: 1;
+        justify-content: center
+    }
+
+    .agenda-summary-grid {
+        gap: 9px
+    }
+
+    .agenda-summary-card {
+        min-height: 82px;
+        padding: 12px;
+        gap: 9px
+    }
+
+    .agenda-summary-icon {
+        width: 35px;
+        height: 35px;
+        flex-basis: 35px;
+    }
+
+    .agenda-summary-card strong {
+        font-size: 21px
+    }
+
+    .agenda-date-nav {
+        justify-content: space-between
+    }
+
+    .agenda-date-copy {
+        min-width: 0;
+        flex: 1;
+        text-align: center
+    }
+
+    .agenda-toolbar-right {
+        flex-direction: column
+    }
+
+    .agenda-filter,
+    .agenda-select {
+        width: 100%
+    }
+
+    .agenda-side {
+        grid-template-columns: 1fr
+    }
+
+    .agenda-note-card {
+        grid-column: auto
+    }
+
+    .time-row {
+        grid-template-columns: 55px minmax(0, 1fr);
+        gap: 8px
+    }
+
+    .appointment-card {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px 10px
+    }
+
+    .appointment-card .schedule-patient {
+        grid-column: 1
+    }
+
+    .appointment-card .schedule-service {
+        grid-column: 1;
+        padding-left: 42px
+    }
+
+    .appointment-card .status-pill {
+        grid-column: 1;
+        justify-self: start;
+        margin-left: 42px
+    }
+
+    .appointment-card .schedule-menu {
+        grid-column: 2;
+        grid-row: 1;
+        align-self: start
+    }
+}
+
+@media(max-width:420px) {
+    .agenda-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr))
+    }
+
+    .agenda-summary-card {
+        min-width: 0
+    }
+
+    .agenda-summary-card div>span {
+        font-size: 9px
+    }
+
+    .agenda-day-panel {
+        padding: 15px 12px
+    }
+
+    .agenda-day-head {
+        align-items: center
+    }
+
+    .agenda-capacity {
+        font-size: 8px
+    }
+
+    .time-row {
+        grid-template-columns: 48px minmax(0, 1fr)
+    }
+}
+
+
+/* =========================================================
+   AGENDA SUMMARY — AJUSTE FINAL
+   Icono perfectamente centrado + número a la derecha
+   + descripción debajo. Mantiene 2x2 en móvil.
+   ========================================================= */
+
+/* Tarjetas */
+.agenda-summary-card {
+    display: grid;
+
+    /* icono | número | descripción */
+    grid-template-columns: 42px auto 1fr;
+    grid-template-rows: 42px;
+
+    align-items: center;
+
+    column-gap: 14px;
+
+    min-height: 105px;
+    padding: 15px 17px;
+
+    border: 1px solid;
+    border-radius: 18px;
+}
+
+/* El div intermedio del HTML no debe crear otra caja de layout */
+.agenda-summary-card>div {
+    display: contents;
+}
+
+/* Cuadrito del icono */
+.agenda-summary-icon {
+    width: 42px;
+    height: 42px;
+
+    grid-column: 1;
+    grid-row: 1;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    align-self: center;
+    justify-self: center;
+
+    margin: 0;
+    padding: 0;
+
+    border-radius: 13px;
+
+    background: rgba(255, 255, 255, .72);
+    border: 1px solid rgba(255, 255, 255, .88);
+
+    box-shadow:
+        0 5px 14px rgba(78, 61, 102, .05);
+}
+
+/* SVG dentro del cuadrito */
+.agenda-summary-icon svg {
+    width: 19px;
+    height: 19px;
+
+    display: block;
+
+    flex: 0 0 19px;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    position: static !important;
+    inset: auto !important;
+    transform: none !important;
+
+    stroke: currentColor;
+    stroke-width: 1.65;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Número, a la derecha del icono */
+.agenda-summary-card strong {
+    grid-column: 2;
+    grid-row: 1;
+
+    align-self: center;
+    justify-self: start;
+
+    display: block;
+    margin: 0;
+
+    color: #40384c;
+
+    font-size: 29px;
+    line-height: 1;
+    font-weight: 850;
+
+    letter-spacing: -.035em;
+}
+
+/* Texto descriptivo debajo */
+.agenda-summary-card div>span {
+    grid-column: 3;
+    grid-row: 1;
+
+    align-self: end;
+    justify-self: start;
+
+    display: block;
+    margin: 0 0 7px 0;
+
+    color: #6f6678;
+
+    font-size: 13px;
+    line-height: 1.2;
+    font-weight: 600;
+}
+
+/* Colores de iconos */
+.agenda-summary-card.peach .agenda-summary-icon {
+    color: #c77f72;
+    background: rgba(255, 255, 255, .72);
+}
+
+.agenda-summary-card.pink .agenda-summary-icon {
+    color: #c47f91;
+    background: rgba(255, 255, 255, .72);
+}
+
+.agenda-summary-card.yellow .agenda-summary-icon {
+    color: #b89536;
+    background: rgba(255, 255, 255, .72);
+}
+
+.agenda-summary-card.blue .agenda-summary-icon {
+    color: #6f9eb2;
+    background: rgba(255, 255, 255, .72);
+}
+
+/* Tablet: conserva cuatro tarjetas cuando hay espacio */
+@media (max-width: 900px) {
+    .agenda-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+}
+
+/* Celular: 2 x 2 */
+@media (max-width: 680px) {
+    .agenda-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 9px;
+    }
+
+    .agenda-summary-card {
+        grid-template-columns: 35px auto 1fr;
+        grid-template-rows: 35px;
+
+        min-width: 0;
+        min-height: 82px;
+
+        padding: 12px 13px;
+
+        column-gap: 9px;
+    }
+
+    .agenda-summary-icon {
+        width: 35px;
+        height: 35px;
+    }
+
+    .agenda-summary-icon svg {
+        width: 17px;
+        height: 17px;
+        flex-basis: 17px;
+    }
+
+    .agenda-summary-card strong {
+        font-size: 22px;
+    }
+
+    .agenda-summary-card div>span {
+        font-size: 10px;
+        line-height: 1.15;
+    }
+}
+
+/* Pantallas muy angostas: seguimos conservando 2 x 2 */
+@media (max-width: 420px) {
+    .agenda-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 8px;
+    }
+
+    .agenda-summary-card {
+        grid-template-columns: 33px minmax(0, 1fr);
+        grid-template-rows: 33px auto;
+
+        min-height: 88px;
+        padding: 11px;
+
+        column-gap: 8px;
+        row-gap: 7px;
+    }
+
+    .agenda-summary-icon {
+        width: 33px;
+        height: 33px;
+        border-radius: 11px;
+    }
+
+    .agenda-summary-icon svg {
+        width: 16px;
+        height: 16px;
+        flex-basis: 16px;
+    }
+
+    .agenda-summary-card strong {
+        font-size: 20px;
+    }
+
+    .agenda-summary-card div>span {
+        font-size: 8.5px;
+    }
+}
+
+/* =========================================================
+   INDEX KPI — MISMO DISEÑO QUE AGENDA
+   Icono + número + descripción en horizontal
+   ========================================================= */
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 18px;
+}
+
+
+/* TARJETA */
+.kpi-card {
+    position: relative;
+
+    display: grid;
+    grid-template-columns: 42px auto 1fr;
+    grid-template-rows: 42px;
+
+    align-items: center;
+
+    column-gap: 14px;
+
+    min-width: 0;
+    min-height: 105px;
+
+    padding: 15px 17px;
+
+    border: 1px solid;
+    border-radius: 18px;
+
+    box-shadow: 0 10px 28px rgba(72, 52, 96, .05);
+}
+
+
+/* =========================================================
+   IMPORTANTE:
+   kpi-top deja de controlar el layout
+   ========================================================= */
+
+.kpi-top {
+    display: contents;
+}
+
+
+/* =========================================================
+   ICONO
+   ========================================================= */
+
+.kpi-icon {
+    grid-column: 1;
+    grid-row: 1;
+
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    align-self: center;
+    justify-self: center;
+
+    margin: 0;
+    padding: 0;
+
+    border-radius: 13px;
+
+    background: rgba(255, 255, 255, .72);
+    border: 1px solid rgba(255, 255, 255, .88);
+
+    box-shadow:
+        0 5px 14px rgba(78, 61, 102, .05);
+}
+
+
+.kpi-icon svg {
+    width: 19px;
+    height: 19px;
+
+    display: block;
+
+    margin: 0;
+    padding: 0;
+
+    stroke: currentColor;
+
+    stroke-width: 1.65;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+
+/* =========================================================
+   NÚMERO
+   ========================================================= */
+
+.kpi-value {
+    grid-column: 2;
+    grid-row: 1;
+
+    align-self: center;
+    justify-self: start;
+
+    margin: 0;
+
+    color: #40384c;
+
+    font-size: 29px;
+    line-height: 1;
+    font-weight: 850;
+
+    letter-spacing: -.035em;
+}
+
+
+/* =========================================================
+   TEXTO
+   Queda al ras de la parte inferior del número
+   igual que Agenda
+   ========================================================= */
+
+.kpi-label {
+    grid-column: 3;
+    grid-row: 1;
+
+    align-self: center;
+    justify-self: start;
+
+    margin: 0;
+
+    color: #6f6678;
+
+    font-size: 13px;
+    line-height: 1.2;
+    font-weight: 600;
+
+    min-width: 0;
+}
+
+/* =========================================================
+   INDICADOR SUPERIOR DERECHO
+   Hoy / +12% mes / Esta semana / 94%
+   ========================================================= */
+
+.kpi-trend {
+    position: absolute;
+
+    top: 14px;
+    right: 14px;
+
+    padding: 5px 8px;
+
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, .68);
+    border: 1px solid rgba(255, 255, 255, .80);
+
+    color: #817789;
+
+    font-size: 9px;
+    line-height: 1;
+    font-weight: 800;
+
+    white-space: nowrap;
+
+    backdrop-filter: blur(5px);
+}
+
+
+/* =========================================================
+   COLORES
+   Mismos tonos que Agenda
+   ========================================================= */
+
+/* 1 — DURAZNO */
+.kpi-card:nth-child(1) {
+    background:
+        linear-gradient(145deg,
+            #fff1ed 0%,
+            #f9dfd8 100%);
+
+    border-color: #f1d0c8;
+}
+
+.kpi-card:nth-child(1) .kpi-icon {
+    color: #c77f72;
+}
+
+
+/* 2 — ROSA */
+.kpi-card:nth-child(2) {
+    background:
+        linear-gradient(145deg,
+            #fceff2 0%,
+            #f5dfe5 100%);
+
+    border-color: #efd1d9;
+}
+
+.kpi-card:nth-child(2) .kpi-icon {
+    color: #c47f91;
+}
+
+
+/* 3 — AMARILLO */
+.kpi-card:nth-child(3) {
+    background:
+        linear-gradient(145deg,
+            #fff9e7 0%,
+            #faefc8 100%);
+
+    border-color: #f2e2a8;
+}
+
+.kpi-card:nth-child(3) .kpi-icon {
+    color: #b89536;
+}
+
+
+/* 4 — AZUL */
+.kpi-card:nth-child(4) {
+    background:
+        linear-gradient(145deg,
+            #eef8fb 0%,
+            #dceef4 100%);
+
+    border-color: #cce3ec;
+}
+
+.kpi-card:nth-child(4) .kpi-icon {
+    color: #6f9eb2;
+}
+
+/* =========================================================
+   INDEX KPI — TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+}
+
+
+/* =========================================================
+   INDEX KPI — CELULAR
+   Mantener 2 x 2
+   ========================================================= */
+
+@media (max-width: 680px) {
+
+    .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 9px;
+    }
+
+
+    .kpi-card {
+        grid-template-columns: 35px auto 1fr;
+        grid-template-rows: 35px;
+
+        min-width: 0;
+        min-height: 82px;
+
+        padding: 12px 13px;
+
+        column-gap: 9px;
+    }
+
+
+    .kpi-icon {
+        width: 35px;
+        height: 35px;
+
+        border-radius: 11px;
+    }
+
+
+    .kpi-icon svg {
+        width: 17px;
+        height: 17px;
+    }
+
+
+    .kpi-value {
+        font-size: 22px;
+    }
+
+
+    .kpi-label {
+        margin-bottom: 5px;
+
+        font-size: 10px;
+        line-height: 1.15;
+    }
+
+
+    .kpi-trend {
+        top: 8px;
+        right: 8px;
+
+        padding: 4px 6px;
+
+        font-size: 7px;
+    }
+}
+
+/* =========================================================
+   TARJETAS RESUMEN — ALINEACIÓN FINAL
+   INICIO + AGENDA
+   ========================================================= */
+
+
+/* =========================
+   INICIO
+   ========================= */
+
+.dashboard-page .kpi-card {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    gap: 14px;
+
+    min-height: 105px;
+    padding: 16px 18px;
+
+    border-radius: 18px;
+}
+
+
+/* Icono */
+
+.dashboard-page .kpi-card .kpi-icon {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0;
+    padding: 0;
+}
+
+
+/* SVG perfectamente centrado */
+
+.dashboard-page .kpi-card .kpi-icon svg {
+    display: block;
+
+    width: 19px;
+    height: 19px;
+
+    margin: 0;
+}
+
+
+/* Número */
+
+.dashboard-page .kpi-card .kpi-value {
+    flex: 0 0 auto;
+
+    margin: 0;
+
+    font-size: 28px;
+    line-height: 1;
+    font-weight: 850;
+}
+
+
+/* Descripción */
+
+.dashboard-page .kpi-card .kpi-label {
+    flex: 1;
+
+    margin: 0;
+
+    align-self: center;
+
+    font-size: 13px;
+    line-height: 1.2;
+    font-weight: 600;
+
+    color: #6f6678;
+}
+
+
+/* Badge superior derecho */
+
+.dashboard-page .kpi-card .kpi-trend {
+    position: absolute;
+
+    top: 14px;
+    right: 14px;
+
+    margin: 0;
+}
+
+
+
+/* =========================
+   AGENDA
+   ========================= */
+
+.dashboard-page .agenda-summary-card {
+    position: relative;
+
+    display: flex;
+    flex-direction: row;
+
+    align-items: center;
+    justify-content: flex-start;
+
+    gap: 14px;
+
+    min-height: 105px;
+    padding: 16px 18px;
+
+    border-radius: 18px;
+}
+
+
+/*
+   IMPORTANTE:
+   Tu HTML tiene un DIV envolviendo
+   el número y descripción.
+*/
+
+.dashboard-page .agenda-summary-card>div {
+    display: flex;
+
+    flex-direction: row;
+    align-items: center;
+
+    gap: 14px;
+
+    min-width: 0;
+}
+
+
+/* Icono */
+
+.dashboard-page .agenda-summary-icon {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0;
+    padding: 0;
+}
+
+
+/* SVG */
+
+.dashboard-page .agenda-summary-icon svg {
+    display: block;
+
+    width: 19px;
+    height: 19px;
+
+    margin: 0;
+}
+
+
+/* Número */
+
+.dashboard-page .agenda-summary-card strong {
+    flex: 0 0 auto;
+
+    margin: 0;
+
+    font-size: 26px;
+    line-height: 1;
+    font-weight: 850;
+
+    color: #40384c;
+}
+
+
+/* Descripción */
+
+.dashboard-page .agenda-summary-card>div>span {
+    margin: 0;
+
+    font-size: 13px;
+    line-height: 1.2;
+    font-weight: 600;
+
+    color: #6f6678;
+}
+
+/* =========================================================
+   TARJETAS RESUMEN — MOBILE
+   ========================================================= */
+
+@media (max-width: 680px) {
+
+    .dashboard-page .kpi-card,
+    .dashboard-page .agenda-summary-card {
+        min-height: 88px;
+
+        padding: 14px;
+
+        gap: 11px;
+    }
+
+
+    .dashboard-page .kpi-card .kpi-icon,
+    .dashboard-page .agenda-summary-icon {
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
+    }
+
+
+    .dashboard-page .kpi-card .kpi-icon svg,
+    .dashboard-page .agenda-summary-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+
+
+    .dashboard-page .kpi-card .kpi-value,
+    .dashboard-page .agenda-summary-card strong {
+        font-size: 23px;
+    }
+
+
+    .dashboard-page .kpi-card .kpi-label,
+    .dashboard-page .agenda-summary-card>div>span {
+        font-size: 11px;
+    }
+
+
+    .dashboard-page .kpi-card .kpi-trend {
+        top: 9px;
+        right: 9px;
+
+        font-size: 8px;
+    }
+}
+
+/* =========================================================
+   AGENDA — FLECHAS NAVEGACIÓN DE FECHA
+   ========================================================= */
+
+.agenda-date-nav button {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: 1px solid #e4daee;
+    border-radius: 12px;
+
+    background: #fbf8fe;
+
+    color: #8f70b3;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        color .2s ease,
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+
+/* Flecha SVG */
+.agenda-date-nav button svg {
+    display: block;
+
+    width: 18px;
+    height: 18px;
+
+    margin: 0;
+
+    fill: none !important;
+    stroke: currentColor !important;
+
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    color: #8f70b3;
+}
+
+
+/* Hover */
+.agenda-date-nav button:hover {
+    background: #f0e8f8;
+    border-color: #cbbbe2;
+
+    color: #715a8d;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 5px 14px rgba(113, 90, 141, .12);
+}
+
+
+/* Al hacer clic */
+.agenda-date-nav button:active {
+    transform: translateY(0) scale(.96);
+
+    background: #e9def4;
+}
+
+
+/* Por si el path tiene un stroke definido directamente */
+.agenda-date-nav button svg path,
+.agenda-date-nav button svg polyline,
+.agenda-date-nav button svg line {
+    stroke: currentColor !important;
 }
