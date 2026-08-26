@@ -4352,6 +4352,71 @@ body.dashboard-page {
         0 14px 38px rgba(90, 68, 105, .07);
 }
 
+.report-save-btn {
+    height: 36px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    padding: 0 13px;
+
+    border: 1px solid #d9cbea;
+    border-radius: 11px;
+
+    background: #f2ebf8;
+
+    color: #80639f;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        color .2s ease,
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+.report-save-btn svg {
+    width: 15px;
+    height: 15px;
+
+    fill: none;
+
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.report-save-btn:hover {
+    background: #e9def4;
+    border-color: #cbbbe2;
+
+    color: #70528f;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 5px 14px rgba(126, 96, 158, .10);
+}
+
+.report-save-btn:active {
+    transform: translateY(0) scale(.97);
+}
+
+.report-save-btn.saved {
+    background: #edf6f2;
+    border-color: #d6e9df;
+
+    color: #5e8a76;
+}
 
 .reports-hero::after {
     content: "";

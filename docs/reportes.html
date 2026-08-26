@@ -534,6 +534,7 @@
 
                             <div class="report-table-actions">
 
+
                                 <button class="report-secondary-btn" id="filterBtn" type="button" aria-expanded="false">
 
                                     <svg viewBox="0 0 24 24" fill="none">
@@ -547,6 +548,20 @@
                                 </button>
 
 
+                                <!-- NUEVO BOTÓN -->
+                                <button class="report-save-btn" id="saveReportBtn" type="button">
+
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <path d="M5 3h12l2 2v16H5z"></path>
+                                        <path d="M8 3v6h8V3"></path>
+                                        <path d="M8 21v-7h8v7"></path>
+                                    </svg>
+
+                                    Guardar ahora
+
+                                </button>
+
+
                                 <button class="report-add-btn" id="addRowBtn" type="button">
 
                                     <svg viewBox="0 0 24 24" fill="none">
@@ -556,6 +571,7 @@
                                     Agregar fila
 
                                 </button>
+
 
                             </div>
 
@@ -1671,6 +1687,7 @@
         const tableBody = document.getElementById('reportTableBody');
         const addRowBtn = document.getElementById('addRowBtn');
         const addMovementBtn = document.getElementById('addMovementBtn');
+        const saveReportBtn = document.getElementById('saveReportBtn');
 
         const STORAGE_KEY = 'samanthaStudioLab_reportDailyRows_v1';
         const AUTOSAVE_SECONDS = 300;
@@ -2031,6 +2048,30 @@
             }, 450);
         }
 
+        saveReportBtn?.addEventListener('click', () => {
+
+            saveRows();
+
+            const originalText = saveReportBtn.innerHTML;
+
+            saveReportBtn.classList.add('saved');
+
+            saveReportBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none">
+            <path d="m5 12 4 4L19 6"></path>
+        </svg>
+
+        Guardado
+    `;
+
+            setTimeout(() => {
+
+                saveReportBtn.classList.remove('saved');
+                saveReportBtn.innerHTML = originalText;
+
+            }, 1800);
+
+        });
         function scheduleSave() {
             clearTimeout(saveDebounceTimer);
 
