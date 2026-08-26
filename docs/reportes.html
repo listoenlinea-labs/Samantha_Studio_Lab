@@ -7,7 +7,7 @@
 
     <title>Reportes | Samantha's Studio Lab</title>
 
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 
 <body class="dashboard-page reports-page">
@@ -20,14 +20,21 @@
         <aside class="sidebar">
 
             <div class="sidebar-brand">
-
-                <img src="assets/logo-white.png" alt="Samantha's Studio Lab" class="mini-logo">
+                <svg class="mini-logo" viewBox="0 0 100 100" aria-hidden="true">
+                    <circle cx="50" cy="50" r="47" fill="#cbbbe2" />
+                    <g fill="none" stroke="#fff" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M44 23c-8 2-12 12-12 25 0 11 3 19 8 25 3 4 3 11 4 18" />
+                        <path d="M49 21c13-2 20 10 20 28 0 13-3 23-8 30-2 3-2 7-1 14" />
+                        <path d="M35 30l-14 2M34 39l-15 2M34 49l-14 3M36 59l-13 4M39 68l-10 5" />
+                        <path d="M50 54c3 3 8 4 12 2 3-2 5-5 6-9" stroke-width="4.4" />
+                        <circle cx="58" cy="43" r="2.6" fill="#fff" stroke="none" />
+                    </g>
+                </svg>
 
                 <div>
                     <strong>samantha's studio lab</strong>
-                    <span>Odontopediatría</span>
+                    <span>odontopediatría</span>
                 </div>
-
             </div>
 
 
@@ -172,7 +179,7 @@
 
                 <div class="top-actions">
 
-                    <button class="icon-btn mobile-menu" aria-label="Abrir menú">
+                    <button class="icon-btn mobile-menu" id="menuBtn" aria-label="Abrir menú">
 
                         <svg viewBox="0 0 24 24" fill="none">
                             <path d="M4 6h16M4 12h16M4 18h16"></path>
@@ -257,946 +264,1165 @@
                  TABS
                  ================================================= -->
 
-                <div class="report-tabs">
+                <div class="report-tabs" role="tablist" aria-label="Secciones de reportes">
 
-                    <button class="report-tab active">
+                    <button class="report-tab active" type="button" role="tab" aria-selected="true"
+                        data-report-tab="registro">
                         Registro del día
                     </button>
 
-                    <button class="report-tab">
+                    <button class="report-tab" type="button" role="tab" aria-selected="false" data-report-tab="resumen">
                         Resumen y análisis
                     </button>
 
-                    <button class="report-tab">
+                    <button class="report-tab" type="button" role="tab" aria-selected="false"
+                        data-report-tab="historial">
                         Historial
                     </button>
 
                 </div>
 
 
-                <!-- =================================================
+                <section class="report-tab-panel" data-report-panel="registro" role="tabpanel">
+                    <!-- =================================================
                  KPIS
                  ================================================= -->
 
-                <section class="report-kpis">
+                    <section class="report-kpis">
 
 
-                    <article class="report-kpi peach">
+                        <article class="report-kpi peach">
 
-                        <div class="report-kpi-icon">
+                            <div class="report-kpi-icon">
 
-                            <svg viewBox="0 0 24 24" fill="none">
-                                <circle cx="12" cy="12" r="9"></circle>
-                                <path d="M16 8h-6a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H8"></path>
-                                <path d="M12 6v12"></path>
-                            </svg>
-
-                        </div>
-
-                        <div>
-                            <span>Ingresos del día</span>
-                            <strong>$18,450</strong>
-                            <small>12 movimientos registrados</small>
-                        </div>
-
-                    </article>
-
-
-                    <article class="report-kpi pink">
-
-                        <div class="report-kpi-icon">
-
-                            <svg viewBox="0 0 24 24" fill="none">
-                                <path d="M3 3v18h18"></path>
-                                <path d="m7 8 4 4 4-3 5 5"></path>
-                            </svg>
-
-                        </div>
-
-                        <div>
-                            <span>Gastos</span>
-                            <strong>$3,280</strong>
-                            <small>Clínica + laboratorio</small>
-                        </div>
-
-                    </article>
-
-
-                    <article class="report-kpi yellow">
-
-                        <div class="report-kpi-icon">
-
-                            <svg viewBox="0 0 24 24" fill="none">
-                                <path d="M4 19V9"></path>
-                                <path d="M10 19V5"></path>
-                                <path d="M16 19v-7"></path>
-                                <path d="M22 19V3"></path>
-                            </svg>
-
-                        </div>
-
-                        <div>
-                            <span>Utilidad estimada</span>
-                            <strong>$15,170</strong>
-                            <small>82.2% del ingreso</small>
-                        </div>
-
-                    </article>
-
-
-                    <article class="report-kpi blue">
-
-                        <div class="report-kpi-icon">
-
-                            <svg viewBox="0 0 24 24" fill="none">
-                                <circle cx="9" cy="7" r="4"></circle>
-                                <path d="M2 21v-2a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v2"></path>
-                                <path d="M17 11h5M19.5 8.5v5"></path>
-                            </svg>
-
-                        </div>
-
-                        <div>
-                            <span>Pacientes atendidos</span>
-                            <strong>14</strong>
-                            <small>De 16 citas programadas</small>
-                        </div>
-
-                    </article>
-
-                </section>
-
-
-                <!-- =================================================
-                 CAPTURA
-                 ================================================= -->
-
-                <section class="report-panel report-entry-panel">
-
-
-                    <div class="report-panel-head">
-
-                        <div>
-
-                            <div class="report-title-row">
-
-                                <h2>Registro operativo del día</h2>
-
-                                <span class="autosave-status">
-
-                                    <span class="autosave-dot"></span>
-
-                                    Guardado automáticamente
-
-                                </span>
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <circle cx="12" cy="12" r="9"></circle>
+                                    <path d="M16 8h-6a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H8"></path>
+                                    <path d="M12 6v12"></path>
+                                </svg>
 
                             </div>
-
-                            <p>
-                                Captura cada movimiento como en una hoja de cálculo.
-                            </p>
-
-                        </div>
-
-
-                        <div class="report-table-actions">
-
-                            <button class="report-secondary-btn">
-
-                                <svg viewBox="0 0 24 24" fill="none">
-                                    <path d="M3 6h18"></path>
-                                    <path d="M8 12h8"></path>
-                                    <path d="M10 18h4"></path>
-                                </svg>
-
-                                Filtrar
-
-                            </button>
-
-
-                            <button class="report-add-btn">
-
-                                <svg viewBox="0 0 24 24" fill="none">
-                                    <path d="M12 5v14M5 12h14"></path>
-                                </svg>
-
-                                Agregar fila
-
-                            </button>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="spreadsheet-wrap">
-
-                        <table class="report-spreadsheet">
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>#</th>
-                                    <th>Hora</th>
-                                    <th>Paciente</th>
-                                    <th>Doctora</th>
-                                    <th>Tratamiento</th>
-                                    <th>Pago</th>
-                                    <th>Ingreso</th>
-                                    <th>Laboratorio</th>
-                                    <th>Otros gastos</th>
-                                    <th>Utilidad</th>
-                                    <th>Estado</th>
-                                    <th>Notas</th>
-
-                                </tr>
-
-                            </thead>
-
-
-                            <tbody>
-
-
-                                <tr>
-
-                                    <td class="row-number">1</td>
-
-                                    <td>
-                                        <input value="09:00">
-                                    </td>
-
-                                    <td>
-                                        <input value="Ana Valeria López">
-                                    </td>
-
-                                    <td>
-                                        <select>
-                                            <option>Dra. Samantha</option>
-                                            <option>Dra. Daniela</option>
-                                            <option>Dra. Fernanda</option>
-                                        </select>
-                                    </td>
-
-                                    <td>
-                                        <input value="Limpieza dental">
-                                    </td>
-
-                                    <td>
-                                        <select>
-                                            <option>Tarjeta</option>
-                                            <option>Efectivo</option>
-                                            <option>Transferencia</option>
-                                        </select>
-                                    </td>
-
-                                    <td>
-                                        <input class="money-input" value="$1,200">
-                                    </td>
-
-                                    <td>
-                                        <input class="money-input" value="$0">
-                                    </td>
-
-                                    <td>
-                                        <input class="money-input" value="$80">
-                                    </td>
-
-                                    <td class="profit-cell">
-                                        $1,120
-                                    </td>
-
-                                    <td>
-                                        <span class="report-status paid">
-                                            Pagado
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <input placeholder="Agregar nota...">
-                                    </td>
-
-                                </tr>
-
-
-                                <tr>
-
-                                    <td class="row-number">2</td>
-
-                                    <td>
-                                        <input value="10:15">
-                                    </td>
-
-                                    <td>
-                                        <input value="Mateo Ramírez">
-                                    </td>
-
-                                    <td>
-                                        <select>
-                                            <option>Dra. Samantha</option>
-                                            <option>Dra. Daniela</option>
-                                            <option>Dra. Fernanda</option>
-                                        </select>
-                                    </td>
-
-                                    <td>
-                                        <input value="Revisión posterior">
-                                    </td>
-
-                                    <td>
-                                        <select>
-                                            <option>Efectivo</option>
-                                            <option>Tarjeta</option>
-                                            <option>Transferencia</option>
-                                        </select>
-                                    </td>
-
-                                    <td>
-                                        <input class="money-input" value="$850">
-                                    </td>
-
-                                    <td>
-                                        <input class="money-input" value="$0">
-                                    </td>
-
-                                    <td>
-                                        <input class="money-input" value="$0">
-                                    </td>
-
-                                    <td class="profit-cell">
-                                        $850
-                                    </td>
-
-                                    <td>
-                                        <span class="report-status pending">
-                                            Pendiente
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <input placeholder="Agregar nota...">
-                                    </td>
-
-                                </tr>
-
-
-                                <tr>
-
-                                    <td class="row-number">3</td>
-
-                                    <td>
-                                        <input value="11:30">
-                                    </td>
-
-                                    <td>
-                                        <input value="Sofía Ortega">
-                                    </td>
-
-                                    <td>
-                                        <select>
-                                            <option>Dra. Daniela</option>
-                                            <option>Dra. Samantha</option>
-                                            <option>Dra. Fernanda</option>
-                                        </select>
-                                    </td>
-
-                                    <td>
-                                        <input value="Aplicación de flúor">
-                                    </td>
-
-                                    <td>
-                                        <select>
-                                            <option>Transferencia</option>
-                                            <option>Tarjeta</option>
-                                            <option>Efectivo</option>
-                                        </select>
-                                    </td>
-
-                                    <td>
-                                        <input class="money-input" value="$950">
-                                    </td>
-
-                                    <td>
-                                        <input class="money-input" value="$120">
-                                    </td>
-
-                                    <td>
-                                        <input class="money-input" value="$45">
-                                    </td>
-
-                                    <td class="profit-cell">
-                                        $785
-                                    </td>
-
-                                    <td>
-                                        <span class="report-status paid">
-                                            Pagado
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <input placeholder="Agregar nota...">
-                                    </td>
-
-                                </tr>
-
-
-                                <tr class="new-row">
-
-                                    <td class="row-number">4</td>
-
-                                    <td colspan="11">
-
-                                        <button class="spreadsheet-new-row">
-
-                                            <svg viewBox="0 0 24 24" fill="none">
-                                                <path d="M12 5v14M5 12h14"></path>
-                                            </svg>
-
-                                            Agregar nuevo movimiento
-
-                                        </button>
-
-                                    </td>
-
-                                </tr>
-
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-
-                    <div class="spreadsheet-footer">
-
-                        <span>
-                            Último guardado: 15:30
-                        </span>
-
-                        <strong>
-                            Próximo autoguardado en 4:32
-                        </strong>
-
-                    </div>
-
-                </section>
-
-
-                <!-- =================================================
-                 RESUMEN POR DOCTORA
-                 ================================================= -->
-
-                <div class="reports-two-columns">
-
-
-                    <section class="report-panel">
-
-
-                        <div class="report-panel-head">
 
                             <div>
-                                <h2>Producción por doctora</h2>
-                                <p>Ingresos y gastos generados durante la jornada.</p>
+                                <span>Ingresos del día</span>
+                                <strong>$18,450</strong>
+                                <small>12 movimientos registrados</small>
                             </div>
 
-                            <button class="report-text-btn">
-                                Ver detalle
-                            </button>
-
-                        </div>
+                        </article>
 
 
-                        <div class="doctor-report-list">
+                        <article class="report-kpi pink">
 
+                            <div class="report-kpi-icon">
 
-                            <div class="doctor-report-row">
-
-                                <div class="doctor-avatar lavender">
-                                    SS
-                                </div>
-
-                                <div class="doctor-info">
-
-                                    <strong>Dra. Samantha</strong>
-
-                                    <span>7 pacientes · 8 tratamientos</span>
-
-                                </div>
-
-
-                                <div class="doctor-money">
-
-                                    <span>Ingresos</span>
-                                    <strong>$9,850</strong>
-
-                                </div>
-
-
-                                <div class="doctor-money expense">
-
-                                    <span>Gastos</span>
-                                    <strong>$1,460</strong>
-
-                                </div>
-
-
-                                <div class="doctor-money profit">
-
-                                    <span>Utilidad</span>
-                                    <strong>$8,390</strong>
-
-                                </div>
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M3 3v18h18"></path>
+                                    <path d="m7 8 4 4 4-3 5 5"></path>
+                                </svg>
 
                             </div>
 
+                            <div>
+                                <span>Gastos</span>
+                                <strong>$3,280</strong>
+                                <small>Clínica + laboratorio</small>
+                            </div>
 
-                            <div class="doctor-report-row">
-
-                                <div class="doctor-avatar pink">
-                                    DR
-                                </div>
-
-                                <div class="doctor-info">
-
-                                    <strong>Dra. Daniela</strong>
-
-                                    <span>4 pacientes · 5 tratamientos</span>
-
-                                </div>
+                        </article>
 
 
-                                <div class="doctor-money">
+                        <article class="report-kpi yellow">
 
-                                    <span>Ingresos</span>
-                                    <strong>$5,400</strong>
+                            <div class="report-kpi-icon">
 
-                                </div>
-
-
-                                <div class="doctor-money expense">
-
-                                    <span>Gastos</span>
-                                    <strong>$1,120</strong>
-
-                                </div>
-
-
-                                <div class="doctor-money profit">
-
-                                    <span>Utilidad</span>
-                                    <strong>$4,280</strong>
-
-                                </div>
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M4 19V9"></path>
+                                    <path d="M10 19V5"></path>
+                                    <path d="M16 19v-7"></path>
+                                    <path d="M22 19V3"></path>
+                                </svg>
 
                             </div>
 
+                            <div>
+                                <span>Utilidad estimada</span>
+                                <strong>$15,170</strong>
+                                <small>82.2% del ingreso</small>
+                            </div>
 
-                            <div class="doctor-report-row">
-
-                                <div class="doctor-avatar blue">
-                                    FE
-                                </div>
-
-                                <div class="doctor-info">
-
-                                    <strong>Dra. Fernanda</strong>
-
-                                    <span>3 pacientes · 3 tratamientos</span>
-
-                                </div>
+                        </article>
 
 
-                                <div class="doctor-money">
+                        <article class="report-kpi blue">
 
-                                    <span>Ingresos</span>
-                                    <strong>$3,200</strong>
+                            <div class="report-kpi-icon">
 
-                                </div>
-
-
-                                <div class="doctor-money expense">
-
-                                    <span>Gastos</span>
-                                    <strong>$700</strong>
-
-                                </div>
-
-
-                                <div class="doctor-money profit">
-
-                                    <span>Utilidad</span>
-                                    <strong>$2,500</strong>
-
-                                </div>
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M2 21v-2a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v2"></path>
+                                    <path d="M17 11h5M19.5 8.5v5"></path>
+                                </svg>
 
                             </div>
 
+                            <div>
+                                <span>Pacientes atendidos</span>
+                                <strong>14</strong>
+                                <small>De 16 citas programadas</small>
+                            </div>
 
-                        </div>
+                        </article>
 
                     </section>
 
 
-                    <!-- GASTOS -->
+                    <!-- =================================================
+                 CAPTURA
+                 ================================================= -->
 
-                    <section class="report-panel">
+                    <section class="report-panel report-entry-panel">
 
 
                         <div class="report-panel-head">
 
                             <div>
-                                <h2>Gastos del día</h2>
-                                <p>Distribución de los egresos registrados.</p>
+
+                                <div class="report-title-row">
+
+                                    <h2>Registro operativo del día</h2>
+
+                                    <span class="autosave-status">
+
+                                        <span class="autosave-dot"></span>
+
+                                        Guardado automáticamente
+
+                                    </span>
+
+                                </div>
+
+                                <p>
+                                    Captura cada movimiento como en una hoja de cálculo.
+                                </p>
+
                             </div>
 
-                            <strong class="expense-total">
-                                $3,280
+
+                            <div class="report-table-actions">
+
+                                <button class="report-secondary-btn">
+
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <path d="M3 6h18"></path>
+                                        <path d="M8 12h8"></path>
+                                        <path d="M10 18h4"></path>
+                                    </svg>
+
+                                    Filtrar
+
+                                </button>
+
+
+                                <button class="report-add-btn">
+
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <path d="M12 5v14M5 12h14"></path>
+                                    </svg>
+
+                                    Agregar fila
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="spreadsheet-wrap">
+
+                            <table class="report-spreadsheet">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>#</th>
+                                        <th>Hora</th>
+                                        <th>Paciente</th>
+                                        <th>Doctora</th>
+                                        <th>Tratamiento</th>
+                                        <th>Pago</th>
+                                        <th>Ingreso</th>
+                                        <th>Laboratorio</th>
+                                        <th>Otros gastos</th>
+                                        <th>Utilidad</th>
+                                        <th>Estado</th>
+                                        <th>Notas</th>
+
+                                    </tr>
+
+                                </thead>
+
+
+                                <tbody>
+
+
+                                    <tr>
+
+                                        <td class="row-number">1</td>
+
+                                        <td>
+                                            <input value="09:00">
+                                        </td>
+
+                                        <td>
+                                            <input value="Ana Valeria López">
+                                        </td>
+
+                                        <td>
+                                            <select>
+                                                <option>Dra. Samantha</option>
+                                                <option>Dra. Daniela</option>
+                                                <option>Dra. Fernanda</option>
+                                            </select>
+                                        </td>
+
+                                        <td>
+                                            <input value="Limpieza dental">
+                                        </td>
+
+                                        <td>
+                                            <select>
+                                                <option>Tarjeta</option>
+                                                <option>Efectivo</option>
+                                                <option>Transferencia</option>
+                                            </select>
+                                        </td>
+
+                                        <td>
+                                            <input class="money-input" value="$1,200">
+                                        </td>
+
+                                        <td>
+                                            <input class="money-input" value="$0">
+                                        </td>
+
+                                        <td>
+                                            <input class="money-input" value="$80">
+                                        </td>
+
+                                        <td class="profit-cell">
+                                            $1,120
+                                        </td>
+
+                                        <td>
+                                            <span class="report-status paid">
+                                                Pagado
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            <input placeholder="Agregar nota...">
+                                        </td>
+
+                                    </tr>
+
+
+                                    <tr>
+
+                                        <td class="row-number">2</td>
+
+                                        <td>
+                                            <input value="10:15">
+                                        </td>
+
+                                        <td>
+                                            <input value="Mateo Ramírez">
+                                        </td>
+
+                                        <td>
+                                            <select>
+                                                <option>Dra. Samantha</option>
+                                                <option>Dra. Daniela</option>
+                                                <option>Dra. Fernanda</option>
+                                            </select>
+                                        </td>
+
+                                        <td>
+                                            <input value="Revisión posterior">
+                                        </td>
+
+                                        <td>
+                                            <select>
+                                                <option>Efectivo</option>
+                                                <option>Tarjeta</option>
+                                                <option>Transferencia</option>
+                                            </select>
+                                        </td>
+
+                                        <td>
+                                            <input class="money-input" value="$850">
+                                        </td>
+
+                                        <td>
+                                            <input class="money-input" value="$0">
+                                        </td>
+
+                                        <td>
+                                            <input class="money-input" value="$0">
+                                        </td>
+
+                                        <td class="profit-cell">
+                                            $850
+                                        </td>
+
+                                        <td>
+                                            <span class="report-status pending">
+                                                Pendiente
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            <input placeholder="Agregar nota...">
+                                        </td>
+
+                                    </tr>
+
+
+                                    <tr>
+
+                                        <td class="row-number">3</td>
+
+                                        <td>
+                                            <input value="11:30">
+                                        </td>
+
+                                        <td>
+                                            <input value="Sofía Ortega">
+                                        </td>
+
+                                        <td>
+                                            <select>
+                                                <option>Dra. Daniela</option>
+                                                <option>Dra. Samantha</option>
+                                                <option>Dra. Fernanda</option>
+                                            </select>
+                                        </td>
+
+                                        <td>
+                                            <input value="Aplicación de flúor">
+                                        </td>
+
+                                        <td>
+                                            <select>
+                                                <option>Transferencia</option>
+                                                <option>Tarjeta</option>
+                                                <option>Efectivo</option>
+                                            </select>
+                                        </td>
+
+                                        <td>
+                                            <input class="money-input" value="$950">
+                                        </td>
+
+                                        <td>
+                                            <input class="money-input" value="$120">
+                                        </td>
+
+                                        <td>
+                                            <input class="money-input" value="$45">
+                                        </td>
+
+                                        <td class="profit-cell">
+                                            $785
+                                        </td>
+
+                                        <td>
+                                            <span class="report-status paid">
+                                                Pagado
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            <input placeholder="Agregar nota...">
+                                        </td>
+
+                                    </tr>
+
+
+                                    <tr class="new-row">
+
+                                        <td class="row-number">4</td>
+
+                                        <td colspan="11">
+
+                                            <button class="spreadsheet-new-row">
+
+                                                <svg viewBox="0 0 24 24" fill="none">
+                                                    <path d="M12 5v14M5 12h14"></path>
+                                                </svg>
+
+                                                Agregar nuevo movimiento
+
+                                            </button>
+
+                                        </td>
+
+                                    </tr>
+
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+
+                        <div class="spreadsheet-footer">
+
+                            <span>
+                                Último guardado: 15:30
+                            </span>
+
+                            <strong>
+                                Próximo autoguardado en 4:32
                             </strong>
 
                         </div>
 
-
-                        <div class="expense-list">
-
-
-                            <div class="expense-row">
-
-                                <div>
-                                    <span class="expense-dot laboratory"></span>
-                                    <strong>Laboratorio</strong>
-                                </div>
-
-                                <span>$1,680</span>
-
-                            </div>
-
-
-                            <div class="expense-bar">
-                                <span style="width: 51%"></span>
-                            </div>
-
-
-                            <div class="expense-row">
-
-                                <div>
-                                    <span class="expense-dot materials"></span>
-                                    <strong>Materiales</strong>
-                                </div>
-
-                                <span>$840</span>
-
-                            </div>
-
-
-                            <div class="expense-bar materials">
-                                <span style="width: 26%"></span>
-                            </div>
-
-
-                            <div class="expense-row">
-
-                                <div>
-                                    <span class="expense-dot services"></span>
-                                    <strong>Servicios</strong>
-                                </div>
-
-                                <span>$460</span>
-
-                            </div>
-
-
-                            <div class="expense-bar services">
-                                <span style="width: 14%"></span>
-                            </div>
-
-
-                            <div class="expense-row">
-
-                                <div>
-                                    <span class="expense-dot other"></span>
-                                    <strong>Otros</strong>
-                                </div>
-
-                                <span>$300</span>
-
-                            </div>
-
-
-                            <div class="expense-bar other">
-                                <span style="width: 9%"></span>
-                            </div>
-
-
-                        </div>
-
-                    </section>
-
-                </div>
-
-
-                <!-- =================================================
-                 GRÁFICAS
-                 ================================================= -->
-
-                <div class="reports-two-columns chart-section">
-
-
-                    <section class="report-panel">
-
-
-                        <div class="report-panel-head">
-
-                            <div>
-                                <h2>Ingresos vs gastos</h2>
-                                <p>Comportamiento de los últimos 7 días.</p>
-                            </div>
-
-                            <span class="positive-indicator">
-                                +12.4%
-                            </span>
-
-                        </div>
-
-
-                        <div class="fake-chart">
-
-                            <div class="chart-y-labels">
-                                <span>$20k</span>
-                                <span>$15k</span>
-                                <span>$10k</span>
-                                <span>$5k</span>
-                                <span>$0</span>
-                            </div>
-
-
-                            <div class="chart-area">
-
-                                <div class="chart-grid-line"></div>
-                                <div class="chart-grid-line"></div>
-                                <div class="chart-grid-line"></div>
-                                <div class="chart-grid-line"></div>
-                                <div class="chart-grid-line"></div>
-
-
-                                <div class="chart-bars">
-
-                                    <div class="chart-day">
-                                        <div class="chart-bar income" style="height:58%"></div>
-                                        <div class="chart-bar cost" style="height:20%"></div>
-                                        <span>Jue</span>
-                                    </div>
-
-                                    <div class="chart-day">
-                                        <div class="chart-bar income" style="height:72%"></div>
-                                        <div class="chart-bar cost" style="height:28%"></div>
-                                        <span>Vie</span>
-                                    </div>
-
-                                    <div class="chart-day">
-                                        <div class="chart-bar income" style="height:49%"></div>
-                                        <div class="chart-bar cost" style="height:16%"></div>
-                                        <span>Sáb</span>
-                                    </div>
-
-                                    <div class="chart-day">
-                                        <div class="chart-bar income" style="height:0%"></div>
-                                        <div class="chart-bar cost" style="height:0%"></div>
-                                        <span>Dom</span>
-                                    </div>
-
-                                    <div class="chart-day">
-                                        <div class="chart-bar income" style="height:68%"></div>
-                                        <div class="chart-bar cost" style="height:23%"></div>
-                                        <span>Lun</span>
-                                    </div>
-
-                                    <div class="chart-day">
-                                        <div class="chart-bar income" style="height:82%"></div>
-                                        <div class="chart-bar cost" style="height:30%"></div>
-                                        <span>Mar</span>
-                                    </div>
-
-                                    <div class="chart-day">
-                                        <div class="chart-bar income" style="height:92%"></div>
-                                        <div class="chart-bar cost" style="height:22%"></div>
-                                        <span>Mié</span>
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="chart-legend">
-
-                            <span>
-                                <i class="legend-income"></i>
-                                Ingresos
-                            </span>
-
-                            <span>
-                                <i class="legend-cost"></i>
-                                Gastos
-                            </span>
-
-                        </div>
-
-
-                    </section>
-
-
-                    <!-- MÉTODOS DE PAGO -->
-
-                    <section class="report-panel">
-
-
-                        <div class="report-panel-head">
-
-                            <div>
-                                <h2>Métodos de pago</h2>
-                                <p>Cómo ingresó el dinero de la jornada.</p>
-                            </div>
-
-                        </div>
-
-
-                        <div class="payment-summary">
-
-
-                            <div class="donut-chart">
-
-                                <div class="donut-center">
-                                    <strong>$18.4k</strong>
-                                    <span>Total</span>
-                                </div>
-
-                            </div>
-
-
-                            <div class="payment-list">
-
-
-                                <div>
-
-                                    <span>
-                                        <i class="payment-dot card"></i>
-                                        Tarjeta
-                                    </span>
-
-                                    <strong>46%</strong>
-
-                                </div>
-
-
-                                <div>
-
-                                    <span>
-                                        <i class="payment-dot cash"></i>
-                                        Efectivo
-                                    </span>
-
-                                    <strong>32%</strong>
-
-                                </div>
-
-
-                                <div>
-
-                                    <span>
-                                        <i class="payment-dot transfer"></i>
-                                        Transferencia
-                                    </span>
-
-                                    <strong>22%</strong>
-
-                                </div>
-
-
-                            </div>
-
-                        </div>
-
-
-                    </section>
-
-                </div>
-
-
-                <!-- =================================================
+                        <!-- =================================================
                  CIERRE DEL DÍA
                  ================================================= -->
 
-                <section class="daily-close-card">
+                        <section class="daily-close-card">
 
 
-                    <div class="daily-close-copy">
+                            <div class="daily-close-copy">
 
-                        <span class="close-icon">
+                                <span class="close-icon">
 
-                            <svg viewBox="0 0 24 24" fill="none">
-                                <path d="M9 11l3 3L22 4"></path>
-                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-                            </svg>
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <path d="M9 11l3 3L22 4"></path>
+                                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                                    </svg>
 
-                        </span>
-
-
-                        <div>
-
-                            <span class="close-eyebrow">
-                                CIERRE DE JORNADA
-                            </span>
-
-                            <h2>
-                                ¿Terminó el día?
-                            </h2>
-
-                            <p>
-                                Revisa los movimientos y genera el reporte
-                                consolidado del consultorio.
-                            </p>
-
-                        </div>
-
-                    </div>
+                                </span>
 
 
-                    <div class="daily-close-totals">
+                                <div>
 
-                        <div>
-                            <span>Ingresos</span>
-                            <strong>$18,450</strong>
-                        </div>
+                                    <span class="close-eyebrow">
+                                        CIERRE DE JORNADA
+                                    </span>
 
-                        <div>
-                            <span>Gastos</span>
-                            <strong>$3,280</strong>
-                        </div>
+                                    <h2>
+                                        ¿Terminó el día?
+                                    </h2>
 
-                        <div class="net-total">
-                            <span>Utilidad</span>
-                            <strong>$15,170</strong>
-                        </div>
+                                    <p>
+                                        Revisa los movimientos y genera el reporte
+                                        consolidado del consultorio.
+                                    </p>
 
-                    </div>
+                                </div>
+
+                            </div>
 
 
-                    <button class="close-day-btn">
+                            <div class="daily-close-totals">
 
-                        Generar cierre del día
+                                <div>
+                                    <span>Ingresos</span>
+                                    <strong>$18,450</strong>
+                                </div>
 
-                        <svg viewBox="0 0 24 24" fill="none">
-                            <path d="M5 12h14M13 6l6 6-6 6"></path>
-                        </svg>
+                                <div>
+                                    <span>Gastos</span>
+                                    <strong>$3,280</strong>
+                                </div>
 
-                    </button>
+                                <div class="net-total">
+                                    <span>Utilidad</span>
+                                    <strong>$15,170</strong>
+                                </div>
 
+                            </div>
+
+
+                            <button class="close-day-btn">
+
+                                Generar cierre del día
+
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M5 12h14M13 6l6 6-6 6"></path>
+                                </svg>
+
+                            </button>
+
+
+                        </section>
+
+                    </section>
 
                 </section>
+
+                </section>
+
+
+                <section class="report-tab-panel" data-report-panel="resumen" role="tabpanel" hidden>
+                    <!-- =================================================
+                 RESUMEN POR DOCTORA
+                 ================================================= -->
+
+                    <div class="reports-two-columns">
+
+
+                        <section class="report-panel">
+
+
+                            <div class="report-panel-head">
+
+                                <div>
+                                    <h2>Producción por doctora</h2>
+                                    <p>Ingresos y gastos generados durante la jornada.</p>
+                                </div>
+
+                                <button class="report-text-btn">
+                                    Ver detalle
+                                </button>
+
+                            </div>
+
+
+                            <div class="doctor-report-list">
+
+
+                                <div class="doctor-report-row">
+
+                                    <div class="doctor-avatar lavender">
+                                        SS
+                                    </div>
+
+                                    <div class="doctor-info">
+
+                                        <strong>Dra. Samantha</strong>
+
+                                        <span>7 pacientes · 8 tratamientos</span>
+
+                                    </div>
+
+
+                                    <div class="doctor-money">
+
+                                        <span>Ingresos</span>
+                                        <strong>$9,850</strong>
+
+                                    </div>
+
+
+                                    <div class="doctor-money expense">
+
+                                        <span>Gastos</span>
+                                        <strong>$1,460</strong>
+
+                                    </div>
+
+
+                                    <div class="doctor-money profit">
+
+                                        <span>Utilidad</span>
+                                        <strong>$8,390</strong>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="doctor-report-row">
+
+                                    <div class="doctor-avatar pink">
+                                        DR
+                                    </div>
+
+                                    <div class="doctor-info">
+
+                                        <strong>Dra. Daniela</strong>
+
+                                        <span>4 pacientes · 5 tratamientos</span>
+
+                                    </div>
+
+
+                                    <div class="doctor-money">
+
+                                        <span>Ingresos</span>
+                                        <strong>$5,400</strong>
+
+                                    </div>
+
+
+                                    <div class="doctor-money expense">
+
+                                        <span>Gastos</span>
+                                        <strong>$1,120</strong>
+
+                                    </div>
+
+
+                                    <div class="doctor-money profit">
+
+                                        <span>Utilidad</span>
+                                        <strong>$4,280</strong>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="doctor-report-row">
+
+                                    <div class="doctor-avatar blue">
+                                        FE
+                                    </div>
+
+                                    <div class="doctor-info">
+
+                                        <strong>Dra. Fernanda</strong>
+
+                                        <span>3 pacientes · 3 tratamientos</span>
+
+                                    </div>
+
+
+                                    <div class="doctor-money">
+
+                                        <span>Ingresos</span>
+                                        <strong>$3,200</strong>
+
+                                    </div>
+
+
+                                    <div class="doctor-money expense">
+
+                                        <span>Gastos</span>
+                                        <strong>$700</strong>
+
+                                    </div>
+
+
+                                    <div class="doctor-money profit">
+
+                                        <span>Utilidad</span>
+                                        <strong>$2,500</strong>
+
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+
+                        </section>
+
+
+                        <!-- GASTOS -->
+
+                        <section class="report-panel">
+
+
+                            <div class="report-panel-head">
+
+                                <div>
+                                    <h2>Gastos del día</h2>
+                                    <p>Distribución de los egresos registrados.</p>
+                                </div>
+
+                                <strong class="expense-total">
+                                    $3,280
+                                </strong>
+
+                            </div>
+
+
+                            <div class="expense-list">
+
+
+                                <div class="expense-row">
+
+                                    <div>
+                                        <span class="expense-dot laboratory"></span>
+                                        <strong>Laboratorio</strong>
+                                    </div>
+
+                                    <span>$1,680</span>
+
+                                </div>
+
+
+                                <div class="expense-bar">
+                                    <span style="width: 51%"></span>
+                                </div>
+
+
+                                <div class="expense-row">
+
+                                    <div>
+                                        <span class="expense-dot materials"></span>
+                                        <strong>Materiales</strong>
+                                    </div>
+
+                                    <span>$840</span>
+
+                                </div>
+
+
+                                <div class="expense-bar materials">
+                                    <span style="width: 26%"></span>
+                                </div>
+
+
+                                <div class="expense-row">
+
+                                    <div>
+                                        <span class="expense-dot services"></span>
+                                        <strong>Servicios</strong>
+                                    </div>
+
+                                    <span>$460</span>
+
+                                </div>
+
+
+                                <div class="expense-bar services">
+                                    <span style="width: 14%"></span>
+                                </div>
+
+
+                                <div class="expense-row">
+
+                                    <div>
+                                        <span class="expense-dot other"></span>
+                                        <strong>Otros</strong>
+                                    </div>
+
+                                    <span>$300</span>
+
+                                </div>
+
+
+                                <div class="expense-bar other">
+                                    <span style="width: 9%"></span>
+                                </div>
+
+
+                            </div>
+
+                        </section>
+
+                    </div>
+
+
+                    <!-- =================================================
+                 GRÁFICAS
+                 ================================================= -->
+
+                    <div class="reports-two-columns chart-section">
+
+
+                        <section class="report-panel">
+
+
+                            <div class="report-panel-head">
+
+                                <div>
+                                    <h2>Ingresos vs gastos</h2>
+                                    <p>Comportamiento de los últimos 7 días.</p>
+                                </div>
+
+                                <span class="positive-indicator">
+                                    +12.4%
+                                </span>
+
+                            </div>
+
+
+                            <div class="fake-chart">
+
+                                <div class="chart-y-labels">
+                                    <span>$20k</span>
+                                    <span>$15k</span>
+                                    <span>$10k</span>
+                                    <span>$5k</span>
+                                    <span>$0</span>
+                                </div>
+
+
+                                <div class="chart-area">
+
+                                    <div class="chart-grid-line"></div>
+                                    <div class="chart-grid-line"></div>
+                                    <div class="chart-grid-line"></div>
+                                    <div class="chart-grid-line"></div>
+                                    <div class="chart-grid-line"></div>
+
+
+                                    <div class="chart-bars">
+
+                                        <div class="chart-day">
+                                            <div class="chart-bar income" style="height:58%"></div>
+                                            <div class="chart-bar cost" style="height:20%"></div>
+                                            <span>Jue</span>
+                                        </div>
+
+                                        <div class="chart-day">
+                                            <div class="chart-bar income" style="height:72%"></div>
+                                            <div class="chart-bar cost" style="height:28%"></div>
+                                            <span>Vie</span>
+                                        </div>
+
+                                        <div class="chart-day">
+                                            <div class="chart-bar income" style="height:49%"></div>
+                                            <div class="chart-bar cost" style="height:16%"></div>
+                                            <span>Sáb</span>
+                                        </div>
+
+                                        <div class="chart-day">
+                                            <div class="chart-bar income" style="height:0%"></div>
+                                            <div class="chart-bar cost" style="height:0%"></div>
+                                            <span>Dom</span>
+                                        </div>
+
+                                        <div class="chart-day">
+                                            <div class="chart-bar income" style="height:68%"></div>
+                                            <div class="chart-bar cost" style="height:23%"></div>
+                                            <span>Lun</span>
+                                        </div>
+
+                                        <div class="chart-day">
+                                            <div class="chart-bar income" style="height:82%"></div>
+                                            <div class="chart-bar cost" style="height:30%"></div>
+                                            <span>Mar</span>
+                                        </div>
+
+                                        <div class="chart-day">
+                                            <div class="chart-bar income" style="height:92%"></div>
+                                            <div class="chart-bar cost" style="height:22%"></div>
+                                            <span>Mié</span>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="chart-legend">
+
+                                <span>
+                                    <i class="legend-income"></i>
+                                    Ingresos
+                                </span>
+
+                                <span>
+                                    <i class="legend-cost"></i>
+                                    Gastos
+                                </span>
+
+                            </div>
+
+
+                        </section>
+
+
+                        <!-- MÉTODOS DE PAGO -->
+
+                        <section class="report-panel">
+
+
+                            <div class="report-panel-head">
+
+                                <div>
+                                    <h2>Métodos de pago</h2>
+                                    <p>Cómo ingresó el dinero de la jornada.</p>
+                                </div>
+
+                            </div>
+
+
+                            <div class="payment-summary">
+
+
+                                <div class="donut-chart">
+
+                                    <div class="donut-center">
+                                        <strong>$18.4k</strong>
+                                        <span>Total</span>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="payment-list">
+
+
+                                    <div>
+
+                                        <span>
+                                            <i class="payment-dot card"></i>
+                                            Tarjeta
+                                        </span>
+
+                                        <strong>46%</strong>
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <span>
+                                            <i class="payment-dot cash"></i>
+                                            Efectivo
+                                        </span>
+
+                                        <strong>32%</strong>
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <span>
+                                            <i class="payment-dot transfer"></i>
+                                            Transferencia
+                                        </span>
+
+                                        <strong>22%</strong>
+
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+
+
+                        </section>
+
+                    </div>
+
+                    <section class="report-tab-panel" data-report-panel="historial" role="tabpanel" hidden>
+
+                        <section class="report-panel">
+
+                            <div class="report-panel-head">
+                                <div>
+                                    <h2>Historial de cierres</h2>
+                                    <p>Consulta jornadas anteriores sin modificar los datos ya cerrados.</p>
+                                </div>
+
+                                <div class="report-table-actions">
+                                    <button class="report-secondary-btn" type="button">
+                                        <svg viewBox="0 0 24 24" fill="none">
+                                            <path d="M3 6h18"></path>
+                                            <path d="M8 12h8"></path>
+                                            <path d="M10 18h4"></path>
+                                        </svg>
+                                        Filtrar periodo
+                                    </button>
+
+                                    <button class="report-add-btn" type="button">
+                                        <svg viewBox="0 0 24 24" fill="none">
+                                            <path d="M12 3v12"></path>
+                                            <path d="m7 10 5 5 5-5"></path>
+                                            <path d="M5 21h14"></path>
+                                        </svg>
+                                        Exportar historial
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="spreadsheet-wrap">
+                                <table class="report-spreadsheet">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Fecha</th>
+                                            <th>Pacientes</th>
+                                            <th>Citas</th>
+                                            <th>Ingresos</th>
+                                            <th>Laboratorio</th>
+                                            <th>Otros gastos</th>
+                                            <th>Gastos totales</th>
+                                            <th>Utilidad</th>
+                                            <th>Tarjeta</th>
+                                            <th>Efectivo</th>
+                                            <th>Transferencia</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr>
+                                            <td class="row-number">1</td>
+                                            <td><input value="25/08/2026" readonly></td>
+                                            <td><input value="13" readonly></td>
+                                            <td><input value="15" readonly></td>
+                                            <td><input class="money-input" value="$17,800" readonly></td>
+                                            <td><input class="money-input" value="$1,420" readonly></td>
+                                            <td><input class="money-input" value="$1,030" readonly></td>
+                                            <td><input class="money-input" value="$2,450" readonly></td>
+                                            <td class="profit-cell">$15,350</td>
+                                            <td><input value="$7,950" readonly></td>
+                                            <td><input value="$5,100" readonly></td>
+                                            <td><input value="$4,750" readonly></td>
+                                            <td><span class="report-status paid">Cerrado</span></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="row-number">2</td>
+                                            <td><input value="24/08/2026" readonly></td>
+                                            <td><input value="12" readonly></td>
+                                            <td><input value="14" readonly></td>
+                                            <td><input class="money-input" value="$16,950" readonly></td>
+                                            <td><input class="money-input" value="$1,280" readonly></td>
+                                            <td><input class="money-input" value="$920" readonly></td>
+                                            <td><input class="money-input" value="$2,200" readonly></td>
+                                            <td class="profit-cell">$14,750</td>
+                                            <td><input value="$7,100" readonly></td>
+                                            <td><input value="$5,300" readonly></td>
+                                            <td><input value="$4,550" readonly></td>
+                                            <td><span class="report-status paid">Cerrado</span></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="row-number">3</td>
+                                            <td><input value="22/08/2026" readonly></td>
+                                            <td><input value="10" readonly></td>
+                                            <td><input value="11" readonly></td>
+                                            <td><input class="money-input" value="$14,200" readonly></td>
+                                            <td><input class="money-input" value="$1,050" readonly></td>
+                                            <td><input class="money-input" value="$780" readonly></td>
+                                            <td><input class="money-input" value="$1,830" readonly></td>
+                                            <td class="profit-cell">$12,370</td>
+                                            <td><input value="$6,500" readonly></td>
+                                            <td><input value="$4,100" readonly></td>
+                                            <td><input value="$3,600" readonly></td>
+                                            <td><span class="report-status paid">Cerrado</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="spreadsheet-footer">
+                                <span>Mostrando cierres recientes</span>
+                                <strong>Los cierres históricos serán de solo lectura.</strong>
+                            </div>
+
+                        </section>
+
+                        <div class="reports-two-columns">
+
+                            <section class="report-panel">
+                                <div class="report-panel-head">
+                                    <div>
+                                        <h2>Resumen del mes</h2>
+                                        <p>Agosto 2026 · datos demostrativos.</p>
+                                    </div>
+                                    <span class="positive-indicator">+8.6%</span>
+                                </div>
+
+                                <div class="doctor-report-list">
+                                    <div class="doctor-report-row">
+                                        <div class="doctor-avatar lavender">SS</div>
+                                        <div class="doctor-info">
+                                            <strong>Dra. Samantha</strong>
+                                            <span>Producción acumulada</span>
+                                        </div>
+                                        <div class="doctor-money">
+                                            <span>Ingresos</span>
+                                            <strong>$126,400</strong>
+                                        </div>
+                                        <div class="doctor-money expense">
+                                            <span>Gastos</span>
+                                            <strong>$18,920</strong>
+                                        </div>
+                                        <div class="doctor-money profit">
+                                            <span>Utilidad</span>
+                                            <strong>$107,480</strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="doctor-report-row">
+                                        <div class="doctor-avatar pink">DR</div>
+                                        <div class="doctor-info">
+                                            <strong>Dra. Daniela</strong>
+                                            <span>Producción acumulada</span>
+                                        </div>
+                                        <div class="doctor-money">
+                                            <span>Ingresos</span>
+                                            <strong>$74,600</strong>
+                                        </div>
+                                        <div class="doctor-money expense">
+                                            <span>Gastos</span>
+                                            <strong>$13,700</strong>
+                                        </div>
+                                        <div class="doctor-money profit">
+                                            <span>Utilidad</span>
+                                            <strong>$60,900</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section class="report-panel">
+                                <div class="report-panel-head">
+                                    <div>
+                                        <h2>Acumulado del consultorio</h2>
+                                        <p>Vista consolidada del periodo seleccionado.</p>
+                                    </div>
+                                </div>
+
+                                <div class="expense-list">
+                                    <div class="expense-row">
+                                        <div>
+                                            <span class="expense-dot laboratory"></span>
+                                            <strong>Ingresos acumulados</strong>
+                                        </div>
+                                        <span>$201,000</span>
+                                    </div>
+
+                                    <div class="expense-row">
+                                        <div>
+                                            <span class="expense-dot materials"></span>
+                                            <strong>Gastos acumulados</strong>
+                                        </div>
+                                        <span>$32,620</span>
+                                    </div>
+
+                                    <div class="expense-row">
+                                        <div>
+                                            <span class="expense-dot services"></span>
+                                            <strong>Utilidad acumulada</strong>
+                                        </div>
+                                        <span>$168,380</span>
+                                    </div>
+
+                                    <div class="expense-row">
+                                        <div>
+                                            <span class="expense-dot other"></span>
+                                            <strong>Pacientes atendidos</strong>
+                                        </div>
+                                        <span>168</span>
+                                    </div>
+                                </div>
+                            </section>
+
+                        </div>
+
+                    </section>
+
 
 
             </div>
@@ -1207,17 +1433,70 @@
 
 
     <script>
+        const menuBtn = document.getElementById('menuBtn');
 
-        const menuButton = document.querySelector('.mobile-menu');
+        menuBtn?.addEventListener('click', () => {
+            document.body.classList.toggle('nav-open');
+        });
 
-        if (menuButton) {
+        document.addEventListener('click', (event) => {
+            if (
+                window.innerWidth <= 900 &&
+                document.body.classList.contains('nav-open') &&
+                !event.target.closest('.sidebar') &&
+                !event.target.closest('#menuBtn')
+            ) {
+                document.body.classList.remove('nav-open');
+            }
+        });
 
-            menuButton.addEventListener('click', () => {
-                document.body.classList.toggle('nav-open');
+
+        /* =====================================================
+           PESTAÑAS DE REPORTES
+           ===================================================== */
+
+        const reportTabs = document.querySelectorAll('[data-report-tab]');
+        const reportPanels = document.querySelectorAll('[data-report-panel]');
+
+        function openReportTab(tabName) {
+            reportTabs.forEach((tab) => {
+                const isActive = tab.dataset.reportTab === tabName;
+
+                tab.classList.toggle('active', isActive);
+                tab.setAttribute('aria-selected', String(isActive));
             });
 
+            reportPanels.forEach((panel) => {
+                panel.hidden = panel.dataset.reportPanel !== tabName;
+            });
+
+            sessionStorage.setItem('samanthaReportTab', tabName);
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         }
 
+        reportTabs.forEach((tab) => {
+            tab.addEventListener('click', () => {
+                openReportTab(tab.dataset.reportTab);
+            });
+        });
+
+        const savedReportTab =
+            sessionStorage.getItem('samanthaReportTab');
+
+        if (
+            savedReportTab &&
+            document.querySelector(
+                `[data-report-tab="${savedReportTab}"]`
+            )
+        ) {
+            openReportTab(savedReportTab);
+        } else {
+            openReportTab('registro');
+        }
     </script>
 
 </body>
