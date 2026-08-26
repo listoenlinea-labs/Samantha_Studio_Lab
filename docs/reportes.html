@@ -8,6 +8,129 @@
     <title>Reportes | Samantha's Studio Lab</title>
 
     <link rel="stylesheet" href="assets/css/style.css" />
+
+    <style>
+        .report-filter-panel {
+            margin: -4px 0 14px;
+            padding: 14px;
+            border: 1px solid #ebe5ef;
+            border-radius: 14px;
+            background: #fbf9fd;
+        }
+
+        .report-filter-grid {
+            display: grid;
+            grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(145px, .7fr));
+            gap: 10px;
+            align-items: end;
+        }
+
+        .report-filter-field {
+            margin: 0;
+        }
+
+        .report-filter-field>span {
+            display: block;
+            margin-bottom: 6px;
+            color: #8c8195;
+            font-size: 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+
+        .report-filter-field input,
+        .report-filter-field select {
+            width: 100%;
+            height: 38px;
+            padding: 0 11px;
+            border: 1px solid #e7e0eb;
+            border-radius: 10px;
+            outline: none;
+            background: #fff;
+            color: #554b5d;
+            font-size: 10px;
+        }
+
+        .report-filter-field input:focus,
+        .report-filter-field select:focus {
+            border-color: #cbbbe2;
+            box-shadow: 0 0 0 3px rgba(203, 187, 226, .14);
+        }
+
+        .report-filter-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding-top: 2px;
+        }
+
+        .report-filter-count {
+            color: #88799a;
+            font-size: 9px;
+            font-weight: 750;
+        }
+
+        .report-spreadsheet tbody tr.report-row-hidden {
+            display: none;
+        }
+
+        .report-spreadsheet .status-select {
+            min-width: 100px;
+            color: #62596a;
+            font-weight: 700;
+        }
+
+        .report-spreadsheet .profit-cell.negative {
+            color: #b47783;
+            background: #fff7f8;
+        }
+
+        .autosave-status.is-saving .autosave-dot {
+            animation: reportPulse .8s ease-in-out infinite alternate;
+        }
+
+        @keyframes reportPulse {
+            from {
+                transform: scale(.8);
+                opacity: .55;
+            }
+
+            to {
+                transform: scale(1.25);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .report-filter-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 560px) {
+            .report-filter-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .report-filter-actions {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .report-filter-actions .report-secondary-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .report-filter-count {
+                text-align: center;
+            }
+        }
+    </style>
+
 </head>
 
 <body class="dashboard-page reports-page">
@@ -411,7 +534,7 @@
 
                             <div class="report-table-actions">
 
-                                <button class="report-secondary-btn">
+                                <button class="report-secondary-btn" id="filterBtn" type="button" aria-expanded="false">
 
                                     <svg viewBox="0 0 24 24" fill="none">
                                         <path d="M3 6h18"></path>
@@ -424,7 +547,7 @@
                                 </button>
 
 
-                                <button class="report-add-btn">
+                                <button class="report-add-btn" id="addRowBtn" type="button">
 
                                     <svg viewBox="0 0 24 24" fill="none">
                                         <path d="M12 5v14M5 12h14"></path>
@@ -438,6 +561,55 @@
 
                         </div>
 
+
+                        <div class="report-filter-panel" id="reportFilterPanel" hidden>
+                            <div class="report-filter-grid">
+                                <label class="report-filter-field">
+                                    <span>Buscar</span>
+                                    <input id="filterSearch" type="search"
+                                        placeholder="Paciente, tratamiento o nota...">
+                                </label>
+
+                                <label class="report-filter-field">
+                                    <span>Doctora</span>
+                                    <select id="filterDoctor">
+                                        <option value="">Todas</option>
+                                        <option value="Dra. Samantha">Dra. Samantha</option>
+                                        <option value="Dra. Daniela">Dra. Daniela</option>
+                                        <option value="Dra. Fernanda">Dra. Fernanda</option>
+                                    </select>
+                                </label>
+
+                                <label class="report-filter-field">
+                                    <span>Método de pago</span>
+                                    <select id="filterPayment">
+                                        <option value="">Todos</option>
+                                        <option value="Tarjeta">Tarjeta</option>
+                                        <option value="Efectivo">Efectivo</option>
+                                        <option value="Transferencia">Transferencia</option>
+                                    </select>
+                                </label>
+
+                                <label class="report-filter-field">
+                                    <span>Estado</span>
+                                    <select id="filterStatus">
+                                        <option value="">Todos</option>
+                                        <option value="Pagado">Pagado</option>
+                                        <option value="Pendiente">Pendiente</option>
+                                    </select>
+                                </label>
+
+                                <div class="report-filter-actions">
+                                    <button class="report-secondary-btn" id="clearFiltersBtn" type="button">
+                                        Limpiar filtros
+                                    </button>
+
+                                    <span class="report-filter-count" id="filterCount">
+                                        3 movimientos
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="spreadsheet-wrap">
 
@@ -465,7 +637,7 @@
                                 </thead>
 
 
-                                <tbody>
+                                <tbody id="reportTableBody">
 
 
                                     <tr>
@@ -657,7 +829,7 @@
 
                                         <td colspan="11">
 
-                                            <button class="spreadsheet-new-row">
+                                            <button class="spreadsheet-new-row" id="addMovementBtn" type="button">
 
                                                 <svg viewBox="0 0 24 24" fill="none">
                                                     <path d="M12 5v14M5 12h14"></path>
@@ -681,91 +853,89 @@
 
                         <div class="spreadsheet-footer">
 
-                            <span>
-                                Último guardado: 15:30
+                            <span id="lastSavedText">
+                                Último guardado: todavía sin cambios
                             </span>
 
-                            <strong>
-                                Próximo autoguardado en 4:32
+                            <strong id="nextAutosaveText">
+                                Próximo autoguardado en 5:00
                             </strong>
 
                         </div>
 
-                        <!-- =================================================
+                    </section>
+
+                    <!-- =================================================
                  CIERRE DEL DÍA
                  ================================================= -->
 
-                        <section class="daily-close-card">
+                    <section class="daily-close-card">
 
 
-                            <div class="daily-close-copy">
+                        <div class="daily-close-copy">
 
-                                <span class="close-icon">
-
-                                    <svg viewBox="0 0 24 24" fill="none">
-                                        <path d="M9 11l3 3L22 4"></path>
-                                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-                                    </svg>
-
-                                </span>
-
-
-                                <div>
-
-                                    <span class="close-eyebrow">
-                                        CIERRE DE JORNADA
-                                    </span>
-
-                                    <h2>
-                                        ¿Terminó el día?
-                                    </h2>
-
-                                    <p>
-                                        Revisa los movimientos y genera el reporte
-                                        consolidado del consultorio.
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="daily-close-totals">
-
-                                <div>
-                                    <span>Ingresos</span>
-                                    <strong>$18,450</strong>
-                                </div>
-
-                                <div>
-                                    <span>Gastos</span>
-                                    <strong>$3,280</strong>
-                                </div>
-
-                                <div class="net-total">
-                                    <span>Utilidad</span>
-                                    <strong>$15,170</strong>
-                                </div>
-
-                            </div>
-
-
-                            <button class="close-day-btn">
-
-                                Generar cierre del día
+                            <span class="close-icon">
 
                                 <svg viewBox="0 0 24 24" fill="none">
-                                    <path d="M5 12h14M13 6l6 6-6 6"></path>
+                                    <path d="M9 11l3 3L22 4"></path>
+                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
                                 </svg>
 
-                            </button>
+                            </span>
 
 
-                        </section>
+                            <div>
+
+                                <span class="close-eyebrow">
+                                    CIERRE DE JORNADA
+                                </span>
+
+                                <h2>
+                                    ¿Terminó el día?
+                                </h2>
+
+                                <p>
+                                    Revisa los movimientos y genera el reporte
+                                    consolidado del consultorio.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="daily-close-totals">
+
+                            <div>
+                                <span>Ingresos</span>
+                                <strong>$18,450</strong>
+                            </div>
+
+                            <div>
+                                <span>Gastos</span>
+                                <strong>$3,280</strong>
+                            </div>
+
+                            <div class="net-total">
+                                <span>Utilidad</span>
+                                <strong>$15,170</strong>
+                            </div>
+
+                        </div>
+
+
+                        <button class="close-day-btn" id="closeDayBtn" type="button">
+
+                            Generar cierre del día
+
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="M5 12h14M13 6l6 6-6 6"></path>
+                            </svg>
+
+                        </button>
+
 
                     </section>
-
-                </section>
 
                 </section>
 
@@ -1212,216 +1382,219 @@
 
                     </div>
 
-                    <section class="report-tab-panel" data-report-panel="historial" role="tabpanel" hidden>
+                </section>
 
-                        <section class="report-panel">
 
-                            <div class="report-panel-head">
-                                <div>
-                                    <h2>Historial de cierres</h2>
-                                    <p>Consulta jornadas anteriores sin modificar los datos ya cerrados.</p>
-                                </div>
+                <section class="report-tab-panel" data-report-panel="historial" role="tabpanel" hidden>
 
-                                <div class="report-table-actions">
-                                    <button class="report-secondary-btn" type="button">
-                                        <svg viewBox="0 0 24 24" fill="none">
-                                            <path d="M3 6h18"></path>
-                                            <path d="M8 12h8"></path>
-                                            <path d="M10 18h4"></path>
-                                        </svg>
-                                        Filtrar periodo
-                                    </button>
+                    <section class="report-panel">
 
-                                    <button class="report-add-btn" type="button">
-                                        <svg viewBox="0 0 24 24" fill="none">
-                                            <path d="M12 3v12"></path>
-                                            <path d="m7 10 5 5 5-5"></path>
-                                            <path d="M5 21h14"></path>
-                                        </svg>
-                                        Exportar historial
-                                    </button>
-                                </div>
+                        <div class="report-panel-head">
+                            <div>
+                                <h2>Historial de cierres</h2>
+                                <p>Consulta jornadas anteriores sin modificar los datos ya cerrados.</p>
                             </div>
 
-                            <div class="spreadsheet-wrap">
-                                <table class="report-spreadsheet">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Fecha</th>
-                                            <th>Pacientes</th>
-                                            <th>Citas</th>
-                                            <th>Ingresos</th>
-                                            <th>Laboratorio</th>
-                                            <th>Otros gastos</th>
-                                            <th>Gastos totales</th>
-                                            <th>Utilidad</th>
-                                            <th>Tarjeta</th>
-                                            <th>Efectivo</th>
-                                            <th>Transferencia</th>
-                                            <th>Estado</th>
-                                        </tr>
-                                    </thead>
+                            <div class="report-table-actions">
+                                <button class="report-secondary-btn" type="button">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <path d="M3 6h18"></path>
+                                        <path d="M8 12h8"></path>
+                                        <path d="M10 18h4"></path>
+                                    </svg>
+                                    Filtrar periodo
+                                </button>
 
-                                    <tbody>
-                                        <tr>
-                                            <td class="row-number">1</td>
-                                            <td><input value="25/08/2026" readonly></td>
-                                            <td><input value="13" readonly></td>
-                                            <td><input value="15" readonly></td>
-                                            <td><input class="money-input" value="$17,800" readonly></td>
-                                            <td><input class="money-input" value="$1,420" readonly></td>
-                                            <td><input class="money-input" value="$1,030" readonly></td>
-                                            <td><input class="money-input" value="$2,450" readonly></td>
-                                            <td class="profit-cell">$15,350</td>
-                                            <td><input value="$7,950" readonly></td>
-                                            <td><input value="$5,100" readonly></td>
-                                            <td><input value="$4,750" readonly></td>
-                                            <td><span class="report-status paid">Cerrado</span></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td class="row-number">2</td>
-                                            <td><input value="24/08/2026" readonly></td>
-                                            <td><input value="12" readonly></td>
-                                            <td><input value="14" readonly></td>
-                                            <td><input class="money-input" value="$16,950" readonly></td>
-                                            <td><input class="money-input" value="$1,280" readonly></td>
-                                            <td><input class="money-input" value="$920" readonly></td>
-                                            <td><input class="money-input" value="$2,200" readonly></td>
-                                            <td class="profit-cell">$14,750</td>
-                                            <td><input value="$7,100" readonly></td>
-                                            <td><input value="$5,300" readonly></td>
-                                            <td><input value="$4,550" readonly></td>
-                                            <td><span class="report-status paid">Cerrado</span></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td class="row-number">3</td>
-                                            <td><input value="22/08/2026" readonly></td>
-                                            <td><input value="10" readonly></td>
-                                            <td><input value="11" readonly></td>
-                                            <td><input class="money-input" value="$14,200" readonly></td>
-                                            <td><input class="money-input" value="$1,050" readonly></td>
-                                            <td><input class="money-input" value="$780" readonly></td>
-                                            <td><input class="money-input" value="$1,830" readonly></td>
-                                            <td class="profit-cell">$12,370</td>
-                                            <td><input value="$6,500" readonly></td>
-                                            <td><input value="$4,100" readonly></td>
-                                            <td><input value="$3,600" readonly></td>
-                                            <td><span class="report-status paid">Cerrado</span></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <button class="report-add-btn" type="button">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <path d="M12 3v12"></path>
+                                        <path d="m7 10 5 5 5-5"></path>
+                                        <path d="M5 21h14"></path>
+                                    </svg>
+                                    Exportar historial
+                                </button>
                             </div>
+                        </div>
 
-                            <div class="spreadsheet-footer">
-                                <span>Mostrando cierres recientes</span>
-                                <strong>Los cierres históricos serán de solo lectura.</strong>
-                            </div>
+                        <div class="spreadsheet-wrap">
+                            <table class="report-spreadsheet">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Fecha</th>
+                                        <th>Pacientes</th>
+                                        <th>Citas</th>
+                                        <th>Ingresos</th>
+                                        <th>Laboratorio</th>
+                                        <th>Otros gastos</th>
+                                        <th>Gastos totales</th>
+                                        <th>Utilidad</th>
+                                        <th>Tarjeta</th>
+                                        <th>Efectivo</th>
+                                        <th>Transferencia</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
 
-                        </section>
+                                <tbody>
+                                    <tr>
+                                        <td class="row-number">1</td>
+                                        <td><input value="25/08/2026" readonly></td>
+                                        <td><input value="13" readonly></td>
+                                        <td><input value="15" readonly></td>
+                                        <td><input class="money-input" value="$17,800" readonly></td>
+                                        <td><input class="money-input" value="$1,420" readonly></td>
+                                        <td><input class="money-input" value="$1,030" readonly></td>
+                                        <td><input class="money-input" value="$2,450" readonly></td>
+                                        <td class="profit-cell">$15,350</td>
+                                        <td><input value="$7,950" readonly></td>
+                                        <td><input value="$5,100" readonly></td>
+                                        <td><input value="$4,750" readonly></td>
+                                        <td><span class="report-status paid">Cerrado</span></td>
+                                    </tr>
 
-                        <div class="reports-two-columns">
+                                    <tr>
+                                        <td class="row-number">2</td>
+                                        <td><input value="24/08/2026" readonly></td>
+                                        <td><input value="12" readonly></td>
+                                        <td><input value="14" readonly></td>
+                                        <td><input class="money-input" value="$16,950" readonly></td>
+                                        <td><input class="money-input" value="$1,280" readonly></td>
+                                        <td><input class="money-input" value="$920" readonly></td>
+                                        <td><input class="money-input" value="$2,200" readonly></td>
+                                        <td class="profit-cell">$14,750</td>
+                                        <td><input value="$7,100" readonly></td>
+                                        <td><input value="$5,300" readonly></td>
+                                        <td><input value="$4,550" readonly></td>
+                                        <td><span class="report-status paid">Cerrado</span></td>
+                                    </tr>
 
-                            <section class="report-panel">
-                                <div class="report-panel-head">
-                                    <div>
-                                        <h2>Resumen del mes</h2>
-                                        <p>Agosto 2026 · datos demostrativos.</p>
-                                    </div>
-                                    <span class="positive-indicator">+8.6%</span>
-                                </div>
+                                    <tr>
+                                        <td class="row-number">3</td>
+                                        <td><input value="22/08/2026" readonly></td>
+                                        <td><input value="10" readonly></td>
+                                        <td><input value="11" readonly></td>
+                                        <td><input class="money-input" value="$14,200" readonly></td>
+                                        <td><input class="money-input" value="$1,050" readonly></td>
+                                        <td><input class="money-input" value="$780" readonly></td>
+                                        <td><input class="money-input" value="$1,830" readonly></td>
+                                        <td class="profit-cell">$12,370</td>
+                                        <td><input value="$6,500" readonly></td>
+                                        <td><input value="$4,100" readonly></td>
+                                        <td><input value="$3,600" readonly></td>
+                                        <td><span class="report-status paid">Cerrado</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
 
-                                <div class="doctor-report-list">
-                                    <div class="doctor-report-row">
-                                        <div class="doctor-avatar lavender">SS</div>
-                                        <div class="doctor-info">
-                                            <strong>Dra. Samantha</strong>
-                                            <span>Producción acumulada</span>
-                                        </div>
-                                        <div class="doctor-money">
-                                            <span>Ingresos</span>
-                                            <strong>$126,400</strong>
-                                        </div>
-                                        <div class="doctor-money expense">
-                                            <span>Gastos</span>
-                                            <strong>$18,920</strong>
-                                        </div>
-                                        <div class="doctor-money profit">
-                                            <span>Utilidad</span>
-                                            <strong>$107,480</strong>
-                                        </div>
-                                    </div>
-
-                                    <div class="doctor-report-row">
-                                        <div class="doctor-avatar pink">DR</div>
-                                        <div class="doctor-info">
-                                            <strong>Dra. Daniela</strong>
-                                            <span>Producción acumulada</span>
-                                        </div>
-                                        <div class="doctor-money">
-                                            <span>Ingresos</span>
-                                            <strong>$74,600</strong>
-                                        </div>
-                                        <div class="doctor-money expense">
-                                            <span>Gastos</span>
-                                            <strong>$13,700</strong>
-                                        </div>
-                                        <div class="doctor-money profit">
-                                            <span>Utilidad</span>
-                                            <strong>$60,900</strong>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-
-                            <section class="report-panel">
-                                <div class="report-panel-head">
-                                    <div>
-                                        <h2>Acumulado del consultorio</h2>
-                                        <p>Vista consolidada del periodo seleccionado.</p>
-                                    </div>
-                                </div>
-
-                                <div class="expense-list">
-                                    <div class="expense-row">
-                                        <div>
-                                            <span class="expense-dot laboratory"></span>
-                                            <strong>Ingresos acumulados</strong>
-                                        </div>
-                                        <span>$201,000</span>
-                                    </div>
-
-                                    <div class="expense-row">
-                                        <div>
-                                            <span class="expense-dot materials"></span>
-                                            <strong>Gastos acumulados</strong>
-                                        </div>
-                                        <span>$32,620</span>
-                                    </div>
-
-                                    <div class="expense-row">
-                                        <div>
-                                            <span class="expense-dot services"></span>
-                                            <strong>Utilidad acumulada</strong>
-                                        </div>
-                                        <span>$168,380</span>
-                                    </div>
-
-                                    <div class="expense-row">
-                                        <div>
-                                            <span class="expense-dot other"></span>
-                                            <strong>Pacientes atendidos</strong>
-                                        </div>
-                                        <span>168</span>
-                                    </div>
-                                </div>
-                            </section>
-
+                        <div class="spreadsheet-footer">
+                            <span>Mostrando cierres recientes</span>
+                            <strong>Los cierres históricos serán de solo lectura.</strong>
                         </div>
 
                     </section>
+
+                    <div class="reports-two-columns">
+
+                        <section class="report-panel">
+                            <div class="report-panel-head">
+                                <div>
+                                    <h2>Resumen del mes</h2>
+                                    <p>Agosto 2026 · datos demostrativos.</p>
+                                </div>
+                                <span class="positive-indicator">+8.6%</span>
+                            </div>
+
+                            <div class="doctor-report-list">
+                                <div class="doctor-report-row">
+                                    <div class="doctor-avatar lavender">SS</div>
+                                    <div class="doctor-info">
+                                        <strong>Dra. Samantha</strong>
+                                        <span>Producción acumulada</span>
+                                    </div>
+                                    <div class="doctor-money">
+                                        <span>Ingresos</span>
+                                        <strong>$126,400</strong>
+                                    </div>
+                                    <div class="doctor-money expense">
+                                        <span>Gastos</span>
+                                        <strong>$18,920</strong>
+                                    </div>
+                                    <div class="doctor-money profit">
+                                        <span>Utilidad</span>
+                                        <strong>$107,480</strong>
+                                    </div>
+                                </div>
+
+                                <div class="doctor-report-row">
+                                    <div class="doctor-avatar pink">DR</div>
+                                    <div class="doctor-info">
+                                        <strong>Dra. Daniela</strong>
+                                        <span>Producción acumulada</span>
+                                    </div>
+                                    <div class="doctor-money">
+                                        <span>Ingresos</span>
+                                        <strong>$74,600</strong>
+                                    </div>
+                                    <div class="doctor-money expense">
+                                        <span>Gastos</span>
+                                        <strong>$13,700</strong>
+                                    </div>
+                                    <div class="doctor-money profit">
+                                        <span>Utilidad</span>
+                                        <strong>$60,900</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="report-panel">
+                            <div class="report-panel-head">
+                                <div>
+                                    <h2>Acumulado del consultorio</h2>
+                                    <p>Vista consolidada del periodo seleccionado.</p>
+                                </div>
+                            </div>
+
+                            <div class="expense-list">
+                                <div class="expense-row">
+                                    <div>
+                                        <span class="expense-dot laboratory"></span>
+                                        <strong>Ingresos acumulados</strong>
+                                    </div>
+                                    <span>$201,000</span>
+                                </div>
+
+                                <div class="expense-row">
+                                    <div>
+                                        <span class="expense-dot materials"></span>
+                                        <strong>Gastos acumulados</strong>
+                                    </div>
+                                    <span>$32,620</span>
+                                </div>
+
+                                <div class="expense-row">
+                                    <div>
+                                        <span class="expense-dot services"></span>
+                                        <strong>Utilidad acumulada</strong>
+                                    </div>
+                                    <span>$168,380</span>
+                                </div>
+
+                                <div class="expense-row">
+                                    <div>
+                                        <span class="expense-dot other"></span>
+                                        <strong>Pacientes atendidos</strong>
+                                    </div>
+                                    <span>168</span>
+                                </div>
+                            </div>
+                        </section>
+
+                    </div>
+
+                </section>
 
 
 
@@ -1452,7 +1625,7 @@
 
 
         /* =====================================================
-           PESTAÑAS DE REPORTES
+           PESTAÑAS
            ===================================================== */
 
         const reportTabs = document.querySelectorAll('[data-report-tab]');
@@ -1471,11 +1644,6 @@
             });
 
             sessionStorage.setItem('samanthaReportTab', tabName);
-
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
         }
 
         reportTabs.forEach((tab) => {
@@ -1484,19 +1652,494 @@
             });
         });
 
-        const savedReportTab =
-            sessionStorage.getItem('samanthaReportTab');
+        const savedReportTab = sessionStorage.getItem('samanthaReportTab');
 
         if (
             savedReportTab &&
-            document.querySelector(
-                `[data-report-tab="${savedReportTab}"]`
-            )
+            document.querySelector(`[data-report-tab="${savedReportTab}"]`)
         ) {
             openReportTab(savedReportTab);
         } else {
             openReportTab('registro');
         }
+
+
+        /* =====================================================
+           TABLA TIPO EXCEL
+           ===================================================== */
+
+        const tableBody = document.getElementById('reportTableBody');
+        const addRowBtn = document.getElementById('addRowBtn');
+        const addMovementBtn = document.getElementById('addMovementBtn');
+
+        const STORAGE_KEY = 'samanthaStudioLab_reportDailyRows_v1';
+        const AUTOSAVE_SECONDS = 300;
+
+        let autosaveRemaining = AUTOSAVE_SECONDS;
+        let saveDebounceTimer = null;
+
+        function parseMoney(value) {
+            const cleaned = String(value ?? '').replace(/[^\d.-]/g, '');
+            const parsed = Number(cleaned);
+            return Number.isFinite(parsed) ? parsed : 0;
+        }
+
+        function formatMoney(value) {
+            return new Intl.NumberFormat('es-MX', {
+                style: 'currency',
+                currency: 'MXN',
+                maximumFractionDigits: 0
+            }).format(value);
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+        function dataRows() {
+            return Array.from(
+                tableBody?.querySelectorAll('tr:not(.new-row)') || []
+            );
+        }
+
+        function getCellControl(row, index) {
+            return row.children[index]?.querySelector('input, select');
+        }
+
+        function getStatusValue(row) {
+            const cell = row.children[10];
+            if (!cell) return '';
+
+            const select = cell.querySelector('select');
+            return select ? select.value : cell.textContent.trim();
+        }
+
+        function ensureEditableStatus(row) {
+            const cell = row.children[10];
+
+            if (!cell || cell.querySelector('select')) return;
+
+            const text = cell.textContent.trim();
+            const status =
+                text.toLowerCase().includes('pagado') &&
+                    !text.toLowerCase().includes('pendiente')
+                    ? 'Pagado'
+                    : 'Pendiente';
+
+            cell.innerHTML = `
+                <select class="status-select" aria-label="Estado">
+                    <option value="Pagado">Pagado</option>
+                    <option value="Pendiente">Pendiente</option>
+                </select>
+            `;
+
+            cell.querySelector('select').value = status;
+        }
+
+        function calculateRow(row) {
+            const income = parseMoney(getCellControl(row, 6)?.value);
+            const laboratory = parseMoney(getCellControl(row, 7)?.value);
+            const other = parseMoney(getCellControl(row, 8)?.value);
+            const profit = income - laboratory - other;
+            const cell = row.children[9];
+
+            if (cell) {
+                cell.textContent = formatMoney(profit);
+                cell.classList.toggle('negative', profit < 0);
+            }
+        }
+
+        function normalizeMoneyInputs(row) {
+            [6, 7, 8].forEach((index) => {
+                const input = getCellControl(row, index);
+                if (input) {
+                    input.value = formatMoney(parseMoney(input.value));
+                }
+            });
+        }
+
+        function renumberRows() {
+            const rows = dataRows();
+
+            rows.forEach((row, index) => {
+                const cell = row.querySelector('.row-number');
+                if (cell) cell.textContent = index + 1;
+            });
+
+            const placeholder = tableBody?.querySelector('.new-row .row-number');
+            if (placeholder) placeholder.textContent = rows.length + 1;
+
+            updateFilterCount();
+        }
+
+        function createRow(data = {}) {
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td class="row-number"></td>
+                <td><input type="time" value="${data.time || ''}" aria-label="Hora"></td>
+                <td><input value="${escapeHtml(data.patient || '')}" placeholder="Nombre del paciente" aria-label="Paciente"></td>
+                <td>
+                    <select aria-label="Doctora">
+                        <option value="Dra. Samantha">Dra. Samantha</option>
+                        <option value="Dra. Daniela">Dra. Daniela</option>
+                        <option value="Dra. Fernanda">Dra. Fernanda</option>
+                    </select>
+                </td>
+                <td><input value="${escapeHtml(data.treatment || '')}" placeholder="Tratamiento" aria-label="Tratamiento"></td>
+                <td>
+                    <select aria-label="Método de pago">
+                        <option value="Tarjeta">Tarjeta</option>
+                        <option value="Efectivo">Efectivo</option>
+                        <option value="Transferencia">Transferencia</option>
+                    </select>
+                </td>
+                <td><input class="money-input" inputmode="decimal" value="${formatMoney(data.income || 0)}" aria-label="Ingreso"></td>
+                <td><input class="money-input" inputmode="decimal" value="${formatMoney(data.laboratory || 0)}" aria-label="Laboratorio"></td>
+                <td><input class="money-input" inputmode="decimal" value="${formatMoney(data.otherExpenses || 0)}" aria-label="Otros gastos"></td>
+                <td class="profit-cell">$0</td>
+                <td>
+                    <select class="status-select" aria-label="Estado">
+                        <option value="Pagado">Pagado</option>
+                        <option value="Pendiente">Pendiente</option>
+                    </select>
+                </td>
+                <td><input value="${escapeHtml(data.notes || '')}" placeholder="Agregar nota..." aria-label="Notas"></td>
+            `;
+
+            row.querySelector('td:nth-child(4) select').value =
+                data.doctor || 'Dra. Samantha';
+
+            row.querySelector('td:nth-child(6) select').value =
+                data.payment || 'Tarjeta';
+
+            row.querySelector('td:nth-child(11) select').value =
+                data.status || 'Pendiente';
+
+            return row;
+        }
+
+        function addNewRow() {
+            const placeholder = tableBody?.querySelector('.new-row');
+
+            if (!tableBody || !placeholder) return;
+
+            const row = createRow();
+
+            tableBody.insertBefore(row, placeholder);
+
+            calculateRow(row);
+            renumberRows();
+            applyFilters();
+            scheduleSave();
+
+            row.querySelector('input, select')?.focus();
+
+            row.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
+            });
+        }
+
+        addRowBtn?.addEventListener('click', addNewRow);
+        addMovementBtn?.addEventListener('click', addNewRow);
+
+
+        /* =====================================================
+           FILTROS
+           ===================================================== */
+
+        const filterBtn = document.getElementById('filterBtn');
+        const filterPanel = document.getElementById('reportFilterPanel');
+        const filterSearch = document.getElementById('filterSearch');
+        const filterDoctor = document.getElementById('filterDoctor');
+        const filterPayment = document.getElementById('filterPayment');
+        const filterStatus = document.getElementById('filterStatus');
+        const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+        const filterCount = document.getElementById('filterCount');
+
+        filterBtn?.addEventListener('click', () => {
+            if (!filterPanel) return;
+
+            const open = filterPanel.hidden;
+            filterPanel.hidden = !open;
+            filterBtn.setAttribute('aria-expanded', String(open));
+
+            if (open) filterSearch?.focus();
+        });
+
+        function rowSearchText(row) {
+            const patient = getCellControl(row, 2)?.value || '';
+            const treatment = getCellControl(row, 4)?.value || '';
+            const notes = getCellControl(row, 11)?.value || '';
+
+            return `${patient} ${treatment} ${notes}`
+                .toLocaleLowerCase('es');
+        }
+
+        function applyFilters() {
+            const search =
+                (filterSearch?.value || '')
+                    .trim()
+                    .toLocaleLowerCase('es');
+
+            const doctor = filterDoctor?.value || '';
+            const payment = filterPayment?.value || '';
+            const status = filterStatus?.value || '';
+
+            dataRows().forEach((row) => {
+                const matchesSearch =
+                    !search ||
+                    rowSearchText(row).includes(search);
+
+                const matchesDoctor =
+                    !doctor ||
+                    (getCellControl(row, 3)?.value || '') === doctor;
+
+                const matchesPayment =
+                    !payment ||
+                    (getCellControl(row, 5)?.value || '') === payment;
+
+                const matchesStatus =
+                    !status ||
+                    getStatusValue(row) === status;
+
+                row.classList.toggle(
+                    'report-row-hidden',
+                    !(matchesSearch && matchesDoctor && matchesPayment && matchesStatus)
+                );
+            });
+
+            updateFilterCount();
+        }
+
+        function updateFilterCount() {
+            const rows = dataRows();
+            const visible = rows.filter(
+                (row) => !row.classList.contains('report-row-hidden')
+            ).length;
+
+            if (filterCount) {
+                filterCount.textContent =
+                    `${visible} de ${rows.length} movimiento${rows.length === 1 ? '' : 's'}`;
+            }
+        }
+
+        filterSearch?.addEventListener('input', applyFilters);
+        filterDoctor?.addEventListener('change', applyFilters);
+        filterPayment?.addEventListener('change', applyFilters);
+        filterStatus?.addEventListener('change', applyFilters);
+
+        clearFiltersBtn?.addEventListener('click', () => {
+            if (filterSearch) filterSearch.value = '';
+            if (filterDoctor) filterDoctor.value = '';
+            if (filterPayment) filterPayment.value = '';
+            if (filterStatus) filterStatus.value = '';
+
+            applyFilters();
+        });
+
+
+        /* =====================================================
+           EDICIÓN Y UTILIDAD
+           ===================================================== */
+
+        tableBody?.addEventListener('input', (event) => {
+            const row = event.target.closest('tr:not(.new-row)');
+            if (!row) return;
+
+            if (event.target.classList.contains('money-input')) {
+                calculateRow(row);
+            }
+
+            applyFilters();
+            scheduleSave();
+        });
+
+        tableBody?.addEventListener('change', (event) => {
+            const row = event.target.closest('tr:not(.new-row)');
+            if (!row) return;
+
+            calculateRow(row);
+            applyFilters();
+            scheduleSave();
+        });
+
+        tableBody?.addEventListener('focusout', (event) => {
+            const row = event.target.closest('tr:not(.new-row)');
+
+            if (row && event.target.classList.contains('money-input')) {
+                normalizeMoneyInputs(row);
+                calculateRow(row);
+            }
+        });
+
+
+        /* =====================================================
+           AUTOGUARDADO LOCAL CADA 5 MINUTOS
+           ===================================================== */
+
+        const autosaveStatus = document.querySelector('.autosave-status');
+        const lastSavedText = document.getElementById('lastSavedText');
+        const nextAutosaveText = document.getElementById('nextAutosaveText');
+
+        function serializeRows() {
+            return dataRows().map((row) => ({
+                time: getCellControl(row, 1)?.value || '',
+                patient: getCellControl(row, 2)?.value || '',
+                doctor: getCellControl(row, 3)?.value || 'Dra. Samantha',
+                treatment: getCellControl(row, 4)?.value || '',
+                payment: getCellControl(row, 5)?.value || 'Tarjeta',
+                income: parseMoney(getCellControl(row, 6)?.value),
+                laboratory: parseMoney(getCellControl(row, 7)?.value),
+                otherExpenses: parseMoney(getCellControl(row, 8)?.value),
+                status: getStatusValue(row) || 'Pendiente',
+                notes: getCellControl(row, 11)?.value || ''
+            }));
+        }
+
+        function saveRows() {
+            if (!tableBody) return;
+
+            autosaveStatus?.classList.add('is-saving');
+
+            const payload = {
+                savedAt: new Date().toISOString(),
+                rows: serializeRows()
+            };
+
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+
+            const time = new Intl.DateTimeFormat('es-MX', {
+                hour: '2-digit',
+                minute: '2-digit'
+            }).format(new Date());
+
+            if (lastSavedText) {
+                lastSavedText.textContent = `Último guardado: ${time}`;
+            }
+
+            autosaveRemaining = AUTOSAVE_SECONDS;
+
+            setTimeout(() => {
+                autosaveStatus?.classList.remove('is-saving');
+            }, 450);
+        }
+
+        function scheduleSave() {
+            clearTimeout(saveDebounceTimer);
+
+            saveDebounceTimer = setTimeout(() => {
+                saveRows();
+            }, 1200);
+        }
+
+        function restoreRows() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+
+            if (!raw || !tableBody) return false;
+
+            try {
+                const payload = JSON.parse(raw);
+
+                if (!Array.isArray(payload.rows)) return false;
+
+                dataRows().forEach((row) => row.remove());
+
+                const placeholder = tableBody.querySelector('.new-row');
+
+                payload.rows.forEach((rowData) => {
+                    const row = createRow(rowData);
+                    tableBody.insertBefore(row, placeholder);
+                    calculateRow(row);
+                });
+
+                if (payload.savedAt && lastSavedText) {
+                    const time = new Intl.DateTimeFormat('es-MX', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }).format(new Date(payload.savedAt));
+
+                    lastSavedText.textContent = `Último guardado: ${time}`;
+                }
+
+                return true;
+            } catch (error) {
+                console.warn('No fue posible restaurar el reporte.', error);
+                return false;
+            }
+        }
+
+        setInterval(() => {
+            autosaveRemaining -= 1;
+
+            if (autosaveRemaining <= 0) {
+                saveRows();
+            }
+
+            const minutes = Math.floor(autosaveRemaining / 60);
+            const seconds = String(autosaveRemaining % 60).padStart(2, '0');
+
+            if (nextAutosaveText) {
+                nextAutosaveText.textContent =
+                    `Próximo autoguardado en ${minutes}:${seconds}`;
+            }
+        }, 1000);
+
+
+        /* =====================================================
+           CIERRE
+           ===================================================== */
+
+        const closeDayBtn = document.getElementById('closeDayBtn');
+
+        closeDayBtn?.addEventListener('click', () => {
+            saveRows();
+
+            const rows = serializeRows();
+
+            const totals = rows.reduce(
+                (acc, row) => {
+                    acc.income += row.income;
+                    acc.expenses += row.laboratory + row.otherExpenses;
+                    return acc;
+                },
+                { income: 0, expenses: 0 }
+            );
+
+            const profit = totals.income - totals.expenses;
+
+            alert(
+                `Cierre guardado.\n\n` +
+                `Movimientos: ${rows.length}\n` +
+                `Ingresos: ${formatMoney(totals.income)}\n` +
+                `Gastos: ${formatMoney(totals.expenses)}\n` +
+                `Utilidad: ${formatMoney(profit)}`
+            );
+        });
+
+
+        /* =====================================================
+           INICIALIZACIÓN
+           ===================================================== */
+
+        const restored = restoreRows();
+
+        if (!restored) {
+            dataRows().forEach((row) => {
+                ensureEditableStatus(row);
+                normalizeMoneyInputs(row);
+                calculateRow(row);
+            });
+        }
+
+        renumberRows();
+        applyFilters();
     </script>
 
 </body>
