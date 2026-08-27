@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#5f4b78" />
+    <title>Samantha's Studio Lab | Pacientes</title>
+    <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+
+<body class="dashboard-page patients-page">
+    <div class="page-loader" id="pageLoader">
+        <div class="loader-orb loader-orb-1"></div>
+        <div class="loader-orb loader-orb-2"></div>
+        <div class="loader-orb loader-orb-3"></div>
+        <div class="loader-content">
+            <div class="loader-logo-wrap">
+                <svg class="loader-logo" viewBox="0 0 100 100" aria-hidden="true">
+                    <circle cx="50" cy="50" r="47" fill="#cbbbe2" />
+                    <g fill="none" stroke="#fff" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M44 23c-8 2-12 12-12 25 0 11 3 19 8 25 3 4 3 11 4 18" />
+                        <path d="M49 21c13-2 20 10 20 28 0 13-3 23-8 30-2 3-2 7-1 14" />
+                        <path d="M35 30l-14 2M34 39l-15 2M34 49l-14 3M36 59l-13 4M39 68l-10 5" />
+                        <path d="M50 54c3 3 8 4 12 2 3-2 5-5 6-9" stroke-width="4.4" />
+                        <circle cx="58" cy="43" r="2.6" fill="#fff" stroke="none" />
+                    </g>
+                </svg>
+                <span class="loader-ring"></span>
+            </div>
+            <div class="loader-brand"><strong>samantha's studio lab</strong><span>odontopediatría</span></div>
+            <div class="loader-line"><span></span></div>
+            <p>Organizando expedientes...</p>
+        </div>
+    </div>
+
+    <div class="dashboard-app">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <svg class="mini-logo" viewBox="0 0 100 100" aria-hidden="true">
+                    <circle cx="50" cy="50" r="47" fill="#cbbbe2" />
+                    <g fill="none" stroke="#fff" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M44 23c-8 2-12 12-12 25 0 11 3 19 8 25 3 4 3 11 4 18" />
+                        <path d="M49 21c13-2 20 10 20 28 0 13-3 23-8 30-2 3-2 7-1 14" />
+                        <path d="M35 30l-14 2M34 39l-15 2M34 49l-14 3M36 59l-13 4M39 68l-10 5" />
+                        <path d="M50 54c3 3 8 4 12 2 3-2 5-5 6-9" stroke-width="4.4" />
+                        <circle cx="58" cy="43" r="2.6" fill="#fff" stroke="none" />
+                    </g>
+                </svg>
+                <div><strong>samantha's studio lab</strong><span>odontopediatría</span></div>
+            </div>
+
+            <div class="nav-label">Principal</div>
+            <nav class="sidebar-nav">
+                <a class="nav-item" href="index.html">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M4 13h6V4H4v9Zm0 7h6v-4H4v4Zm10 0h6v-9h-6v9Zm0-16v4h6V4h-6Z" /></svg>
+                    Inicio
+                </a>
+                <a class="nav-item" href="agenda.html">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M7 3v4M17 3v4M3 10h18" /></svg>
+                    Agenda <span class="badge">8</span>
+                </a>
+                <a class="nav-item active" href="pacientes.html">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+                    Pacientes
+                </a>
+                <a class="nav-item" href="#">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M12 20h9" /><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z" /></svg>
+                    Tratamientos
+                </a>
+                <a class="nav-item" href="#">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z" /><path d="M8 9h8M8 13h5" /></svg>
+                    Seguimientos <span class="badge">3</span>
+                </a>
+            </nav>
+
+            <div class="nav-label">Administración</div>
+            <nav class="sidebar-nav">
+                <a class="nav-item" href="reportes.html">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M3 3v18h18" /><path d="m7 16 4-5 3 3 5-7" /></svg>
+                    Reportes
+                </a>
+                <a class="nav-item" href="#">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.09A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.1 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H2.3v-4h.09A1.7 1.7 0 0 0 4.1 8.5a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 8.5 4.1a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V2.3h4v.09A1.7 1.7 0 0 0 15 4.1a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 8.5c.11.39.32.74.6 1 .3.27.68.41 1.1.4h.09v4h-.09A1.7 1.7 0 0 0 19.4 15Z" /></svg>
+                    Configuración
+                </a>
+            </nav>
+            <div class="sidebar-footer"><div class="sidebar-profile"><div class="avatar">SS</div><div><strong>Dra. Samantha</strong><span>Propietaria · Administrador</span></div></div></div>
+        </aside>
+
+        <main class="main-area">
+            <header class="topbar">
+                <div class="topbar-title-wrap">
+                    <button class="icon-btn mobile-menu" id="menuBtn" aria-label="Abrir menú"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16" /></svg></button>
+                    <div class="page-title"><small>Expediente clínico</small><strong>Directorio de pacientes</strong></div>
+                </div>
+                <div class="top-actions">
+                    <span class="data-mode"><i></i> Datos de demostración</span>
+                    <button class="primary-action" id="newPatientBtn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 5v14M5 12h14" /></svg><span>Nuevo paciente</span></button>
+                </div>
+            </header>
+
+            <div class="dashboard-content patients-content">
+                <section class="patients-hero">
+                    <div>
+                        <p class="eyebrow">Pacientes</p>
+                        <h1>La historia de cada sonrisa, siempre a la mano.</h1>
+                        <p>Encuentra rápidamente a un paciente y consulta su información, evolución clínica y documentos.</p>
+                    </div>
+                    <div class="patients-stats" aria-label="Resumen de pacientes">
+                        <div><span>Pacientes activos</span><strong>126</strong><small>+8 este mes</small></div>
+                        <div><span>Visitas en agosto</span><strong>84</strong><small>67% del padrón</small></div>
+                        <div><span>Por seguimiento</span><strong>14</strong><small>Próximos 30 días</small></div>
+                    </div>
+                </section>
+
+                <section class="patients-workspace">
+                    <article class="patient-directory">
+                        <div class="directory-head">
+                            <div><h2>Todos los pacientes</h2><p id="resultCount">8 expedientes encontrados</p></div>
+                            <button class="directory-filter-btn" id="filterBtn" aria-pressed="false" title="Mostrar solo pacientes con seguimiento pendiente">
+                                <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M7 12h10M10 18h4" /></svg>
+                                <span>Por seguimiento</span>
+                            </button>
+                        </div>
+                        <label class="patient-search">
+                            <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+                            <input type="search" id="patientSearch" placeholder="Buscar por nombre, tutor o folio..." autocomplete="off" />
+                            <kbd>⌘ K</kbd>
+                        </label>
+                        <div class="patient-list-head"><span>Paciente</span><span>Última visita</span></div>
+                        <div class="patient-list" id="patientList" aria-live="polite"></div>
+                        <div class="directory-footer"><span>Mostrando expedientes de demostración</span><div><button aria-label="Página anterior" disabled>‹</button><strong>1</strong><button aria-label="Página siguiente" disabled>›</button></div></div>
+                    </article>
+
+                    <article class="patient-record" id="patientRecord" aria-live="polite">
+                        <div class="record-placeholder">Selecciona un paciente para consultar su expediente.</div>
+                    </article>
+                </section>
+
+                <div class="notice"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="9" /><path d="M12 8v4M12 16h.01" /></svg>Todos los nombres, teléfonos, tratamientos y archivos de esta pantalla son ficticios. En la versión final, el acceso deberá protegerse con permisos por usuario y almacenamiento seguro.</div>
+            </div>
+        </main>
+    </div>
+
+    <div class="patient-modal" id="patientModal" aria-hidden="true">
+        <div class="patient-modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <button class="modal-close" id="modalClose" aria-label="Cerrar">×</button>
+            <span class="modal-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="7" r="4" /><path d="M2 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2M19 8v6M16 11h6" /></svg></span>
+            <h2 id="modalTitle">Nuevo paciente</h2>
+            <p>Este botón conectará el formulario de registro cuando se integre la base de datos.</p>
+            <button class="primary-action modal-ok" id="modalOk">Entendido</button>
+        </div>
+    </div>
+    <div class="demo-toast" id="demoToast" role="status"></div>
+
+    <script>
+        const patients = [
+            {
+                id: 'SSL-0261', name: 'Ana Valeria López', initials: 'AV', age: 8, birth: '14 feb. 2018', sex: 'Femenino', status: 'Activo', followUp: false,
+                guardian: 'Laura López Martínez', relationship: 'Mamá', phone: '33 0000 0184', email: 'laura.lopez@correo.demo', lastVisit: '24 ago. 2026', lastShort: '24 ago.', nextVisit: '18 feb. 2027 · 10:00', doctor: 'Dra. Samantha', blood: 'O+', allergies: 'Ninguna conocida', color: 'rose',
+                reason: 'Control preventivo semestral y seguimiento de higiene.',
+                treatments: [
+                    { date: '24 ago. 2026', name: 'Limpieza dental y profilaxis', doctor: 'Dra. Samantha', detail: 'Buena evolución. Se reforzó técnica de cepillado.', state: 'Completado' },
+                    { date: '18 feb. 2026', name: 'Aplicación de flúor', doctor: 'Dra. Samantha', detail: 'Barniz de flúor; toleró correctamente el procedimiento.', state: 'Completado' },
+                    { date: '03 sep. 2025', name: 'Primera valoración', doctor: 'Dra. Mariana', detail: 'Dentición mixta sin hallazgos de urgencia.', state: 'Completado' }
+                ],
+                notes: [
+                    { date: '24 ago. 2026 · 10:42', doctor: 'Dra. Samantha', text: 'Paciente tranquila y cooperadora. Higiene general adecuada; vigilar acumulación de placa en molares inferiores.' },
+                    { date: '18 feb. 2026 · 11:15', doctor: 'Dra. Samantha', text: 'Se explicaron cuidados posteriores a la aplicación de flúor a la tutora.' }
+                ],
+                images: [{ type: 'Radiografía panorámica', date: '24 ago. 2026', tag: 'PANORÁMICA' }, { type: 'Fotografía intraoral', date: '24 ago. 2026', tag: 'INTRAORAL' }, { type: 'Radiografía bitewing', date: '18 feb. 2026', tag: 'BITEWING' }],
+                files: [{ name: 'Consentimiento informado.pdf', meta: 'PDF · 248 KB · 24 ago. 2026' }, { name: 'Plan preventivo Ana Valeria.pdf', meta: 'PDF · 1.2 MB · 24 ago. 2026' }, { name: 'Cuestionario médico.pdf', meta: 'PDF · 384 KB · 03 sep. 2025' }]
+            },
+            {
+                id: 'SSL-0248', name: 'Mateo Ramírez', initials: 'MR', age: 6, birth: '09 jun. 2020', sex: 'Masculino', status: 'Seguimiento', followUp: true,
+                guardian: 'Carlos Ramírez Pérez', relationship: 'Papá', phone: '33 0000 0248', email: 'carlos.ramirez@correo.demo', lastVisit: '21 ago. 2026', lastShort: '21 ago.', nextVisit: '28 ago. 2026 · 10:15', doctor: 'Dra. Samantha', blood: 'A+', allergies: 'Sensibilidad al látex', color: 'blue',
+                reason: 'Revisión posterior a restauración de molar temporal.',
+                treatments: [{ date: '21 ago. 2026', name: 'Restauración con resina', doctor: 'Dra. Samantha', detail: 'Restauración oclusal en órgano dental 75.', state: 'En seguimiento' }, { date: '08 ago. 2026', name: 'Valoración y radiografía', doctor: 'Dra. Samantha', detail: 'Lesión cariosa moderada; se indicó restauración.', state: 'Completado' }],
+                notes: [{ date: '21 ago. 2026 · 12:18', doctor: 'Dra. Samantha', text: 'Evitar alimentos duros durante 24 horas. Tutor informado sobre signos de alarma.' }],
+                images: [{ type: 'Radiografía periapical', date: '08 ago. 2026', tag: 'PERIAPICAL' }, { type: 'Fotografía de control', date: '21 ago. 2026', tag: 'CONTROL' }],
+                files: [{ name: 'Consentimiento restauración.pdf', meta: 'PDF · 206 KB · 21 ago. 2026' }, { name: 'Indicaciones posteriores.pdf', meta: 'PDF · 122 KB · 21 ago. 2026' }]
+            },
+            {
+                id: 'SSL-0232', name: 'Sofía Ortega', initials: 'SO', age: 10, birth: '30 nov. 2015', sex: 'Femenino', status: 'Activo', followUp: false,
+                guardian: 'Daniela Ortega Ruiz', relationship: 'Mamá', phone: '33 0000 0232', email: 'daniela.ortega@correo.demo', lastVisit: '19 ago. 2026', lastShort: '19 ago.', nextVisit: '20 feb. 2027 · 11:30', doctor: 'Dra. Mariana', blood: 'B+', allergies: 'Ninguna conocida', color: 'yellow',
+                reason: 'Prevención de caries y aplicación periódica de flúor.',
+                treatments: [{ date: '19 ago. 2026', name: 'Aplicación de flúor', doctor: 'Dra. Mariana', detail: 'Procedimiento preventivo sin incidencias.', state: 'Completado' }, { date: '12 feb. 2026', name: 'Selladores de fosetas', doctor: 'Dra. Mariana', detail: 'Selladores en primeros molares permanentes.', state: 'Completado' }],
+                notes: [{ date: '19 ago. 2026 · 12:05', doctor: 'Dra. Mariana', text: 'Excelente cooperación. Mantener revisiones semestrales.' }],
+                images: [{ type: 'Fotografía intraoral', date: '19 ago. 2026', tag: 'INTRAORAL' }],
+                files: [{ name: 'Plan preventivo.pdf', meta: 'PDF · 536 KB · 19 ago. 2026' }]
+            },
+            {
+                id: 'SSL-0204', name: 'Leonardo Esparza', initials: 'LE', age: 12, birth: '05 mar. 2014', sex: 'Masculino', status: 'Seguimiento', followUp: true,
+                guardian: 'Fernanda Silva Esparza', relationship: 'Mamá', phone: '33 0000 0204', email: 'fernanda.silva@correo.demo', lastVisit: '12 ago. 2026', lastShort: '12 ago.', nextVisit: '16 sep. 2026 · 13:00', doctor: 'Dra. Sofía', blood: 'O-', allergies: 'Amoxicilina', color: 'lilac',
+                reason: 'Control mensual de ortodoncia interceptiva.',
+                treatments: [{ date: '12 ago. 2026', name: 'Control de ortodoncia', doctor: 'Dra. Sofía', detail: 'Ajuste de aparato y revisión de avance.', state: 'En seguimiento' }, { date: '15 jul. 2026', name: 'Colocación de aparato', doctor: 'Dra. Sofía', detail: 'Inicio de fase interceptiva.', state: 'Completado' }],
+                notes: [{ date: '12 ago. 2026 · 14:10', doctor: 'Dra. Sofía', text: 'Mejorar uso nocturno del aparato. La tutora confirma comprensión de indicaciones.' }],
+                images: [{ type: 'Radiografía panorámica', date: '15 jul. 2026', tag: 'PANORÁMICA' }, { type: 'Fotografía de progreso', date: '12 ago. 2026', tag: 'PROGRESO' }],
+                files: [{ name: 'Plan de ortodoncia.pdf', meta: 'PDF · 2.1 MB · 15 jul. 2026' }, { name: 'Carta de indicaciones.pdf', meta: 'PDF · 185 KB · 12 ago. 2026' }]
+            },
+            {
+                id: 'SSL-0189', name: 'Emiliano Mendoza', initials: 'EM', age: 5, birth: '27 ene. 2021', sex: 'Masculino', status: 'Nuevo', followUp: false,
+                guardian: 'Natalia Mendoza Torres', relationship: 'Mamá', phone: '33 0000 0189', email: 'natalia.mendoza@correo.demo', lastVisit: '08 ago. 2026', lastShort: '08 ago.', nextVisit: '29 ago. 2026 · 15:30', doctor: 'Dra. Mariana', blood: 'A-', allergies: 'Ninguna conocida', color: 'mint',
+                reason: 'Primera valoración y adaptación al entorno dental.',
+                treatments: [{ date: '08 ago. 2026', name: 'Primera valoración', doctor: 'Dra. Mariana', detail: 'Consulta de adaptación; revisión visual general.', state: 'Completado' }],
+                notes: [{ date: '08 ago. 2026 · 16:22', doctor: 'Dra. Mariana', text: 'Paciente aprensivo al inicio; respondió bien a manejo de conducta decir-mostrar-hacer.' }],
+                images: [{ type: 'Fotografía inicial', date: '08 ago. 2026', tag: 'INICIAL' }],
+                files: [{ name: 'Historia clínica inicial.pdf', meta: 'PDF · 442 KB · 08 ago. 2026' }]
+            },
+            {
+                id: 'SSL-0177', name: 'Renata Díaz', initials: 'RD', age: 9, birth: '18 abr. 2017', sex: 'Femenino', status: 'Activo', followUp: false,
+                guardian: 'Mónica Díaz Navarro', relationship: 'Mamá', phone: '33 0000 0177', email: 'monica.diaz@correo.demo', lastVisit: '30 jul. 2026', lastShort: '30 jul.', nextVisit: '30 ene. 2027 · 09:00', doctor: 'Dra. Samantha', blood: 'AB+', allergies: 'Ninguna conocida', color: 'rose',
+                reason: 'Control preventivo y vigilancia de erupción dental.',
+                treatments: [{ date: '30 jul. 2026', name: 'Limpieza dental', doctor: 'Dra. Samantha', detail: 'Profilaxis y control de placa.', state: 'Completado' }],
+                notes: [{ date: '30 jul. 2026 · 09:52', doctor: 'Dra. Samantha', text: 'Sin caries activas. Programar revisión preventiva en seis meses.' }],
+                images: [{ type: 'Fotografía intraoral', date: '30 jul. 2026', tag: 'INTRAORAL' }],
+                files: [{ name: 'Reporte de consulta.pdf', meta: 'PDF · 294 KB · 30 jul. 2026' }]
+            },
+            {
+                id: 'SSL-0156', name: 'Diego Luna', initials: 'DL', age: 7, birth: '22 dic. 2018', sex: 'Masculino', status: 'Seguimiento', followUp: true,
+                guardian: 'Paola Luna Gómez', relationship: 'Mamá', phone: '33 0000 0156', email: 'paola.luna@correo.demo', lastVisit: '18 jul. 2026', lastShort: '18 jul.', nextVisit: '02 sep. 2026 · 16:00', doctor: 'Dra. Samantha', blood: 'O+', allergies: 'Ibuprofeno', color: 'blue',
+                reason: 'Seguimiento de traumatismo en incisivo temporal.',
+                treatments: [{ date: '18 jul. 2026', name: 'Control por traumatismo', doctor: 'Dra. Samantha', detail: 'Sin movilidad patológica. Continuar observación.', state: 'En seguimiento' }, { date: '20 jun. 2026', name: 'Atención de urgencia', doctor: 'Dra. Samantha', detail: 'Valoración inicial posterior a caída.', state: 'Completado' }],
+                notes: [{ date: '18 jul. 2026 · 17:40', doctor: 'Dra. Samantha', text: 'Sin cambios de coloración. Mantener vigilancia y regresar si hay dolor o inflamación.' }],
+                images: [{ type: 'Radiografía periapical', date: '20 jun. 2026', tag: 'PERIAPICAL' }, { type: 'Fotografía de control', date: '18 jul. 2026', tag: 'CONTROL' }],
+                files: [{ name: 'Reporte de urgencia.pdf', meta: 'PDF · 670 KB · 20 jun. 2026' }]
+            },
+            {
+                id: 'SSL-0138', name: 'Camila Torres', initials: 'CT', age: 11, birth: '11 may. 2015', sex: 'Femenino', status: 'Inactivo', followUp: false,
+                guardian: 'Alejandro Torres Vega', relationship: 'Papá', phone: '33 0000 0138', email: 'alejandro.torres@correo.demo', lastVisit: '02 jun. 2026', lastShort: '02 jun.', nextVisit: 'Sin cita programada', doctor: 'Dra. Sofía', blood: 'A+', allergies: 'Ninguna conocida', color: 'yellow',
+                reason: 'Valoración ortodóncica y control de dentición mixta.',
+                treatments: [{ date: '02 jun. 2026', name: 'Valoración ortodóncica', doctor: 'Dra. Sofía', detail: 'Se recomendó valoración de seguimiento en cuatro meses.', state: 'Completado' }],
+                notes: [{ date: '02 jun. 2026 · 13:15', doctor: 'Dra. Sofía', text: 'Tutor pendiente de confirmar inicio de tratamiento.' }],
+                images: [{ type: 'Radiografía panorámica', date: '02 jun. 2026', tag: 'PANORÁMICA' }],
+                files: [{ name: 'Valoración ortodóncica.pdf', meta: 'PDF · 1.8 MB · 02 jun. 2026' }]
+            }
+        ];
+
+        const patientList = document.getElementById('patientList');
+        const patientRecord = document.getElementById('patientRecord');
+        const searchInput = document.getElementById('patientSearch');
+        const resultCount = document.getElementById('resultCount');
+        const filterBtn = document.getElementById('filterBtn');
+        let activeId = patients[0].id;
+        let followUpOnly = false;
+
+        const icon = {
+            chevron: '<svg viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" /></svg>',
+            phone: '<svg viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.33 1.78.62 2.63a2 2 0 0 1-.45 2.11L8 9.73a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.85.29 1.73.5 2.63.62A2 2 0 0 1 22 16.92Z" /></svg>',
+            calendar: '<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M7 3v4M17 3v4M3 10h18" /></svg>',
+            file: '<svg viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" /><path d="M14 2v6h6M8 13h8M8 17h5" /></svg>',
+            download: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 19h16" /></svg>'
+        };
+
+        function escapeText(value) {
+            return String(value).replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
+        }
+
+        function visiblePatients() {
+            const query = searchInput.value.trim().toLocaleLowerCase('es');
+            return patients.filter(patient => {
+                const matches = [patient.name, patient.guardian, patient.id].join(' ').toLocaleLowerCase('es').includes(query);
+                return matches && (!followUpOnly || patient.followUp);
+            });
+        }
+
+        function renderList() {
+            const matches = visiblePatients();
+            resultCount.textContent = `${matches.length} ${matches.length === 1 ? 'expediente encontrado' : 'expedientes encontrados'}`;
+            patientList.innerHTML = matches.length ? matches.map(patient => `
+                <button class="patient-row ${patient.id === activeId ? 'active' : ''}" data-id="${patient.id}">
+                    <span class="patient-row-avatar ${patient.color}">${patient.initials}</span>
+                    <span class="patient-row-copy"><strong>${escapeText(patient.name)}</strong><small>${patient.age} años · ${escapeText(patient.guardian)}</small><em>${escapeText(patient.id)}</em></span>
+                    <span class="patient-last-visit"><small>Última visita</small><strong>${patient.lastShort}</strong><em class="record-status ${patient.status.toLowerCase()}">${patient.status}</em></span>
+                    <span class="patient-chevron">${icon.chevron}</span>
+                </button>`).join('') : `<div class="patient-empty"><strong>No encontramos coincidencias</strong><span>Prueba con otro nombre, tutor o folio.</span></div>`;
+
+            patientList.querySelectorAll('.patient-row').forEach(row => row.addEventListener('click', () => {
+                activeId = row.dataset.id;
+                renderList();
+                renderRecord();
+                if (window.innerWidth < 1120) patientRecord.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }));
+        }
+
+        function xrayGraphic(index) {
+            if (index % 2) return '<svg class="xray-art" viewBox="0 0 180 110" aria-hidden="true"><path d="M25 55c25-20 105-20 130 0"/><path d="M34 50v24c0 15 19 15 19 0V45m17-4v36c0 17 20 17 20 0V39m17 2v36c0 17 20 17 20 0V45m17 5v24c0 15 19 15 19 0V55"/><path d="M24 57c25 22 107 22 132 0"/></svg>';
+            return '<svg class="xray-art" viewBox="0 0 180 110" aria-hidden="true"><path d="M18 56c13-31 37-42 72-42s59 11 72 42c-15 27-40 39-72 39S33 83 18 56Z"/><path d="M42 50c14 13 82 13 96 0M45 66c15-11 75-11 90 0"/><path d="M54 39v27m18-34v39m18-42v45m18-42v39m18-32v27"/></svg>';
+        }
+
+        function renderRecord() {
+            const patient = patients.find(item => item.id === activeId) || visiblePatients()[0];
+            if (!patient) {
+                patientRecord.innerHTML = '<div class="record-placeholder">Selecciona un paciente para consultar su expediente.</div>';
+                return;
+            }
+            activeId = patient.id;
+            patientRecord.innerHTML = `
+                <header class="record-hero">
+                    <div class="record-identity"><span class="record-avatar ${patient.color}">${patient.initials}</span><div><span class="record-folio">${patient.id}</span><h2>${escapeText(patient.name)}</h2><p>${patient.age} años · ${patient.sex} · Paciente desde 2025</p></div></div>
+                    <div class="record-actions"><button class="record-icon-btn" data-demo="Llamada a ${escapeText(patient.guardian)}">${icon.phone}<span>Llamar</span></button><button class="record-primary-btn" data-demo="Nueva cita para ${escapeText(patient.name)}">${icon.calendar}<span>Agendar cita</span></button></div>
+                </header>
+
+                <div class="record-alert ${patient.followUp ? '' : 'is-calm'}"><span>${patient.followUp ? 'Seguimiento pendiente' : 'Expediente al corriente'}</span><strong>${patient.followUp ? patient.nextVisit : 'Próxima revisión: ' + patient.nextVisit}</strong></div>
+
+                <section class="record-section record-summary">
+                    <div class="section-title"><div><span>01</span><div><h3>Información del paciente</h3><p>Datos generales y contacto del tutor</p></div></div><button data-demo="Editar información de ${escapeText(patient.name)}">Editar</button></div>
+                    <div class="info-grid">
+                        <div><span>Fecha de nacimiento</span><strong>${patient.birth}</strong></div><div><span>Tipo de sangre</span><strong>${patient.blood}</strong></div><div><span>Alergias</span><strong class="${patient.allergies === 'Ninguna conocida' ? '' : 'warning-text'}">${patient.allergies}</strong></div><div><span>Odontóloga responsable</span><strong>${patient.doctor}</strong></div>
+                        <div class="info-wide"><span>Tutor responsable</span><strong>${patient.guardian} · ${patient.relationship}</strong></div><div><span>Teléfono</span><strong>${patient.phone}</strong></div><div><span>Correo</span><strong>${patient.email}</strong></div>
+                    </div>
+                    <div class="visit-reason"><span>Motivo / objetivo actual</span><p>${patient.reason}</p></div>
+                </section>
+
+                <section class="record-section">
+                    <div class="section-title"><div><span>02</span><div><h3>Historial de tratamientos</h3><p>${patient.treatments.length} registros clínicos</p></div></div><button data-demo="Agregar tratamiento a ${escapeText(patient.name)}">+ Agregar</button></div>
+                    <div class="treatment-timeline">${patient.treatments.map((item, index) => `<article class="treatment-history-item"><div class="timeline-marker"><i></i>${index < patient.treatments.length - 1 ? '<b></b>' : ''}</div><div class="treatment-history-copy"><div><span>${item.date}</span><em>${item.state}</em></div><h4>${item.name}</h4><p>${item.detail}</p><small>${item.doctor}</small></div></article>`).join('')}</div>
+                </section>
+
+                <section class="record-section">
+                    <div class="section-title"><div><span>03</span><div><h3>Notas clínicas</h3><p>Observaciones registradas por el equipo</p></div></div><button data-demo="Nueva nota clínica para ${escapeText(patient.name)}">+ Nueva nota</button></div>
+                    <div class="clinical-notes">${patient.notes.map(note => `<article><div class="note-avatar">${note.doctor.split(' ').pop().slice(0, 2).toUpperCase()}</div><div><div><strong>${note.doctor}</strong><time>${note.date}</time></div><p>${note.text}</p></div></article>`).join('')}</div>
+                </section>
+
+                <section class="record-section">
+                    <div class="section-title"><div><span>04</span><div><h3>Radiografías e imágenes</h3><p>${patient.images.length} estudios visuales</p></div></div><button data-demo="Subir imagen para ${escapeText(patient.name)}">Subir imagen</button></div>
+                    <div class="clinical-gallery">${patient.images.map((image, index) => `<button class="clinical-image" data-demo="Vista previa: ${escapeText(image.type)}"><span class="image-kind">${image.tag}</span>${xrayGraphic(index)}<span class="image-overlay"><strong>${image.type}</strong><small>${image.date}</small></span></button>`).join('')}</div>
+                </section>
+
+                <section class="record-section record-files-section">
+                    <div class="section-title"><div><span>05</span><div><h3>Archivos del paciente</h3><p>Documentos, consentimientos y planes</p></div></div><button data-demo="Subir archivo para ${escapeText(patient.name)}">Subir archivo</button></div>
+                    <div class="patient-files">${patient.files.map(file => `<button class="patient-file" data-demo="Archivo de demostración: ${escapeText(file.name)}"><span class="file-type">${icon.file}</span><span><strong>${escapeText(file.name)}</strong><small>${file.meta}</small></span><i>${icon.download}</i></button>`).join('')}</div>
+                </section>`;
+
+            patientRecord.querySelectorAll('[data-demo]').forEach(button => button.addEventListener('click', () => showToast(button.dataset.demo)));
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('demoToast');
+            toast.textContent = `${message}. Función disponible al conectar el sistema.`;
+            toast.classList.add('show');
+            clearTimeout(showToast.timer);
+            showToast.timer = setTimeout(() => toast.classList.remove('show'), 3200);
+        }
+
+        searchInput.addEventListener('input', () => {
+            const matches = visiblePatients();
+            if (matches.length && !matches.some(patient => patient.id === activeId)) activeId = matches[0].id;
+            renderList();
+            renderRecord();
+        });
+        filterBtn.addEventListener('click', () => {
+            followUpOnly = !followUpOnly;
+            filterBtn.setAttribute('aria-pressed', String(followUpOnly));
+            filterBtn.classList.toggle('active', followUpOnly);
+            const matches = visiblePatients();
+            if (matches.length && !matches.some(patient => patient.id === activeId)) activeId = matches[0].id;
+            renderList();
+            renderRecord();
+        });
+
+        document.addEventListener('keydown', event => {
+            if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+                event.preventDefault();
+                searchInput.focus();
+            }
+            if (event.key === 'Escape') closeModal();
+        });
+
+        const modal = document.getElementById('patientModal');
+        function openModal() { modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false'); }
+        function closeModal() { modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); }
+        document.getElementById('newPatientBtn').addEventListener('click', openModal);
+        document.getElementById('modalClose').addEventListener('click', closeModal);
+        document.getElementById('modalOk').addEventListener('click', closeModal);
+        modal.addEventListener('click', event => { if (event.target === modal) closeModal(); });
+
+        const menuBtn = document.getElementById('menuBtn');
+        menuBtn?.addEventListener('click', () => document.body.classList.toggle('nav-open'));
+        document.addEventListener('click', event => {
+            if (window.innerWidth <= 900 && document.body.classList.contains('nav-open') && !event.target.closest('.sidebar') && !event.target.closest('#menuBtn')) document.body.classList.remove('nav-open');
+        });
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('pageLoader')?.classList.add('is-hidden');
+                setTimeout(() => document.getElementById('pageLoader')?.remove(), 600);
+            }, 450);
+        });
+
+        renderList();
+        renderRecord();
+    </script>
+</body>
+
+</html>
