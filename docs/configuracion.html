@@ -16,7 +16,7 @@
 </head>
 <body class="dashboard-page settings-page">
   <div class="dashboard-app">
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
       <div class="sidebar-brand">
         <svg class="mini-logo" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="47" fill="#cbbbe2"/><g fill="none" stroke="#fff" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round"><path d="M44 23c-8 2-12 12-12 25 0 11 3 19 8 25 3 4 3 11 4 18"/><path d="M49 21c13-2 20 10 20 28 0 13-3 23-8 30-2 3-2 7-1 14"/><path d="M35 30l-14 2M34 39l-15 2M34 49l-14 3M36 59l-13 4M39 68l-10 5"/><path d="M50 54c3 3 8 4 12 2 3-2 5-5 6-9" stroke-width="4.4"/><circle cx="58" cy="43" r="2.6" fill="#fff" stroke="none"/></g></svg>
         <div><strong>samantha's studio lab</strong><span>odontopediatría</span></div>
@@ -38,8 +38,11 @@
     </aside>
     <main class="main-area">
       <header class="topbar">
-        <div class="page-title"><small>ADMINISTRACIÓN</small><strong>Configuración de usuarios</strong></div>
-        <div class="top-actions"><button class="icon-btn mobile-menu" id="menuBtn" aria-label="Abrir menú"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><button class="primary-action" id="newUserBtn"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14"/></svg><span>Nuevo usuario</span></button></div>
+        <div style="display:flex;align-items:center;gap:12px;min-width:0">
+          <button class="icon-btn mobile-menu" id="menuBtn" aria-label="Abrir menú" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+          <div class="page-title"><small>ADMINISTRACIÓN</small><strong>Configuración de usuarios</strong></div>
+        </div>
+        <div class="top-actions"><button class="primary-action" id="newUserBtn"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14"/></svg><span>Nuevo usuario</span></button></div>
       </header>
       <div class="dashboard-content settings-content">
         <section class="settings-hero"><div><p class="eyebrow">ACCESOS DEL EQUIPO</p><h1>El consultorio, en las manos correctas.</h1><p>Administra los datos de acceso y asigna a cada integrante el rol que necesita.</p></div><div class="settings-count"><strong id="userCount">0</strong><span>usuarios activos</span></div></section>
@@ -82,7 +85,11 @@
       list.addEventListener('click',event=>{const edit=event.target.closest('[data-edit]'),del=event.target.closest('[data-delete]');if(edit)editUser(edit.dataset.edit);if(del){const u=users.find(x=>x.id===del.dataset.delete);if(u&&confirm(`¿Eliminar el acceso de ${u.username}?`)){users=users.filter(x=>x.id!==u.id);save();render();if(idInput.value===u.id)resetForm();flash('Usuario eliminado.')}}});
       document.getElementById('passwordToggle').addEventListener('click',()=>{const showing=password.type==='text';password.type=showing?'password':'text';document.getElementById('passwordToggle').setAttribute('aria-label',showing?'Mostrar contraseña':'Ocultar contraseña')});
       document.getElementById('cancelBtn').addEventListener('click',resetForm);document.getElementById('newUserBtn').addEventListener('click',()=>{resetForm();username.focus()});
-      document.getElementById('menuBtn').addEventListener('click',()=>document.body.classList.toggle('nav-open'));document.addEventListener('click',e=>{if(document.body.classList.contains('nav-open')&&!e.target.closest('.sidebar')&&!e.target.closest('#menuBtn'))document.body.classList.remove('nav-open')});
+      const menuBtn=document.getElementById('menuBtn');
+      const setMenu=open=>{document.body.classList.toggle('nav-open',open);menuBtn.setAttribute('aria-expanded',String(open))};
+      menuBtn.addEventListener('click',event=>{event.stopPropagation();setMenu(!document.body.classList.contains('nav-open'))});
+      document.addEventListener('click',event=>{if(document.body.classList.contains('nav-open')&&!event.target.closest('.sidebar')&&!event.target.closest('#menuBtn'))setMenu(false)});
+      document.addEventListener('keydown',event=>{if(event.key==='Escape')setMenu(false)});
       save();render();
     })();
   </script>
