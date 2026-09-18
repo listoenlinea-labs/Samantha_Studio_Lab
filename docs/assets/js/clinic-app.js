@@ -131,9 +131,21 @@
   }
 
   function renderAgenda() {
+    const monthDays = [
+      { day: 31, muted: true }, { day: 1 }, { day: 2 }, { day: 3 }, { day: 4 }, { day: 5 }, { day: 6 },
+      { day: 7 }, { day: 8 }, { day: 9 }, { day: 10 }, { day: 11 }, { day: 12 }, { day: 13 },
+      { day: 14, events: [['09:00 · Paciente demo A', 'lilac']] },
+      { day: 15, events: [['10:00 · Paciente demo B', 'coral']] },
+      { day: 16, events: [['12:00 · Paciente demo C', 'sage']] },
+      { day: 17, today: true, events: [['09:00 · Paciente demo D', 'gold'], ['13:00 · Paciente demo E', 'lilac']] },
+      { day: 18, events: [['11:00 · Paciente demo F', 'coral']] },
+      { day: 19, events: [['10:00 · Paciente demo G', 'sage']] }, { day: 20 },
+      { day: 21 }, { day: 22 }, { day: 23 }, { day: 24 }, { day: 25 }, { day: 26 }, { day: 27 },
+      { day: 28 }, { day: 29 }, { day: 30 }, { day: 1, muted: true }, { day: 2, muted: true }, { day: 3, muted: true }, { day: 4, muted: true },
+    ];
     shell(
-      `<section class="dc-agenda-toolbar"><div class="dc-date-nav"><button class="icon-button">‹</button><button class="button secondary">Hoy</button><button class="icon-button">›</button><div><strong>14 – 19 septiembre 2026</strong><small>Semana clínica · 38 citas</small></div></div><div class="toolbar"><input class="input search" id="agendaSearch" placeholder="Buscar paciente o tratamiento"><select class="select"><option>Semana</option><option>Día</option><option>Mes</option></select><button class="button secondary" data-toast="Integración preparada: falta autorizar Google Calendar.">Sincronizar Google</button></div></section>
-      <section class="dc-agenda-layout"><article class="dc-calendar card"><div class="dc-calendar-head"><div class="dc-time-label">Hora</div><div>Lun <strong>14</strong></div><div>Mar <strong>15</strong></div><div>Mié <strong>16</strong></div><div class="today">Jue <strong>17</strong></div><div>Vie <strong>18</strong></div><div>Sáb <strong>19</strong></div></div><div class="dc-calendar-body" id="agendaList">
+      `<section class="dc-agenda-toolbar"><div class="dc-date-nav"><button class="icon-button">‹</button><button class="button secondary">Hoy</button><button class="icon-button">›</button><div><strong id="agendaPeriodTitle">14 – 19 septiembre 2026</strong><small id="agendaPeriodSubtitle">Semana clínica · 38 citas</small></div></div><div class="toolbar"><input class="input search" id="agendaSearch" placeholder="Buscar paciente o tratamiento"><select class="select" id="agendaView" aria-label="Vista de agenda"><option value="week">Semana</option><option value="day">Día</option><option value="month">Mes</option></select><button class="button secondary" data-toast="Integración preparada: falta autorizar Google Calendar.">Sincronizar Google</button></div></section>
+      <section class="dc-agenda-view" data-agenda-view="week"><section class="dc-agenda-layout"><article class="dc-calendar card"><div class="dc-calendar-head"><div class="dc-time-label">Hora</div><div>Lun <strong>14</strong></div><div>Mar <strong>15</strong></div><div>Mié <strong>16</strong></div><div class="today">Jue <strong>17</strong></div><div>Vie <strong>18</strong></div><div>Sáb <strong>19</strong></div></div><div class="dc-calendar-body">
         ${['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'].map((time) => `<div class="dc-hour"><span>${time}</span></div>`).join('')}
         <button class="dc-event lilac" style="--day:1;--start:1;--span:2" data-modal="appointment"><b>09:00</b><strong>Paciente demo A</strong><span>Profilaxis · 45 min</span></button>
         <button class="dc-event coral complex" style="--day:2;--start:2;--span:3" data-modal="appointment"><b>10:00</b><strong>Paciente demo B</strong><span>Tiempo extra · nota clínica</span></button>
@@ -142,7 +154,9 @@
         <button class="dc-event lilac" style="--day:4;--start:5;--span:2" data-modal="appointment"><b>13:00</b><strong>Paciente demo E</strong><span>Primera consulta</span></button>
         <button class="dc-event coral" style="--day:5;--start:3;--span:2" data-modal="appointment"><b>11:00</b><strong>Paciente demo F</strong><span>Resina · 60 min</span></button>
         <button class="dc-event sage" style="--day:6;--start:2;--span:2" data-modal="appointment"><b>10:00</b><strong>Paciente demo G</strong><span>Estudio RX</span></button>
-      </div></article><aside class="dc-agenda-rail"><article class="card"><div class="card-head"><div><h2>Profesionales</h2><p>Visibilidad en agenda</p></div></div><label class="dc-doctor"><span class="avatar">SA</span><span><strong>Samantha</strong><small>5 citas hoy</small></span><input type="checkbox" checked></label><label class="dc-doctor"><span class="avatar peach">AS</span><span><strong>Asistente</strong><small>3 apoyos</small></span><input type="checkbox" checked></label><label class="dc-doctor"><span class="avatar sage">RX</span><span><strong>Samantha RX</strong><small>2 estudios</small></span><input type="checkbox" checked></label></article><article class="card"><div class="card-head"><div><h2>Estado de hoy</h2><p>Jueves 17</p></div></div><div class="dc-legend"><span><i class="lilac"></i>Confirmadas <b>6</b></span><span><i class="gold"></i>Por confirmar <b>2</b></span><span><i class="coral"></i>Complejas <b>1</b></span><span><i class="sage"></i>RX / apoyo <b>2</b></span></div><div class="callout warning"><strong>Atención:</strong> una cita requiere 90 minutos y manejo especial.</div></article></aside></section>`
+      </div></article><aside class="dc-agenda-rail"><article class="card"><div class="card-head"><div><h2>Profesionales</h2><p>Visibilidad en agenda</p></div></div><label class="dc-doctor"><span class="avatar">SA</span><span><strong>Samantha</strong><small>5 citas hoy</small></span><input type="checkbox" checked></label><label class="dc-doctor"><span class="avatar peach">AS</span><span><strong>Asistente</strong><small>3 apoyos</small></span><input type="checkbox" checked></label><label class="dc-doctor"><span class="avatar sage">RX</span><span><strong>Samantha RX</strong><small>2 estudios</small></span><input type="checkbox" checked></label></article><article class="card"><div class="card-head"><div><h2>Estado de hoy</h2><p>Jueves 17</p></div></div><div class="dc-legend"><span><i class="lilac"></i>Confirmadas <b>6</b></span><span><i class="gold"></i>Por confirmar <b>2</b></span><span><i class="coral"></i>Complejas <b>1</b></span><span><i class="sage"></i>RX / apoyo <b>2</b></span></div><div class="callout warning"><strong>Atención:</strong> una cita requiere 90 minutos y manejo especial.</div></article></aside></section></section>
+      <section class="dc-agenda-view dc-day-view" data-agenda-view="day" hidden><article class="card"><div class="card-head"><div><h2>Jueves 17 de septiembre</h2><p>Citas ordenadas por hora, duración y complejidad.</p></div>${status('8 citas', 'info')}</div>${appointmentRows(demoAppointments)}</article><aside class="dc-day-summary"><article class="card"><div class="card-head"><div><h2>Resumen del día</h2><p>Estado operativo</p></div></div><div class="dc-legend"><span><i class="lilac"></i>Confirmadas <b>6</b></span><span><i class="gold"></i>Por confirmar <b>2</b></span><span><i class="coral"></i>Complejas <b>1</b></span><span><i class="sage"></i>RX / apoyo <b>2</b></span></div></article><div class="callout warning"><strong>Atención:</strong> una cita requiere 90 minutos y manejo especial.</div></aside></section>
+      <section class="dc-agenda-view dc-month-view card" data-agenda-view="month" hidden><div class="dc-month-head">${['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map((day) => `<span>${day}</span>`).join('')}</div><div class="dc-month-grid">${monthDays.map((item) => `<div class="dc-month-day${item.muted ? ' muted' : ''}${item.today ? ' today' : ''}"><strong>${item.day}</strong>${(item.events || []).map(([label, tone]) => `<button class="dc-month-chip ${tone}" data-modal="appointment">${label}</button>`).join('')}</div>`).join('')}</div></section>`
     );
   }
 
@@ -412,8 +426,27 @@
     });
     document.getElementById('agendaSearch')?.addEventListener('input', (event) => {
       const q = event.target.value.toLowerCase();
-      document.querySelectorAll('#agendaList .appointment').forEach((item) => { item.hidden = !item.textContent.toLowerCase().includes(q); });
+      document.querySelectorAll('[data-agenda-view] .dc-event, [data-agenda-view] .appointment, [data-agenda-view] .dc-month-chip').forEach((item) => { item.hidden = !item.textContent.toLowerCase().includes(q); });
     });
+
+    const agendaView = document.getElementById('agendaView');
+    const setAgendaView = (view) => {
+      const validView = ['week', 'day', 'month'].includes(view) ? view : 'week';
+      const copy = {
+        week: ['14 – 19 septiembre 2026', 'Semana clínica · 38 citas'],
+        day: ['Jueves 17 septiembre 2026', 'Agenda del día · 8 citas'],
+        month: ['Septiembre 2026', 'Vista mensual · 38 citas'],
+      };
+      document.querySelectorAll('[data-agenda-view]').forEach((panel) => { panel.hidden = panel.dataset.agendaView !== validView; });
+      if (agendaView) agendaView.value = validView;
+      if (document.getElementById('agendaPeriodTitle')) document.getElementById('agendaPeriodTitle').textContent = copy[validView][0];
+      if (document.getElementById('agendaPeriodSubtitle')) document.getElementById('agendaPeriodSubtitle').textContent = copy[validView][1];
+      localStorage.setItem('ssl-agenda-view', validView);
+    };
+    if (agendaView) {
+      agendaView.addEventListener('change', (event) => setAgendaView(event.target.value));
+      setAgendaView(localStorage.getItem('ssl-agenda-view') || 'week');
+    }
 
     let rxRotation = 0;
     document.querySelectorAll('[data-rx]').forEach((control) => control.addEventListener('click', () => {
