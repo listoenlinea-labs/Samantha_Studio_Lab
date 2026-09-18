@@ -106,3 +106,68 @@ tbody tr:hover { background: #f5fbfb; }
 .login-page .brand-wrap,.login-page .brand-footer { position:relative;z-index:1 }.login-page .logo-mark { width:72px;height:72px;filter:brightness(0) invert(1) }.login-page .logo-text strong { color:#fff }.login-page .logo-text span,.login-page .brand-panel .lead,.login-page .brand-footer { color:rgba(255,255,255,.68) }.login-page .brand-panel .eyebrow { color:#8dd8d6 }.login-page .brand-panel h1 { color:#fff;font-size:clamp(28px,4vw,44px);line-height:1.04 }.login-page .feature { border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.055);color:rgba(255,255,255,.82) }.login-page .check { color:#8dd8d6 }
 .login-page .login-panel { display:grid;place-items:center;padding:42px }.login-page .login-card { width:min(350px,100%);padding:0;border:0;box-shadow:none }.login-page .login-card h2 { color:var(--dc-navy);font-size:27px }.login-page .login-card > p { color:var(--muted) }.login-page .field label { color:#667c86 }.login-page .input-wrap { border-color:var(--dc-line);border-radius:8px }.login-page .input-wrap:focus-within { border-color:var(--dc-teal);box-shadow:0 0 0 3px rgba(69,170,177,.12) }.login-page .input-wrap svg { stroke:var(--dc-teal) }.login-page .options a { color:var(--dc-teal) }.login-page .submit { border-radius:8px;background:linear-gradient(135deg,var(--dc-teal),#368d97);box-shadow:0 8px 18px rgba(69,170,177,.22) }
 @media(max-width:720px){.login-page{padding:12px}.login-page .shell{display:block;min-height:0}.login-page .brand-panel{padding:27px}.login-page .brand-panel h1{font-size:25px}.login-page .brand-panel .lead,.login-page .features,.login-page .brand-footer{display:none}.login-page .login-panel{padding:30px 24px 34px}}
+
+/* Escala de lectura general: el diseño original usaba texto demasiado pequeño. */
+body { font-size: 16px; }
+.dc-header .brand strong { font-size: 14px; }
+.dc-header .brand span { font-size: 9px; }
+.app-nav a { font-size: 12px; }
+.dc-search, .dc-create { font-size: 11px; }
+.dc-profile-copy strong { font-size: 10px; }
+.dc-profile-copy small { font-size: 9px; }
+.page-identity small { font-size: 11px; }
+.page-identity strong { font-size: 18px; }
+.dc-live, .dc-role { font-size: 10px; }
+.dc-role select { font-size: 11px; }
+.button { font-size: 13px; }
+.hero p:not(.eyebrow) { font-size: 14px; }
+.eyebrow { font-size: 11px; }
+.card-head h2, .card-head h3 { font-size: 17px; }
+.card-head p { font-size: 12px; }
+.kpi-label { font-size: 12px; }
+.kpi-value { font-size: 32px; }
+.kpi-note { font-size: 11px; }
+.field label { font-size: 11px; }
+.input, .select, .textarea { font-size: 13px; }
+table { font-size: 12px; }
+th { font-size: 10px; }
+.table-sub { font-size: 11px; }
+.status { font-size: 10px; }
+.list-copy strong { font-size: 13px; }
+.list-copy span { font-size: 11px; }
+.list-end strong { font-size: 13px; }
+.list-end span { font-size: 10px; }
+.tab { font-size: 12px; }
+.callout { font-size: 12px; line-height: 1.55; }
+.dc-date-nav strong { font-size: 14px; }
+.dc-date-nav small { font-size: 10px; }
+.dc-calendar-head > div { font-size: 11px; }
+.dc-calendar-head strong { font-size: 13px; }
+.dc-hour { font-size: 10px; }
+.dc-event b { font-size: 9px; }
+.dc-event strong { font-size: 12px; }
+.dc-event span { font-size: 10px; }
+.dc-doctor strong { font-size: 12px; }
+.dc-doctor small { font-size: 10px; }
+.dc-legend span { font-size: 11px; }
+
+/* Vistas diaria y mensual de Agenda */
+.dc-agenda-view[hidden] { display: none !important; }
+.dc-day-view { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 14px; }
+.dc-day-summary { display: grid; gap: 10px; align-content: start; }
+.dc-day-view .appointment-time strong { font-size: 16px; }
+.dc-day-view .appointment-time span, .dc-day-view .appointment-copy span { font-size: 11px; }
+.dc-day-view .appointment-copy strong { font-size: 13px; }
+.dc-month-view { overflow: hidden; padding: 0; }
+.dc-month-head, .dc-month-grid { display: grid; grid-template-columns: repeat(7,minmax(120px,1fr)); min-width: 840px; }
+.dc-month-head { color: #657b85; background: #f5f9fa; }
+.dc-month-head span { padding: 13px; border-right: 1px solid var(--dc-line); font-size: 11px; font-weight: 800; text-align: center; text-transform: uppercase; }
+.dc-month-grid { grid-auto-rows: minmax(105px,1fr); }
+.dc-month-day { position: relative; min-height: 105px; padding: 10px; border-top: 1px solid var(--dc-line); border-right: 1px solid var(--dc-line); background: #fff; }
+.dc-month-day.muted { background: #f8fafb; color: #a4b0b5; }
+.dc-month-day.today { background: #f0fbfb; box-shadow: inset 0 0 0 2px rgba(69,170,177,.35); }
+.dc-month-day > strong { display: grid; width: 27px; height: 27px; place-items: center; border-radius: 50%; font-size: 12px; }
+.dc-month-day.today > strong { color: #fff; background: var(--dc-teal); }
+.dc-month-chip { display: block; margin-top: 6px; padding: 5px 7px; overflow: hidden; border-left: 3px solid var(--chip); border-radius: 5px; color: var(--dc-navy); background: color-mix(in srgb,var(--chip) 14%,white); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.dc-month-chip.lilac { --chip: var(--lilac-700); }.dc-month-chip.coral { --chip: #df7182; }.dc-month-chip.sage { --chip: #6cae9d; }.dc-month-chip.gold { --chip: #d6a946; }
+@media(max-width:760px){.dc-day-view{grid-template-columns:1fr}.dc-day-view .dc-day-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.dc-month-view{overflow:auto}.app-nav a{font-size:13px}.page-identity strong{font-size:15px}.button{font-size:12px}}
