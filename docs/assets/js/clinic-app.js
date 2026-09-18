@@ -3,23 +3,99 @@
 
   const seed = window.SSL_SEED || {};
   const page = document.body.dataset.page || 'dashboard';
-  const money = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 });
+  const money = new Intl.NumberFormat('es-MX', {
+    style: 'currency',
+    currency: 'MXN',
+    maximumFractionDigits: 0
+  });
   const number = new Intl.NumberFormat('es-MX');
 
-  const nav = [
-    { section: 'Operación' },
-    { id: 'dashboard', label: 'Inicio', href: 'index.html', icon: '⌂', permissions: ['Administrador', 'Asistente', 'Recepcionista'] },
-    { id: 'agenda', label: 'Agenda', href: 'agenda.html', icon: '▣', badge: '8', permissions: ['Administrador', 'Asistente', 'Recepcionista'] },
-    { id: 'pacientes', label: 'Pacientes', href: 'pacientes.html', icon: '●', permissions: ['Administrador', 'Asistente', 'Recepcionista'] },
-    { id: 'operacion', label: 'Jornada clínica', href: 'operacion.html', icon: '✓', permissions: ['Administrador', 'Asistente'] },
-    { id: 'tratamientos', label: 'Tratamientos', href: 'tratamientos.html', icon: '✦', permissions: ['Administrador', 'Asistente', 'Recepcionista'] },
-    { id: 'seguimientos', label: 'Seguimientos', href: 'seguimientos.html', icon: '✉', badge: '3', permissions: ['Administrador', 'Asistente', 'Recepcionista'] },
-    { id: 'inventario', label: 'Inventario', href: 'inventario.html', icon: '▦', badge: '!', permissions: ['Administrador', 'Asistente'] },
-    { id: 'radiografias', label: 'Rayos X', href: 'radiografias.html', icon: '◉', permissions: ['Administrador', 'Asistente'] },
-    { section: 'Administración' },
-    { id: 'finanzas', label: 'Finanzas y CxC', href: 'finanzas.html', icon: '$', permissions: ['Administrador'] },
-    { id: 'reportes', label: 'Reportes', href: 'reportes.html', icon: '↗', permissions: ['Administrador'] },
-    { id: 'configuracion', label: 'Configuración', href: 'configuracion.html', icon: '⚙', permissions: ['Administrador'] },
+  const nav = [{
+    section: 'Operación'
+  },
+  {
+    id: 'dashboard',
+    label: 'Inicio',
+    href: 'index.html',
+    icon: '⌂',
+    permissions: ['Administrador', 'Asistente', 'Recepcionista']
+  },
+  {
+    id: 'agenda',
+    label: 'Agenda',
+    href: 'agenda.html',
+    icon: '▣',
+    badge: '8',
+    permissions: ['Administrador', 'Asistente', 'Recepcionista']
+  },
+  {
+    id: 'pacientes',
+    label: 'Pacientes',
+    href: 'pacientes.html',
+    icon: '●',
+    permissions: ['Administrador', 'Asistente', 'Recepcionista']
+  },
+  {
+    id: 'operacion',
+    label: 'Jornada clínica',
+    href: 'operacion.html',
+    icon: '✓',
+    permissions: ['Administrador', 'Asistente']
+  },
+  {
+    id: 'tratamientos',
+    label: 'Tratamientos',
+    href: 'tratamientos.html',
+    icon: '✦',
+    permissions: ['Administrador', 'Asistente', 'Recepcionista']
+  },
+  {
+    id: 'seguimientos',
+    label: 'Seguimientos',
+    href: 'seguimientos.html',
+    icon: '✉',
+    badge: '3',
+    permissions: ['Administrador', 'Asistente', 'Recepcionista']
+  },
+  {
+    id: 'inventario',
+    label: 'Inventario',
+    href: 'inventario.html',
+    icon: '▦',
+    badge: '!',
+    permissions: ['Administrador', 'Asistente']
+  },
+  {
+    id: 'radiografias',
+    label: 'Rayos X',
+    href: 'radiografias.html',
+    icon: '◉',
+    permissions: ['Administrador', 'Asistente']
+  },
+  {
+    section: 'Administración'
+  },
+  {
+    id: 'finanzas',
+    label: 'Finanzas y CxC',
+    href: 'finanzas.html',
+    icon: '$',
+    permissions: ['Administrador']
+  },
+  {
+    id: 'reportes',
+    label: 'Reportes',
+    href: 'reportes.html',
+    icon: '↗',
+    permissions: ['Administrador']
+  },
+  {
+    id: 'configuracion',
+    label: 'Configuración',
+    href: 'configuracion.html',
+    icon: '⚙',
+    permissions: ['Administrador']
+  },
   ];
 
   const pageMeta = {
@@ -36,16 +112,70 @@
     configuracion: ['Seguridad', 'Usuarios y permisos'],
   };
 
-  const demoAppointments = [
-    { time: '09:00', minutes: 45, patient: 'Paciente demo A', treatment: 'Procedimiento preventivo', doctor: 'Profesional A', state: 'Confirmada', kind: 'normal' },
-    { time: '10:00', minutes: 90, patient: 'Paciente demo B', treatment: 'Procedimiento clínico demo', doctor: 'Profesional A', state: 'Confirmada', kind: 'complex', note: 'Paciente sensible · reservar tiempo adicional' },
-    { time: '11:45', minutes: 30, patient: 'Paciente demo C', treatment: 'Revisión especializada', doctor: 'Profesional B', state: 'Por confirmar', kind: 'pending' },
-    { time: '12:30', minutes: 60, patient: 'Paciente demo D', treatment: 'Procedimiento demo', doctor: 'Profesional C', state: 'Confirmada', kind: 'normal' },
-    { time: '14:30', minutes: 40, patient: 'Paciente demo E', treatment: 'Valoración inicial', doctor: 'Profesional A', state: 'Por confirmar', kind: 'pending' },
-    { time: '15:30', minutes: 60, patient: 'Paciente demo F', treatment: 'Procedimiento restaurativo', doctor: 'Profesional A', state: 'Confirmada', kind: 'normal' },
+  const demoAppointments = [{
+    time: '09:00',
+    minutes: 45,
+    patient: 'Paciente demo A',
+    treatment: 'Procedimiento preventivo',
+    doctor: 'Profesional A',
+    state: 'Confirmada',
+    kind: 'normal'
+  },
+  {
+    time: '10:00',
+    minutes: 90,
+    patient: 'Paciente demo B',
+    treatment: 'Procedimiento clínico demo',
+    doctor: 'Profesional A',
+    state: 'Confirmada',
+    kind: 'complex',
+    note: 'Paciente sensible · reservar tiempo adicional'
+  },
+  {
+    time: '11:45',
+    minutes: 30,
+    patient: 'Paciente demo C',
+    treatment: 'Revisión especializada',
+    doctor: 'Profesional B',
+    state: 'Por confirmar',
+    kind: 'pending'
+  },
+  {
+    time: '12:30',
+    minutes: 60,
+    patient: 'Paciente demo D',
+    treatment: 'Procedimiento demo',
+    doctor: 'Profesional C',
+    state: 'Confirmada',
+    kind: 'normal'
+  },
+  {
+    time: '14:30',
+    minutes: 40,
+    patient: 'Paciente demo E',
+    treatment: 'Valoración inicial',
+    doctor: 'Profesional A',
+    state: 'Por confirmar',
+    kind: 'pending'
+  },
+  {
+    time: '15:30',
+    minutes: 60,
+    patient: 'Paciente demo F',
+    treatment: 'Procedimiento restaurativo',
+    doctor: 'Profesional A',
+    state: 'Confirmada',
+    kind: 'normal'
+  },
   ];
 
-  const esc = (value) => String(value ?? '').replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
+  const esc = (value) => String(value ?? '').replace(/[&<>'"]/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    "'": '&#39;',
+    '"': '&quot;'
+  }[character]));
   const status = (label, tone = 'info') => `<span class="status ${tone}"><span class="dot"></span>${esc(label)}</span>`;
   const kpi = (label, value, note, color) => `<article class="card kpi" style="--kpi:${color}"><span class="kpi-label">${label}</span><strong class="kpi-value">${value}</strong><div class="kpi-note">${note}</div></article>`;
   const button = (label, className = 'secondary', attrs = '') => `<button class="button ${className}" ${attrs}>${label}</button>`;
@@ -72,7 +202,7 @@
           <nav class="app-nav" id="appSidebar" aria-label="Navegación principal">${navigation(role)}</nav>
           <div class="dc-header-tools">
             <button class="dc-search" data-toast="La búsqueda global se conectará al expediente clínico.">⌕ <span>Buscar</span></button>
-            <button class="dc-create" data-modal="appointment">＋ Crear</button>
+            <button class="dc-create" data-modal="appointment"> Crear</button>
             <button class="dc-notification" data-toast="No tienes alertas críticas nuevas." aria-label="Notificaciones">♧<span></span></button>
             <div class="dc-profile"><span class="dc-avatar">SS</span><span class="dc-profile-copy"><strong>Samantha Studio</strong><small>${role}</small></span></div>
           </div>
@@ -81,7 +211,7 @@
         <main class="app-main">
           <header class="app-topbar">
             <div class="page-identity"><small>${meta[0]}</small><strong>${meta[1]}</strong></div>
-            <div class="top-actions"><span class="dc-live"><i></i> Sistema operativo</span><label class="dc-role"><span>Vista</span><select id="activeRole"><option ${role === 'Administrador' ? 'selected' : ''}>Administrador</option><option ${role === 'Asistente' ? 'selected' : ''}>Asistente</option><option ${role === 'Recepcionista' ? 'selected' : ''}>Recepcionista</option></select></label><button class="button primary" data-modal="appointment">＋ <span class="top-label">Nueva cita</span></button></div>
+            <div class="top-actions"><span class="dc-live"><i></i> Sistema operativo</span><label class="dc-role"><span>Vista</span><select id="activeRole"><option ${role === 'Administrador' ? 'selected' : ''}>Administrador</option><option ${role === 'Asistente' ? 'selected' : ''}>Asistente</option><option ${role === 'Recepcionista' ? 'selected' : ''}>Recepcionista</option></select></label><button class="button primary" data-modal="appointment"> <span class="top-label">Nueva cita</span></button></div>
           </header>
           <div class="content">${allowed ? content : accessDenied(role)}</div>
         </main>
@@ -131,22 +261,319 @@
   }
 
   function renderAgenda() {
-    const monthDays = [
-      { day: 31, muted: true }, { day: 1 }, { day: 2 }, { day: 3 }, { day: 4 }, { day: 5 }, { day: 6 },
-      { day: 7 }, { day: 8 }, { day: 9 }, { day: 10 }, { day: 11 }, { day: 12 }, { day: 13 },
-      { day: 14, events: [['09:00 · Paciente demo A', 'lilac']] },
-      { day: 15, events: [['10:00 · Paciente demo B', 'coral']] },
-      { day: 16, events: [['12:00 · Paciente demo C', 'sage']] },
-      { day: 17, today: true, events: [['09:00 · Paciente demo D', 'gold'], ['13:00 · Paciente demo E', 'lilac']] },
-      { day: 18, events: [['11:00 · Paciente demo F', 'coral']] },
-      { day: 19, events: [['10:00 · Paciente demo G', 'sage']] }, { day: 20 },
-      { day: 21 }, { day: 22 }, { day: 23 }, { day: 24 }, { day: 25 }, { day: 26 }, { day: 27 },
-      { day: 28 }, { day: 29 }, { day: 30 }, { day: 1, muted: true }, { day: 2, muted: true }, { day: 3, muted: true }, { day: 4, muted: true },
+    const monthDays = [{
+      day: 31,
+      muted: true
+    }, {
+      day: 1
+    }, {
+      day: 2
+    }, {
+      day: 3
+    }, {
+      day: 4
+    }, {
+      day: 5
+    }, {
+      day: 6
+    },
+    {
+      day: 7
+    }, {
+      day: 8
+    }, {
+      day: 9
+    }, {
+      day: 10
+    }, {
+      day: 11
+    }, {
+      day: 12
+    }, {
+      day: 13
+    },
+    {
+      day: 14,
+      events: [
+        ['09:00 · Paciente demo A', 'lilac']
+      ]
+    },
+    {
+      day: 15,
+      events: [
+        ['10:00 · Paciente demo B', 'coral']
+      ]
+    },
+    {
+      day: 16,
+      events: [
+        ['12:00 · Paciente demo C', 'sage']
+      ]
+    },
+    {
+      day: 17,
+      today: true,
+      events: [
+        ['09:00 · Paciente demo D', 'gold'],
+        ['13:00 · Paciente demo E', 'lilac']
+      ]
+    },
+    {
+      day: 18,
+      events: [
+        ['11:00 · Paciente demo F', 'coral']
+      ]
+    },
+    {
+      day: 19,
+      events: [
+        ['10:00 · Paciente demo G', 'sage']
+      ]
+    }, {
+      day: 20
+    },
+    {
+      day: 21
+    }, {
+      day: 22
+    }, {
+      day: 23
+    }, {
+      day: 24
+    }, {
+      day: 25
+    }, {
+      day: 26
+    }, {
+      day: 27
+    },
+    {
+      day: 28
+    }, {
+      day: 29
+    }, {
+      day: 30
+    }, {
+      day: 1,
+      muted: true
+    }, {
+      day: 2,
+      muted: true
+    }, {
+      day: 3,
+      muted: true
+    }, {
+      day: 4,
+      muted: true
+    },
     ];
     shell(
-      `<section class="dc-agenda-toolbar"><div class="dc-date-nav"><button class="icon-button">‹</button><button class="button secondary">Hoy</button><button class="icon-button">›</button><div><strong id="agendaPeriodTitle">14 – 19 septiembre 2026</strong><small id="agendaPeriodSubtitle">Semana clínica · 38 citas</small></div></div><div class="toolbar"><input class="input search" id="agendaSearch" placeholder="Buscar paciente o tratamiento"><select class="select" id="agendaView" aria-label="Vista de agenda"><option value="week">Semana</option><option value="day">Día</option><option value="month">Mes</option></select><button class="button secondary" data-toast="Integración preparada: falta autorizar Google Calendar.">Sincronizar Google</button></div></section>
-      <section class="dc-agenda-view" data-agenda-view="week"><section class="dc-agenda-layout"><article class="dc-calendar card"><div class="dc-calendar-head"><div class="dc-time-label">Hora</div><div>Lun <strong>14</strong></div><div>Mar <strong>15</strong></div><div>Mié <strong>16</strong></div><div class="today">Jue <strong>17</strong></div><div>Vie <strong>18</strong></div><div>Sáb <strong>19</strong></div></div><div class="dc-calendar-body">
-        ${['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'].map((time) => `<div class="dc-hour"><span>${time}</span></div>`).join('')}
+      `<section class="dc-agenda-toolbar">
+        <div class="dc-date-nav">
+          <button
+            class="icon-button"
+            id="agendaPrevious"
+            type="button"
+            aria-label="Periodo anterior"
+          >
+            ‹
+          </button>
+
+          <button
+            class="button secondary"
+            id="agendaToday"
+            type="button"
+          >
+            Hoy
+          </button>
+
+          <button
+            class="icon-button"
+            id="agendaNext"
+            type="button"
+            aria-label="Periodo siguiente"
+          >
+            ›
+          </button>
+
+          <div>
+            <strong id="agendaPeriodTitle">14 – 19 septiembre 2026</strong>
+            <small id="agendaPeriodSubtitle">Semana clínica · 38 citas</small>
+          </div>
+        </div>
+
+        <div class="dc-agenda-actions">
+          <!-- Conservamos tu buscador -->
+          <input
+            class="input dc-agenda-search"
+            id="agendaSearch"
+            placeholder="Buscar paciente o tratamiento"
+            autocomplete="off"
+          >
+
+          <!-- Selector Semana / Día / otras vistas -->
+          <div class="dc-view-selector" aria-label="Seleccionar vista">
+            <button
+              class="dc-view-button active"
+              type="button"
+              data-agenda-set="week"
+              title="Vista semanal"
+            >
+              S
+            </button>
+
+            <button
+              class="dc-view-button"
+              type="button"
+              data-agenda-set="day"
+              title="Vista diaria"
+            >
+              D
+            </button>
+
+            <div class="dc-view-dropdown">
+              <button
+                class="dc-view-button dc-dropdown-toggle"
+                id="agendaViewMenuButton"
+                type="button"
+                aria-label="Más vistas"
+                aria-expanded="false">
+                <svg
+                  class="dc-chevron-icon"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true">
+                  <path d="M7 9.5 12 14.5 17 9.5"></path>
+                </svg>
+              </button>
+
+              <div class="dc-dropdown-menu dc-view-menu" id="agendaViewMenu" hidden>
+                <span class="dc-menu-title">Selecciona una vista</span>
+
+                <button type="button" data-agenda-set="month">
+                  Por mes
+                </button>
+
+                <button type="button" data-agenda-set="day">
+                  Por día
+                </button>
+
+                <button
+                  type="button"
+                  data-toast="La vista detallada por doctor estará disponible al conectar los profesionales."
+                >
+                  Detallado por doctor
+                </button>
+
+                <button
+                  type="button"
+                  data-toast="La vista diaria por consultorio estará disponible al conectar los consultorios."
+                >
+                  Diaria por consultorio
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Calendario y confirmaciones -->
+          <div class="dc-agenda-button-group">
+            <button
+              class="dc-agenda-icon active"
+              id="agendaCalendarMode"
+              type="button"
+              aria-label="Mostrar calendario"
+              title="Mostrar calendario">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3.5" y="5.5" width="17" height="15" rx="2"></rect>
+                <path d="M7.5 3.5v4M16.5 3.5v4M3.5 9.5h17"></path>
+                <path d="M7 13h2M11 13h2M15 13h2M7 17h2M11 17h2"></path>
+              </svg>
+            </button>
+
+            <button
+              class="dc-agenda-icon"
+              id="agendaFollowupMode"
+              type="button"
+              aria-label="Mostrar seguimientos"
+              title="Mostrar seguimientos">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="8.5"></circle>
+                <path d="m8.2 12.2 2.5 2.5 5.4-5.8"></path>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Abre el modal de configuración -->
+          <button
+            class="dc-agenda-tool"
+            type="button"
+            data-modal="agendaConfig"
+            aria-label="Configurar agenda"
+            title="Configurar agenda">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+
+          <!-- Menú de tres puntos -->
+          <div class="dc-options-dropdown">
+            <button
+              class="dc-agenda-tool dc-kebab"
+              id="agendaOptionsButton"
+              type="button"
+              aria-label="Más opciones"
+              aria-expanded="false">
+              ⋮
+            </button>
+
+            <div class="dc-dropdown-menu dc-options-menu" id="agendaOptionsMenu" hidden>
+              <button
+                type="button"
+                data-toast="La descarga de la agenda se habilitará al conectar la base de datos.">
+                <span>⇩</span>
+                Descargar
+              </button>
+
+              <button
+                type="button"
+                data-toast="No existen citas eliminadas en esta demostración.">
+                <span>▦</span>
+                Citas eliminadas
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <div class="dc-agenda-mode-view" data-agenda-mode-view="calendar">
+      <section class="dc-agenda-view" data-agenda-view="week"><section class="dc-agenda-layout"><article class="dc-calendar card"><div class="dc-calendar-head"><div class="dc-time-label">Hora</div><div data-week-day="0">
+  <span>Lun</span>
+  <strong>14</strong>
+</div>
+
+<div data-week-day="1">
+  <span>Mar</span>
+  <strong>15</strong>
+</div>
+
+<div data-week-day="2">
+  <span>Mié</span>
+  <strong>16</strong>
+</div>
+
+<div data-week-day="3" class="today">
+  <span>Jue</span>
+  <strong>17</strong>
+</div>
+
+<div data-week-day="4">
+  <span>Vie</span>
+  <strong>18</strong>
+</div>
+
+<div data-week-day="5">
+  <span>Sáb</span>
+  <strong>19</strong>
+</div></div><div class="dc-calendar-body">
+        ${['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'].map((time) => `<div class="dc-hour"><span>${time}</span></div>`).join('')}
         <button class="dc-event lilac" style="--day:1;--start:1;--span:2" data-modal="appointment"><b>09:00</b><strong>Paciente demo A</strong><span>Profilaxis · 45 min</span></button>
         <button class="dc-event coral complex" style="--day:2;--start:2;--span:3" data-modal="appointment"><b>10:00</b><strong>Paciente demo B</strong><span>Tiempo extra · nota clínica</span></button>
         <button class="dc-event sage" style="--day:3;--start:4;--span:2" data-modal="appointment"><b>12:00</b><strong>Paciente demo C</strong><span>Revisión ortopedia</span></button>
@@ -155,16 +582,97 @@
         <button class="dc-event coral" style="--day:5;--start:3;--span:2" data-modal="appointment"><b>11:00</b><strong>Paciente demo F</strong><span>Resina · 60 min</span></button>
         <button class="dc-event sage" style="--day:6;--start:2;--span:2" data-modal="appointment"><b>10:00</b><strong>Paciente demo G</strong><span>Estudio RX</span></button>
       </div></article><aside class="dc-agenda-rail"><article class="card"><div class="card-head"><div><h2>Profesionales</h2><p>Visibilidad en agenda</p></div></div><label class="dc-doctor"><span class="avatar">SA</span><span><strong>Samantha</strong><small>5 citas hoy</small></span><input type="checkbox" checked></label><label class="dc-doctor"><span class="avatar peach">AS</span><span><strong>Asistente</strong><small>3 apoyos</small></span><input type="checkbox" checked></label><label class="dc-doctor"><span class="avatar sage">RX</span><span><strong>Samantha RX</strong><small>2 estudios</small></span><input type="checkbox" checked></label></article><article class="card"><div class="card-head"><div><h2>Estado de hoy</h2><p>Jueves 17</p></div></div><div class="dc-legend"><span><i class="lilac"></i>Confirmadas <b>6</b></span><span><i class="gold"></i>Por confirmar <b>2</b></span><span><i class="coral"></i>Complejas <b>1</b></span><span><i class="sage"></i>RX / apoyo <b>2</b></span></div><div class="callout warning"><strong>Atención:</strong> una cita requiere 90 minutos y manejo especial.</div></article></aside></section></section>
-      <section class="dc-agenda-view dc-day-view" data-agenda-view="day" hidden><article class="card"><div class="card-head"><div><h2>Jueves 17 de septiembre</h2><p>Citas ordenadas por hora, duración y complejidad.</p></div>${status('8 citas', 'info')}</div>${appointmentRows(demoAppointments)}</article><aside class="dc-day-summary"><article class="card"><div class="card-head"><div><h2>Resumen del día</h2><p>Estado operativo</p></div></div><div class="dc-legend"><span><i class="lilac"></i>Confirmadas <b>6</b></span><span><i class="gold"></i>Por confirmar <b>2</b></span><span><i class="coral"></i>Complejas <b>1</b></span><span><i class="sage"></i>RX / apoyo <b>2</b></span></div></article><div class="callout warning"><strong>Atención:</strong> una cita requiere 90 minutos y manejo especial.</div></aside></section>
-      <section class="dc-agenda-view dc-month-view card" data-agenda-view="month" hidden><div class="dc-month-head">${['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map((day) => `<span>${day}</span>`).join('')}</div><div class="dc-month-grid">${monthDays.map((item) => `<div class="dc-month-day${item.muted ? ' muted' : ''}${item.today ? ' today' : ''}"><strong>${item.day}</strong>${(item.events || []).map(([label, tone]) => `<button class="dc-month-chip ${tone}" data-modal="appointment">${label}</button>`).join('')}</div>`).join('')}</div></section>`
+      <section class="dc-agenda-view dc-day-view" data-agenda-view="day" hidden><article class="card"><div class="card-head"><div><h2 id="agendaDayTitle">Jueves 17 de septiembre</h2><p>Citas ordenadas por hora, duración y complejidad.</p></div>${status('8 citas', 'info')}</div>${appointmentRows(demoAppointments)}</article><aside class="dc-day-summary"><article class="card"><div class="card-head"><div><h2>Resumen del día</h2><p>Estado operativo</p></div></div><div class="dc-legend"><span><i class="lilac"></i>Confirmadas <b>6</b></span><span><i class="gold"></i>Por confirmar <b>2</b></span><span><i class="coral"></i>Complejas <b>1</b></span><span><i class="sage"></i>RX / apoyo <b>2</b></span></div></article><div class="callout warning"><strong>Atención:</strong> una cita requiere 90 minutos y manejo especial.</div></aside></section>
+      <section class="dc-agenda-view dc-month-view card" data-agenda-view="month" hidden><div class="dc-month-head">${['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((day) => `<span>${day}</span>`).join('')}</div><div class="dc-month-grid">${monthDays.map((item) => `<div class="dc-month-day${item.muted ? ' muted' : ''}${item.today ? ' today' : ''}"><strong>${item.day}</strong>${(item.events || []).map(([label, tone]) => `<button class="dc-month-chip ${tone}" data-modal="appointment">${label}</button>`).join('')}</div>`).join('')}</div></section></div>
+      <section
+  class="dc-agenda-mode-view dc-followup-view"
+  data-agenda-mode-view="followups"
+  hidden
+>
+  <article class="card dc-followup-card">
+    <div class="dc-followup-toolbar">
+      <div>
+        <h2>Seguimientos y tareas</h2>
+        <p>Control de actividades relacionadas con pacientes y tratamientos.</p>
+      </div>
+
+      <button
+        class="button primary"
+        type="button"
+        data-toast="Nuevo seguimiento preparado."
+      >
+        + Nuevo seguimiento
+      </button>
+    </div>
+
+    <div class="table-wrap">
+      <table class="dc-followup-table">
+        <thead>
+          <tr>
+            <th>Fecha límite</th>
+            <th>Paciente</th>
+            <th>Tarea</th>
+            <th>Estado</th>
+            <th>Nota de seguimiento</th>
+            <th>Responsable</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>18 sep 2026</td>
+            <td>
+              <strong>Paciente demo A</strong>
+              <span class="table-sub">SSL-DEM-001</span>
+            </td>
+            <td>Confirmar próxima consulta</td>
+            <td>
+              ${status('Pendiente', 'warning')}
+            </td>
+            <td>Contactar al tutor por WhatsApp.</td>
+            <td>Samantha</td>
+          </tr>
+
+          <tr>
+            <td>19 sep 2026</td>
+            <td>
+              <strong>Paciente demo B</strong>
+              <span class="table-sub">SSL-DEM-002</span>
+            </td>
+            <td>Revisar evolución</td>
+            <td>
+              ${status('En proceso', 'info')}
+            </td>
+            <td>Revisar respuesta posterior al tratamiento.</td>
+            <td>Asistente</td>
+          </tr>
+
+          <tr>
+            <td>22 sep 2026</td>
+            <td>
+              <strong>Paciente demo C</strong>
+              <span class="table-sub">SSL-DEM-003</span>
+            </td>
+            <td>Programar estudio RX</td>
+            <td>
+              ${status('Confirmado', 'success')}
+            </td>
+            <td>Estudio solicitado por el profesional.</td>
+            <td>Samantha RX</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+</section>`
     );
   }
 
   function teeth() {
-    const upper = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28];
-    const lower = [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
+    const upper = [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28];
+    const lower = [48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38];
     const tooth = (id) => `<button class="tooth ${id === 54 ? 'caries' : id === 64 ? 'treated' : ''}" data-tooth="${id}" aria-label="Diente ${id}">${id}</button>`;
-    return `<div class="odontogram"><div class="tooth-row">${upper.map(tooth).join('')}</div><div class="tooth-row">${[55,54,53,52,51,61,62,63,64,65].map(tooth).join('')}</div><div class="tooth-row">${[85,84,83,82,81,71,72,73,74,75].map(tooth).join('')}</div><div class="tooth-row">${lower.map(tooth).join('')}</div><div class="odontogram-legend"><span>○ Sano</span><span style="color:#b34d5d">● Caries</span><span style="color:#497d6b">● Tratado</span><span style="opacity:.5">╳ Ausente</span></div></div>`;
+    return `<div class="odontogram"><div class="tooth-row">${upper.map(tooth).join('')}</div><div class="tooth-row">${[55, 54, 53, 52, 51, 61, 62, 63, 64, 65].map(tooth).join('')}</div><div class="tooth-row">${[85, 84, 83, 82, 81, 71, 72, 73, 74, 75].map(tooth).join('')}</div><div class="tooth-row">${lower.map(tooth).join('')}</div><div class="odontogram-legend"><span>○ Sano</span><span style="color:#b34d5d">● Caries</span><span style="color:#497d6b">● Tratado</span><span style="opacity:.5">╳ Ausente</span></div></div>`;
   }
 
   function renderPatients() {
@@ -197,7 +705,13 @@
 
   function matchPrice(name) {
     const normalized = String(name).toLowerCase();
-    const aliases = { 'profilaxis': 'profilaxis / limpieza', 'consulta': 'consulta general', 'agenda primera vez': '1ra. consulta', 'urgencia': 'cita de emergencia', 'cementación aparato': 'cementar aparato' };
+    const aliases = {
+      'profilaxis': 'profilaxis / limpieza',
+      'consulta': 'consulta general',
+      'agenda primera vez': '1ra. consulta',
+      'urgencia': 'cita de emergencia',
+      'cementación aparato': 'cementar aparato'
+    };
     const target = aliases[normalized] || normalized;
     return seed.priceList?.find((item) => String(item.name).toLowerCase() === target)?.price || null;
   }
@@ -245,7 +759,10 @@
       const [label, tone] = inventoryTone(item);
       return `<tr data-search-row data-tone="${tone}"><td><span class="table-title">${esc(item.product)}</span><span class="table-sub">${esc(item.category || 'Sin categoría')}</span></td><td>${esc(item.current ?? '—')} <span class="table-sub">${esc(item.unit || '')}</span></td><td>${esc(item.minimum ?? '—')}</td><td>${esc(item.optimal ?? '—')}</td><td>${esc(item.supplier || 'Por definir')}</td><td>${item.approximateCost ? money.format(item.approximateCost) : '—'}</td><td>${status(label, tone)}</td><td><button class="button soft" data-toast="Consumo registrado en borrador; el backend descontará por tratamiento.">Registrar uso</button></td></tr>`;
     }).join('');
-    const counts = (seed.inventory || []).reduce((acc, item) => { acc[inventoryTone(item)[1]] = (acc[inventoryTone(item)[1]] || 0) + 1; return acc; }, {});
+    const counts = (seed.inventory || []).reduce((acc, item) => {
+      acc[inventoryTone(item)[1]] = (acc[inventoryTone(item)[1]] || 0) + 1;
+      return acc;
+    }, {});
     shell(
       hero('Mayor oportunidad operativa', 'Inventario descontado desde cada procedimiento.', 'Cada material conserva unidad, mínimo, óptimo, proveedor y punto de reposición. El 25% es el valor inicial y puede ajustarse por insumo.', `${button('Registrar conteo semanal', 'primary', 'data-toast="Conteo semanal guardado localmente en modo demostración."')}${button('Generar orden de compra', 'secondary', 'data-toast="Orden preparada con insumos críticos y bajos."')}`) +
       `<section class="grid kpis">${kpi('Insumos importados', number.format(seed.inventory?.length || 0), '6 categorías del Excel', 'var(--lilac-200)')}${kpi('Compra inmediata', counts.danger || 0, 'Cantidad en cero o marcada comprar', 'var(--peach-200)')}${kpi('Nivel bajo', counts.warning || 0, 'En o debajo del mínimo', 'var(--gold-400)')}${kpi('Unidad por validar', counts.info || 0, 'Texto como ¼ o mezcla de piezas', 'var(--sage-500)')}</section>
@@ -277,14 +794,16 @@
   }
 
   function renderReports() {
-    const months = ['Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-    const values = [52,63,58,71,75,82,73,0,0,0];
+    const months = ['Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const values = [52, 63, 58, 71, 75, 82, 73, 0, 0, 0];
     shell(
       hero('Dashboard Anual · Datos ficticios', 'Del dato diario a la decisión anual.', 'El vaciado mensual alimenta ingresos, gastos, utilidad, pacientes, ticket, crecimiento, proyección y punto de equilibrio.', `${button('Imprimir reporte', 'primary', 'onclick="window.print()"')}${button('Exportar Excel', 'secondary', 'data-toast="La exportación conservará la estructura homologada."')}`) +
       `<section class="grid kpis">${kpi('Ingreso mínimo mensual', money.format(seed.goals?.monthlyIncomeMinimum || 70000), 'Meta demo', 'var(--lilac-200)')}${kpi('Ingreso objetivo', money.format(seed.goals?.monthlyIncomeTarget || 95000), 'Meta demo', 'var(--peach-200)')}${kpi('Ticket objetivo', money.format(seed.goals?.ticketTarget || 700), 'Dato ficticio', 'var(--gold-400)')}${kpi('Utilidad neta mínima', money.format(seed.goals?.monthlyNetProfitMinimum || 35000), 'Dato ficticio', 'var(--sage-500)')}</section>
       <section class="grid layout"><article class="card"><div class="card-head"><div><h2>Avance mensual contra meta</h2><p>Marzo–diciembre, como en el archivo anual.</p></div>${status('73% septiembre', 'info')}</div><div class="bars">${months.map((m, i) => `<div class="bar-wrap"><div class="bar" style="height:${values[i]}%${values[i] === 0 ? ';opacity:.16' : ''}"></div><span>${m}</span></div>`).join('')}</div></article>
       <aside class="card"><div class="card-head"><div><h2>Parámetros personales</h2><p>Único conjunto editable en la pestaña Metas.</p></div></div><div class="metric-row"><div class="metric-label"><span>Pacientes por día</span><strong>6 mínimo · 10 objetivo</strong></div><div class="progress"><span style="width:70%"></span></div></div><div class="metric-row"><div class="metric-label"><span>Materiales / ingresos</span><strong>15–20%</strong></div><div class="progress"><span style="width:85%;background:var(--gold-400)"></span></div></div><div class="callout"><strong>Regla:</strong> las metas cambian a futuro; los resultados históricos conservan la meta vigente de su periodo.</div></aside></section>
-      <article class="card" style="margin-top:16px"><div class="card-head"><div><h2>Mapa de archivos homologado</h2><p>Las pestañas se conservan como entidades o reportes equivalentes.</p></div></div><div class="grid three">${Object.entries(seed.sourceSheets || {}).map(([key, sheets]) => `<div class="callout"><strong>${esc(key)}</strong><br>${sheets.map(esc).join(' · ')}</div>`).join('')}</div></article>`
+      <article class="card" style="margin-top:16px"><div class="card-head"><div><h2>Mapa de archivos homologado</h2><p>Las pestañas se conservan como entidades o reportes equivalentes.</p></div></div><div class="grid three">${Object.entries(seed.sourceSheets || {}).map(([key, sheets]) => ` < div class = "callout" > < strong > $ {
+                esc(key)
+            } < /strong><br>${sheets.map(esc).join(' · ')}</div > `).join('')}</div></article>`
     );
   }
 
@@ -326,8 +845,125 @@
       patient: ['Nuevo paciente', 'Crea el expediente y enlázalo a su tutor o familia.'],
       procedure: ['Registrar procedimiento', `Captura clínica de ${trigger?.dataset.patient || 'la cita seleccionada'}.`],
       user: ['Nuevo usuario', 'Asigna acceso según el rol acordado.'],
+      agendaConfig: ['Configuración de agenda', 'Define cómo quieres visualizar y organizar tu agenda.'],
     };
+
     const [title, subtitle] = headers[type] || headers.appointment;
+    if (type === 'agendaConfig') {
+      return `
+    <div class="modal-head">
+      <div>
+        <h2>${title}</h2>
+        <p>Define cómo quieres visualizar y organizar tu agenda.</p>
+      </div>
+
+      ${close}
+    </div>
+
+    <form id="agendaConfigForm">
+      <div class="agenda-config-tabs">
+        <button type="button">Generales</button>
+        <button type="button" class="active">Mi vista</button>
+        <button type="button">Horarios de trabajo</button>
+        <button type="button">Agendamiento en línea</button>
+        <button type="button">Motivos de consulta</button>
+        <button type="button">Agendas</button>
+      </div>
+
+      <div class="agenda-config-content">
+        <section class="agenda-config-days">
+          <h3>Define cómo quieres ver tu agenda por defecto.</h3>
+          <p>Selecciona los días que quieres ver.</p>
+
+          ${[
+          ['Lunes', true],
+          ['Martes', true],
+          ['Miércoles', true],
+          ['Jueves', true],
+          ['Viernes', true],
+          ['Sábado', true],
+          ['Domingo', false],
+        ].map(([day, checked]) => `
+            <label class="agenda-day-option">
+              <input type="checkbox" ${checked ? 'checked' : ''}>
+              <span>${day}</span>
+            </label>
+          `).join('')}
+        </section>
+
+        <section class="agenda-config-settings">
+          <h3>Define un rango horario</h3>
+
+          <div class="field">
+            <label for="agendaStartTime">Inicio</label>
+            <select class="select" id="agendaStartTime">
+              <option>08:00 AM</option>
+              <option selected>09:00 AM</option>
+              <option>10:00 AM</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="agendaEndTime">Final</label>
+            <select class="select" id="agendaEndTime">
+              <option>06:00 PM</option>
+              <option>08:00 PM</option>
+              <option selected>09:00 PM</option>
+            </select>
+          </div>
+
+          <div class="agenda-quick-hours">
+            <button type="button" data-toast="Horario de mañana seleccionado.">
+              Ver sólo mañana
+            </button>
+
+            <button type="button" data-toast="Horario de tarde seleccionado.">
+              Ver sólo tarde
+            </button>
+          </div>
+
+          <h3>Color de las citas</h3>
+          <p>¿En base a qué deseas que cambie el color?</p>
+
+          <div class="agenda-radio-row">
+            <label>
+              <input type="radio" name="appointmentColor" checked>
+              Agenda de doctores
+            </label>
+
+            <label>
+              <input type="radio" name="appointmentColor">
+              Motivo de consulta
+            </label>
+          </div>
+
+          <div class="field">
+            <label for="defaultAgendaView">
+              Vista seleccionada por defecto
+            </label>
+
+            <select class="select" id="defaultAgendaView">
+              <option value="week">Por semana</option>
+              <option value="day">Por día</option>
+              <option value="month">Por mes</option>
+            </select>
+          </div>
+        </section>
+      </div>
+
+      <label class="agenda-apply-all">
+        <input type="checkbox">
+        Quiero que estos cambios apliquen para todos los usuarios de mi equipo
+      </label>
+
+      <div class="form-actions agenda-config-footer">
+        <button class="button primary" type="submit">
+          Guardar
+        </button>
+      </div>
+    </form>
+  `;
+    }
     let fields = '';
     if (type === 'appointment') fields = `<div class="field wide"><label>Paciente</label><input class="input" required placeholder="Buscar o registrar paciente"></div><div class="field"><label>Fecha</label><input class="input" type="date" required></div><div class="field"><label>Hora</label><input class="input" type="time" required></div><div class="field"><label>Tratamiento</label><select class="select">${(seed.treatments || []).map((t) => `<option>${esc(t.name)}</option>`).join('')}</select></div><div class="field"><label>Duración</label><select class="select"><option>30 minutos</option><option>45 minutos</option><option>60 minutos</option><option>90 minutos</option></select></div><div class="field wide"><label>Complejidad / nota roja</label><textarea class="textarea" placeholder="Manejo especial, tiempo extra o indicaciones para recepción"></textarea></div>`;
     if (type === 'patient') fields = `<div class="field"><label>Nombre(s)</label><input class="input" required></div><div class="field"><label>Apellidos</label><input class="input" required></div><div class="field"><label>Fecha de nacimiento</label><input class="input" type="date"></div><div class="field"><label>Familia / tutor</label><input class="input" placeholder="Buscar tutor existente"></div><div class="field"><label>Teléfono del tutor</label><input class="input" type="tel"></div><div class="field"><label>Foto de perfil</label><input class="input" type="file" accept="image/*"></div><div class="field wide"><label>Alertas clínicas</label><textarea class="textarea" placeholder="Alergias, medicamentos, manejo o antecedentes"></textarea></div>`;
@@ -342,9 +978,13 @@
     const closeMenu = () => body.classList.remove('nav-open');
     menu?.addEventListener('click', () => body.classList.toggle('nav-open'));
     document.getElementById('sidebarScrim')?.addEventListener('click', closeMenu);
-    document.getElementById('activeRole')?.addEventListener('change', (event) => { localStorage.setItem('ssl-active-role', event.target.value); window.location.href = 'index.html'; });
+    document.getElementById('activeRole')?.addEventListener('change', (event) => {
+      localStorage.setItem('ssl-active-role', event.target.value);
+      window.location.href = 'index.html';
+    });
 
     let toastTimer;
+
     function showToast(message) {
       const toast = document.getElementById('toast');
       toast.textContent = message;
@@ -356,7 +996,9 @@
       const toastTrigger = event.target.closest('[data-toast]');
       if (toastTrigger) showToast(toastTrigger.dataset.toast);
       const scrollTrigger = event.target.closest('[data-scroll]');
-      if (scrollTrigger) document.getElementById(scrollTrigger.dataset.scroll)?.scrollIntoView({ behavior: 'smooth' });
+      if (scrollTrigger) document.getElementById(scrollTrigger.dataset.scroll)?.scrollIntoView({
+        behavior: 'smooth'
+      });
       const modalTrigger = event.target.closest('[data-modal]');
       if (modalTrigger) {
         const backdrop = document.getElementById('modalBackdrop');
@@ -367,24 +1009,52 @@
       if (event.target.closest('[data-close-modal]') || event.target.id === 'modalBackdrop') closeModal();
     });
     document.addEventListener('submit', (event) => {
+      if (event.target.id === 'agendaConfigForm') {
+        event.preventDefault();
+
+        const defaultView =
+          document.getElementById('defaultAgendaView')?.value || 'week';
+
+        localStorage.setItem('ssl-agenda-view', defaultView);
+
+        setAgendaView(defaultView);
+        closeModal();
+
+        showToast('Configuración de Agenda guardada correctamente.');
+        return;
+      }
+
       if (event.target.id !== 'demoForm') return;
+
       event.preventDefault();
       closeModal();
-      showToast('Registro guardado en la demostración. El backend persistirá y auditará el cambio.');
+
+      showToast(
+        'Registro guardado en la demostración. El backend persistirá y auditará el cambio.'
+      );
     });
+
     function closeModal() {
       const backdrop = document.getElementById('modalBackdrop');
       backdrop?.classList.remove('open');
       backdrop?.setAttribute('aria-hidden', 'true');
     }
-    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') { closeModal(); closeMenu(); } });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeModal();
+        closeMenu();
+      }
+    });
 
     document.querySelectorAll('[data-tab]').forEach((tab) => tab.addEventListener('click', () => {
       const parent = tab.closest('.tabs');
       const name = tab.dataset.tab;
       parent.querySelectorAll('.tab').forEach((item) => item.classList.toggle('active', item === tab));
       let next = parent.nextElementSibling;
-      while (next?.classList.contains('tab-panel')) { next.classList.toggle('active', next.dataset.panel === name); next = next.nextElementSibling; }
+      while (next?.classList.contains('tab-panel')) {
+        next.classList.toggle('active', next.dataset.panel === name);
+        next = next.nextElementSibling;
+      }
     }));
 
     document.querySelectorAll('.tooth').forEach((tooth) => tooth.addEventListener('click', () => {
@@ -393,7 +1063,12 @@
       states.slice(1).forEach((state) => tooth.classList.remove(state));
       const next = states[(current + 1) % states.length];
       if (next) tooth.classList.add(next);
-      const labels = { '': 'Sano', caries: 'Caries', treated: 'Tratado', absent: 'Ausente' };
+      const labels = {
+        '': 'Sano',
+        caries: 'Caries',
+        treated: 'Tratado',
+        absent: 'Ausente'
+      };
       const detail = document.getElementById('toothDetail');
       if (detail) detail.innerHTML = `<strong>Diente ${tooth.dataset.tooth} · ${labels[next]}</strong><br>Agrega superficie, diagnóstico, evidencia y plan de tratamiento. El cambio quedará ligado al usuario y fecha.`;
     }));
@@ -416,38 +1091,364 @@
     function bindTableSearch(inputId, tableId) {
       document.getElementById(inputId)?.addEventListener('input', (event) => {
         const query = event.target.value.trim().toLowerCase();
-        document.querySelectorAll(`#${tableId} [data-search-row]`).forEach((row) => { row.hidden = !row.textContent.toLowerCase().includes(query); });
+        document.querySelectorAll(`#${tableId} [data-search-row]`).forEach((row) => {
+          row.hidden = !row.textContent.toLowerCase().includes(query);
+        });
       });
     }
     bindTableSearch('treatmentSearch', 'treatmentTable');
     bindTableSearch('inventorySearch', 'inventoryTable');
     document.getElementById('inventoryFilter')?.addEventListener('change', (event) => {
-      document.querySelectorAll('#inventoryTable [data-search-row]').forEach((row) => { row.hidden = Boolean(event.target.value) && row.dataset.tone !== event.target.value; });
+      document.querySelectorAll('#inventoryTable [data-search-row]').forEach((row) => {
+        row.hidden = Boolean(event.target.value) && row.dataset.tone !== event.target.value;
+      });
     });
     document.getElementById('agendaSearch')?.addEventListener('input', (event) => {
       const q = event.target.value.toLowerCase();
-      document.querySelectorAll('[data-agenda-view] .dc-event, [data-agenda-view] .appointment, [data-agenda-view] .dc-month-chip').forEach((item) => { item.hidden = !item.textContent.toLowerCase().includes(q); });
+      document.querySelectorAll('[data-agenda-view] .dc-event, [data-agenda-view] .appointment, [data-agenda-view] .dc-month-chip').forEach((item) => {
+        item.hidden = !item.textContent.toLowerCase().includes(q);
+      });
     });
 
-    const agendaView = document.getElementById('agendaView');
-    const setAgendaView = (view) => {
-      const validView = ['week', 'day', 'month'].includes(view) ? view : 'week';
-      const copy = {
-        week: ['14 – 19 septiembre 2026', 'Semana clínica · 38 citas'],
-        day: ['Jueves 17 septiembre 2026', 'Agenda del día · 8 citas'],
-        month: ['Septiembre 2026', 'Vista mensual · 38 citas'],
-      };
-      document.querySelectorAll('[data-agenda-view]').forEach((panel) => { panel.hidden = panel.dataset.agendaView !== validView; });
-      if (agendaView) agendaView.value = validView;
-      if (document.getElementById('agendaPeriodTitle')) document.getElementById('agendaPeriodTitle').textContent = copy[validView][0];
-      if (document.getElementById('agendaPeriodSubtitle')) document.getElementById('agendaPeriodSubtitle').textContent = copy[validView][1];
-      localStorage.setItem('ssl-agenda-view', validView);
-    };
-    if (agendaView) {
-      agendaView.addEventListener('change', (event) => setAgendaView(event.target.value));
-      setAgendaView(localStorage.getItem('ssl-agenda-view') || 'week');
+    const agendaDate = new Date(2026, 8, 17);
+
+    let currentAgendaView =
+      localStorage.getItem('ssl-agenda-view') || 'week';
+
+    const monthNames = [
+      'enero',
+      'febrero',
+      'marzo',
+      'abril',
+      'mayo',
+      'junio',
+      'julio',
+      'agosto',
+      'septiembre',
+      'octubre',
+      'noviembre',
+      'diciembre',
+    ];
+
+    const dayNames = [
+      'domingo',
+      'lunes',
+      'martes',
+      'miércoles',
+      'jueves',
+      'viernes',
+      'sábado',
+    ];
+
+    const shortDayNames = [
+      'Dom',
+      'Lun',
+      'Mar',
+      'Mié',
+      'Jue',
+      'Vie',
+      'Sáb',
+    ];
+
+    function capitalize(value) {
+      return value.charAt(0).toUpperCase() + value.slice(1);
     }
 
+    function getMonday(date) {
+      const result = new Date(date);
+      const day = result.getDay();
+      const difference = day === 0 ? -6 : 1 - day;
+
+      result.setDate(result.getDate() + difference);
+
+      return result;
+    }
+
+    function formatAgendaDate(date) {
+      return `${capitalize(dayNames[date.getDay()])} ${date.getDate()} de ${monthNames[date.getMonth()]
+        } de ${date.getFullYear()}`;
+    }
+
+    function updateWeeklyHeader() {
+      const monday = getMonday(agendaDate);
+
+      document
+        .querySelectorAll('[data-week-day]')
+        .forEach((column, index) => {
+          const columnDate = new Date(monday);
+
+          columnDate.setDate(monday.getDate() + index);
+
+          const dayLabel = column.querySelector('span');
+          const dayNumber = column.querySelector('strong');
+
+          if (dayLabel) {
+            dayLabel.textContent =
+              shortDayNames[columnDate.getDay()];
+          }
+
+          if (dayNumber) {
+            dayNumber.textContent = columnDate.getDate();
+          }
+
+          const isSelectedDay =
+            columnDate.toDateString() === agendaDate.toDateString();
+
+          column.classList.toggle('today', isSelectedDay);
+        });
+    }
+
+    function updateAgendaPeriod() {
+      const periodTitle =
+        document.getElementById('agendaPeriodTitle');
+
+      const periodSubtitle =
+        document.getElementById('agendaPeriodSubtitle');
+
+      const dayTitle =
+        document.getElementById('agendaDayTitle');
+
+      if (!periodTitle || !periodSubtitle) return;
+
+      if (currentAgendaView === 'day') {
+        periodTitle.textContent = formatAgendaDate(agendaDate);
+        periodSubtitle.textContent = 'Agenda del día · 8 citas';
+
+        if (dayTitle) {
+          dayTitle.textContent = formatAgendaDate(agendaDate);
+        }
+
+        return;
+      }
+
+      if (currentAgendaView === 'month') {
+        periodTitle.textContent = `${capitalize(
+          monthNames[agendaDate.getMonth()]
+        )} ${agendaDate.getFullYear()}`;
+
+        periodSubtitle.textContent = 'Vista mensual · 38 citas';
+
+        return;
+      }
+
+      const monday = getMonday(agendaDate);
+      const saturday = new Date(monday);
+
+      saturday.setDate(monday.getDate() + 5);
+
+      const sameMonth =
+        monday.getMonth() === saturday.getMonth();
+
+      if (sameMonth) {
+        periodTitle.textContent =
+          `${monday.getDate()} – ${saturday.getDate()} ` +
+          `${monthNames[monday.getMonth()]} ` +
+          `${monday.getFullYear()}`;
+      } else {
+        periodTitle.textContent =
+          `${monday.getDate()} ${monthNames[monday.getMonth()]} – ` +
+          `${saturday.getDate()} ${monthNames[saturday.getMonth()]} ` +
+          `${saturday.getFullYear()}`;
+      }
+
+      periodSubtitle.textContent = 'Semana clínica · 38 citas';
+
+      updateWeeklyHeader();
+    }
+
+    const setAgendaView = (view) => {
+      currentAgendaView = ['week', 'day', 'month'].includes(view) ?
+        view :
+        'week';
+
+      document
+        .querySelectorAll('[data-agenda-view]')
+        .forEach((panel) => {
+          panel.hidden =
+            panel.dataset.agendaView !== currentAgendaView;
+        });
+
+      document
+        .querySelectorAll('[data-agenda-set]')
+        .forEach((button) => {
+          button.classList.toggle(
+            'active',
+            button.dataset.agendaSet === currentAgendaView
+          );
+        });
+
+      localStorage.setItem(
+        'ssl-agenda-view',
+        currentAgendaView
+      );
+
+      updateAgendaPeriod();
+    };
+
+    function moveAgendaPeriod(direction) {
+      if (currentAgendaView === 'day') {
+        agendaDate.setDate(
+          agendaDate.getDate() + direction
+        );
+      } else if (currentAgendaView === 'week') {
+        agendaDate.setDate(
+          agendaDate.getDate() + direction * 7
+        );
+      } else if (currentAgendaView === 'month') {
+        agendaDate.setMonth(
+          agendaDate.getMonth() + direction
+        );
+      }
+
+      updateAgendaPeriod();
+    }
+
+    document
+      .getElementById('agendaPrevious')
+      ?.addEventListener('click', () => {
+        moveAgendaPeriod(-1);
+      });
+
+    document
+      .getElementById('agendaNext')
+      ?.addEventListener('click', () => {
+        moveAgendaPeriod(1);
+      });
+
+    document
+      .getElementById('agendaToday')
+      ?.addEventListener('click', () => {
+        const today = new Date();
+
+        agendaDate.setFullYear(today.getFullYear());
+        agendaDate.setMonth(today.getMonth());
+        agendaDate.setDate(today.getDate());
+
+        updateAgendaPeriod();
+      });
+
+    const agendaCalendarMode = document.getElementById(
+      'agendaCalendarMode'
+    );
+
+    const agendaFollowupMode = document.getElementById(
+      'agendaFollowupMode'
+    );
+
+    const agendaToolbar = document.querySelector(
+      '.dc-agenda-toolbar'
+    );
+
+    function setAgendaMode(mode) {
+      const selectedMode =
+        mode === 'followups' ? 'followups' : 'calendar';
+
+      document
+        .querySelectorAll('[data-agenda-mode-view]')
+        .forEach((view) => {
+          view.hidden =
+            view.dataset.agendaModeView !== selectedMode;
+        });
+
+      agendaCalendarMode?.classList.toggle(
+        'active',
+        selectedMode === 'calendar'
+      );
+
+      agendaFollowupMode?.classList.toggle(
+        'active',
+        selectedMode === 'followups'
+      );
+
+      /*
+       * En Seguimientos dejamos visibles los botones de modo,
+       * pero ocultamos navegación, buscador y selector S/D.
+       */
+      agendaToolbar?.classList.toggle(
+        'followup-mode',
+        selectedMode === 'followups'
+      );
+
+      localStorage.setItem(
+        'ssl-agenda-mode',
+        selectedMode
+      );
+    }
+
+    agendaCalendarMode?.addEventListener('click', () => {
+      setAgendaMode('calendar');
+    });
+
+    agendaFollowupMode?.addEventListener('click', () => {
+      setAgendaMode('followups');
+    });
+
+    if (agendaCalendarMode && agendaFollowupMode) {
+      setAgendaMode(
+        localStorage.getItem('ssl-agenda-mode') || 'calendar'
+      );
+    }
+
+    document.querySelectorAll('[data-agenda-set]').forEach((button) => {
+      button.addEventListener('click', () => {
+        setAgendaView(button.dataset.agendaSet);
+
+        document.getElementById('agendaViewMenu')?.setAttribute('hidden', '');
+        document
+          .getElementById('agendaViewMenuButton')
+          ?.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    const savedAgendaView =
+      localStorage.getItem('ssl-agenda-view') || 'week';
+
+    if (document.querySelector('[data-agenda-view]')) {
+      setAgendaView(
+        localStorage.getItem('ssl-agenda-view') || 'week'
+      );
+    }
+
+    function bindAgendaDropdown(buttonId, menuId) {
+      const button = document.getElementById(buttonId);
+      const menu = document.getElementById(menuId);
+
+      if (!button || !menu) return;
+
+      button.addEventListener('click', (event) => {
+        event.stopPropagation();
+
+        const willOpen = menu.hidden;
+
+        document.querySelectorAll('.dc-dropdown-menu').forEach((dropdown) => {
+          dropdown.hidden = true;
+        });
+
+        document
+          .querySelectorAll('[aria-expanded]')
+          .forEach((control) => control.setAttribute('aria-expanded', 'false'));
+
+        menu.hidden = !willOpen;
+        button.setAttribute('aria-expanded', String(willOpen));
+      });
+    }
+
+    bindAgendaDropdown('agendaViewMenuButton', 'agendaViewMenu');
+    bindAgendaDropdown('agendaOptionsButton', 'agendaOptionsMenu');
+
+    document.addEventListener('click', (event) => {
+      if (event.target.closest('.dc-view-dropdown, .dc-options-dropdown')) {
+        return;
+      }
+
+      document.querySelectorAll('.dc-dropdown-menu').forEach((menu) => {
+        menu.hidden = true;
+      });
+
+      document
+        .querySelectorAll('[aria-expanded]')
+        .forEach((button) => button.setAttribute('aria-expanded', 'false'));
+    });
     let rxRotation = 0;
     document.querySelectorAll('[data-rx]').forEach((control) => control.addEventListener('click', () => {
       if (control.dataset.rx === 'left') rxRotation -= 15;
