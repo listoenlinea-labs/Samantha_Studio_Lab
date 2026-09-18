@@ -813,14 +813,39 @@
   function renderReports() {
     const months = ['Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
     const values = [52, 63, 58, 71, 75, 82, 73, 0, 0, 0];
+    const sourceFileCards = Object.entries(
+      seed.sourceSheets || {}
+    ).map(([key, sheets]) => {
+      return `
+    <div class="callout source-file-card">
+      <strong>${esc(key)}</strong>
+
+      <span>
+        ${sheets.map((sheet) => esc(sheet)).join(' · ')}
+      </span>
+    </div>
+  `;
+    }).join('');
     shell(
       hero('Dashboard Anual · Datos ficticios', 'Del dato diario a la decisión anual.', 'El vaciado mensual alimenta ingresos, gastos, utilidad, pacientes, ticket, crecimiento, proyección y punto de equilibrio.', `${button('Imprimir reporte', 'primary', 'onclick="window.print()"')}${button('Exportar Excel', 'secondary', 'data-toast="La exportación conservará la estructura homologada."')}`) +
       `<section class="grid kpis">${kpi('Ingreso mínimo mensual', money.format(seed.goals?.monthlyIncomeMinimum || 70000), 'Meta demo', 'var(--lilac-200)')}${kpi('Ingreso objetivo', money.format(seed.goals?.monthlyIncomeTarget || 95000), 'Meta demo', 'var(--peach-200)')}${kpi('Ticket objetivo', money.format(seed.goals?.ticketTarget || 700), 'Dato ficticio', 'var(--gold-400)')}${kpi('Utilidad neta mínima', money.format(seed.goals?.monthlyNetProfitMinimum || 35000), 'Dato ficticio', 'var(--sage-500)')}</section>
       <section class="grid layout"><article class="card"><div class="card-head"><div><h2>Avance mensual contra meta</h2><p>Marzo–diciembre, como en el archivo anual.</p></div>${status('73% septiembre', 'info')}</div><div class="bars">${months.map((m, i) => `<div class="bar-wrap"><div class="bar" style="height:${values[i]}%${values[i] === 0 ? ';opacity:.16' : ''}"></div><span>${m}</span></div>`).join('')}</div></article>
       <aside class="card"><div class="card-head"><div><h2>Parámetros personales</h2><p>Único conjunto editable en la pestaña Metas.</p></div></div><div class="metric-row"><div class="metric-label"><span>Pacientes por día</span><strong>6 mínimo · 10 objetivo</strong></div><div class="progress"><span style="width:70%"></span></div></div><div class="metric-row"><div class="metric-label"><span>Materiales / ingresos</span><strong>15–20%</strong></div><div class="progress"><span style="width:85%;background:var(--gold-400)"></span></div></div><div class="callout"><strong>Regla:</strong> las metas cambian a futuro; los resultados históricos conservan la meta vigente de su periodo.</div></aside></section>
-      <article class="card" style="margin-top:16px"><div class="card-head"><div><h2>Mapa de archivos homologado</h2><p>Las pestañas se conservan como entidades o reportes equivalentes.</p></div></div><div class="grid three">${Object.entries(seed.sourceSheets || {}).map(([key, sheets]) => ` < div class = "callout" > < strong > $ {
-                esc(key)
-            } < /strong><br>${sheets.map(esc).join(' · ')}</div > `).join('')}</div></article>`
+      <article class="card reports-source-map">
+        <div class="card-head">
+          <div>
+            <h2>Mapa de archivos homologado</h2>
+
+            <p>
+              Las pestañas se conservan como entidades o reportes equivalentes.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid three source-files-grid">
+          ${sourceFileCards}
+        </div>
+      </article>`
     );
   }
 
@@ -835,9 +860,9 @@
     ];
     shell(
       hero('Tres roles claros', 'Cada persona ve sólo lo necesario.', 'Administrador, asistente y recepcionista con permisos acordes a la reunión y trazabilidad por usuario.', `${button('＋ Nuevo usuario', 'primary', 'data-modal="user"')}${button('Guardar permisos', 'secondary', 'data-toast="Matriz de permisos guardada en modo demostración."')}`) +
-      `<section class="grid layout"><article class="card"><div class="card-head"><div><h2>Matriz de permisos</h2><p>Los controles reales deben validarse también en el servidor.</p></div></div><div class="table-wrap"><div class="permission-matrix"><div class="matrix-head">Capacidad</div><div class="matrix-head">Administrador</div><div class="matrix-head">Asistente</div><div class="matrix-head">Recepcionista</div>${capabilities.map((row) => row.map((value, i) => `<div>${i === 0 ? value : value ? '<span class="check">✓</span>' : '<span class="dash">—</span>'}</div>`).join('')).join('')}</div></div></article>
-      <aside class="grid"><article class="card"><div class="card-head"><div><h2>Usuarios</h2><p>Sin contraseñas almacenadas en el navegador.</p></div></div><div class="list"><div class="list-item"><span class="avatar">SS</span><span class="list-copy"><strong>Administración SSL</strong><span>admin@clinica.example</span></span>${status('Administrador', 'info')}</div><div class="list-item"><span class="avatar">AS</span><span class="list-copy"><strong>Asistente demo</strong><span>asistente@clinica.example</span></span>${status('Asistente', 'success')}</div><div class="list-item"><span class="avatar">RE</span><span class="list-copy"><strong>Recepción demo</strong><span>recepcion@clinica.example</span></span>${status('Recepcionista', 'warning')}</div></div></article><div class="callout warning"><strong>Seguridad:</strong> el backend debe usar hash de contraseña, sesión segura, segundo factor para administración, bitácora y control por permiso; nunca guardar contraseñas en localStorage.</div></aside></section>
-      <section class="grid three" style="margin-top:16px"><article class="card"><div class="card-head"><div><h2>Google Calendar</h2><p>Agenda y eventos.</p></div>${status('Pendiente', 'warning')}</div>${button('Autorizar cuenta', 'secondary', 'data-toast="Se requiere OAuth del consultorio."')}</article><article class="card"><div class="card-head"><div><h2>WhatsApp Business</h2><p>Recordatorios y confirmación.</p></div>${status('Pendiente', 'warning')}</div>${button('Configurar API', 'secondary', 'data-toast="Se requieren número, cuenta Meta y plantillas aprobadas."')}</article><article class="card"><div class="card-head"><div><h2>Almacenamiento clínico</h2><p>Fotos, PDF y DICOM.</p></div>${status('Pendiente', 'warning')}</div>${button('Configurar', 'secondary', 'data-toast="Se requiere almacenamiento cifrado y política de retención."')}</article></section>`
+      `< section class= "grid layout" ><article class="card"><div class="card-head"><div><h2>Matriz de permisos</h2><p>Los controles reales deben validarse también en el servidor.</p></div></div><div class="table-wrap"><div class="permission-matrix"><div class="matrix-head">Capacidad</div><div class="matrix-head">Administrador</div><div class="matrix-head">Asistente</div><div class="matrix-head">Recepcionista</div>${capabilities.map((row) => row.map((value, i) => `<div>${i === 0 ? value : value ? '<span class="check">✓</span>' : '<span class="dash">—</span>'}</div>`).join('')).join('')}</div></div></article>
+      <aside class="grid"><article class="card"><div class="card-head"><div><h2>Usuarios</h2><p>Sin contraseñas almacenadas en el navegador.</p></div></div><div class="list"><div class="list-item"><span class="avatar">SS</span><span class="list-copy"><strong>Administración SSL</strong><span>admin@clinica.example</span></span>${status('Administrador', 'info')}</div><div class="list-item"><span class="avatar">AS</span><span class="list-copy"><strong>Asistente demo</strong><span>asistente@clinica.example</span></span>${status('Asistente', 'success')}</div><div class="list-item"><span class="avatar">RE</span><span class="list-copy"><strong>Recepción demo</strong><span>recepcion@clinica.example</span></span>${status('Recepcionista', 'warning')}</div></div></article><div class="callout warning"><strong>Seguridad:</strong> el backend debe usar hash de contraseña, sesión segura, segundo factor para administración, bitácora y control por permiso; nunca guardar contraseñas en localStorage.</div></aside></section >
+    <section class="grid three" style="margin-top:16px"><article class="card"><div class="card-head"><div><h2>Google Calendar</h2><p>Agenda y eventos.</p></div>${status('Pendiente', 'warning')}</div>${button('Autorizar cuenta', 'secondary', 'data-toast="Se requiere OAuth del consultorio."')}</article><article class="card"><div class="card-head"><div><h2>WhatsApp Business</h2><p>Recordatorios y confirmación.</p></div>${status('Pendiente', 'warning')}</div>${button('Configurar API', 'secondary', 'data-toast="Se requieren número, cuenta Meta y plantillas aprobadas."')}</article><article class="card"><div class="card-head"><div><h2>Almacenamiento clínico</h2><p>Fotos, PDF y DICOM.</p></div>${status('Pendiente', 'warning')}</div>${button('Configurar', 'secondary', 'data-toast="Se requiere almacenamiento cifrado y política de retención."')}</article></section>`
     );
   }
 
@@ -868,31 +893,31 @@
     const [title, subtitle] = headers[type] || headers.appointment;
     if (type === 'agendaConfig') {
       return `
-    <div class="modal-head">
-      <div>
-        <h2>${title}</h2>
-        <p>Define cómo quieres visualizar y organizar tu agenda.</p>
-      </div>
-
-      ${close}
+    < div class= "modal-head" >
+    <div>
+      <h2>${title}</h2>
+      <p>Define cómo quieres visualizar y organizar tu agenda.</p>
     </div>
 
-    <form id="agendaConfigForm">
-      <div class="agenda-config-tabs">
-        <button type="button">Generales</button>
-        <button type="button" class="active">Mi vista</button>
-        <button type="button">Horarios de trabajo</button>
-        <button type="button">Agendamiento en línea</button>
-        <button type="button">Motivos de consulta</button>
-        <button type="button">Agendas</button>
-      </div>
+      ${close}
+    </div >
 
-      <div class="agenda-config-content">
-        <section class="agenda-config-days">
-          <h3>Define cómo quieres ver tu agenda por defecto.</h3>
-          <p>Selecciona los días que quieres ver.</p>
+      <form id="agendaConfigForm">
+        <div class="agenda-config-tabs">
+          <button type="button">Generales</button>
+          <button type="button" class="active">Mi vista</button>
+          <button type="button">Horarios de trabajo</button>
+          <button type="button">Agendamiento en línea</button>
+          <button type="button">Motivos de consulta</button>
+          <button type="button">Agendas</button>
+        </div>
 
-          ${[
+        <div class="agenda-config-content">
+          <section class="agenda-config-days">
+            <h3>Define cómo quieres ver tu agenda por defecto.</h3>
+            <p>Selecciona los días que quieres ver.</p>
+
+            ${[
           ['Lunes', true],
           ['Martes', true],
           ['Miércoles', true],
@@ -906,87 +931,384 @@
               <span>${day}</span>
             </label>
           `).join('')}
-        </section>
+          </section>
 
-        <section class="agenda-config-settings">
-          <h3>Define un rango horario</h3>
+          <section class="agenda-config-settings">
+            <h3>Define un rango horario</h3>
 
-          <div class="field">
-            <label for="agendaStartTime">Inicio</label>
-            <select class="select" id="agendaStartTime">
-              <option>08:00 AM</option>
-              <option selected>09:00 AM</option>
-              <option>10:00 AM</option>
-            </select>
-          </div>
+            <div class="field">
+              <label for="agendaStartTime">Inicio</label>
+              <select class="select" id="agendaStartTime">
+                <option>08:00 AM</option>
+                <option selected>09:00 AM</option>
+                <option>10:00 AM</option>
+              </select>
+            </div>
 
-          <div class="field">
-            <label for="agendaEndTime">Final</label>
-            <select class="select" id="agendaEndTime">
-              <option>06:00 PM</option>
-              <option>08:00 PM</option>
-              <option selected>09:00 PM</option>
-            </select>
-          </div>
+            <div class="field">
+              <label for="agendaEndTime">Final</label>
+              <select class="select" id="agendaEndTime">
+                <option>06:00 PM</option>
+                <option>08:00 PM</option>
+                <option selected>09:00 PM</option>
+              </select>
+            </div>
 
-          <div class="agenda-quick-hours">
-            <button type="button" data-toast="Horario de mañana seleccionado.">
-              Ver sólo mañana
-            </button>
+            <div class="agenda-quick-hours">
+              <button type="button" data-toast="Horario de mañana seleccionado.">
+                Ver sólo mañana
+              </button>
 
-            <button type="button" data-toast="Horario de tarde seleccionado.">
-              Ver sólo tarde
-            </button>
-          </div>
+              <button type="button" data-toast="Horario de tarde seleccionado.">
+                Ver sólo tarde
+              </button>
+            </div>
 
-          <h3>Color de las citas</h3>
-          <p>¿En base a qué deseas que cambie el color?</p>
+            <h3>Color de las citas</h3>
+            <p>¿En base a qué deseas que cambie el color?</p>
 
-          <div class="agenda-radio-row">
-            <label>
-              <input type="radio" name="appointmentColor" checked>
-              Agenda de doctores
-            </label>
+            <div class="agenda-radio-row">
+              <label>
+                <input type="radio" name="appointmentColor" checked>
+                  Agenda de doctores
+              </label>
 
-            <label>
-              <input type="radio" name="appointmentColor">
-              Motivo de consulta
-            </label>
-          </div>
+              <label>
+                <input type="radio" name="appointmentColor">
+                  Motivo de consulta
+              </label>
+            </div>
 
-          <div class="field">
-            <label for="defaultAgendaView">
-              Vista seleccionada por defecto
-            </label>
+            <div class="field">
+              <label for="defaultAgendaView">
+                Vista seleccionada por defecto
+              </label>
 
-            <select class="select" id="defaultAgendaView">
-              <option value="week">Por semana</option>
-              <option value="day">Por día</option>
-              <option value="month">Por mes</option>
-            </select>
-          </div>
-        </section>
-      </div>
+              <select class="select" id="defaultAgendaView">
+                <option value="week">Por semana</option>
+                <option value="day">Por día</option>
+                <option value="month">Por mes</option>
+              </select>
+            </div>
+          </section>
+        </div>
 
-      <label class="agenda-apply-all">
-        <input type="checkbox">
-        Quiero que estos cambios apliquen para todos los usuarios de mi equipo
-      </label>
+        <label class="agenda-apply-all">
+          <input type="checkbox">
+            Quiero que estos cambios apliquen para todos los usuarios de mi equipo
+        </label>
 
-      <div class="form-actions agenda-config-footer">
-        <button class="button primary" type="submit">
-          Guardar
-        </button>
-      </div>
-    </form>
+        <div class="form-actions agenda-config-footer">
+          <button class="button primary" type="submit">
+            Guardar
+          </button>
+        </div>
+      </form>
   `;
     }
     let fields = '';
-    if (type === 'appointment') fields = `<div class="field wide"><label>Paciente</label><input class="input" required placeholder="Buscar o registrar paciente"></div><div class="field"><label>Fecha</label><input class="input" type="date" required></div><div class="field"><label>Hora</label><input class="input" type="time" required></div><div class="field"><label>Tratamiento</label><select class="select">${(seed.treatments || []).map((t) => `<option>${esc(t.name)}</option>`).join('')}</select></div><div class="field"><label>Duración</label><select class="select"><option>30 minutos</option><option>45 minutos</option><option>60 minutos</option><option>90 minutos</option></select></div><div class="field wide"><label>Complejidad / nota roja</label><textarea class="textarea" placeholder="Manejo especial, tiempo extra o indicaciones para recepción"></textarea></div>`;
-    if (type === 'patient') fields = `<div class="field"><label>Nombre(s)</label><input class="input" required></div><div class="field"><label>Apellidos</label><input class="input" required></div><div class="field"><label>Fecha de nacimiento</label><input class="input" type="date"></div><div class="field"><label>Familia / tutor</label><input class="input" placeholder="Buscar tutor existente"></div><div class="field"><label>Teléfono del tutor</label><input class="input" type="tel"></div><div class="field"><label>Foto de perfil</label><input class="input" type="file" accept="image/*"></div><div class="field wide"><label>Alertas clínicas</label><textarea class="textarea" placeholder="Alergias, medicamentos, manejo o antecedentes"></textarea></div>`;
-    if (type === 'procedure') fields = `<div class="field"><label>Procedimiento</label><select class="select">${(seed.treatments || []).map((t) => `<option>${esc(t.name)}</option>`).join('')}</select></div><div class="field"><label>Diente / región</label><input class="input" placeholder="Ej. 54 · oclusal"></div><div class="field wide"><label>Detalle clínico</label><textarea class="textarea" placeholder="Diagnóstico, hallazgos y procedimiento realizado"></textarea></div><div class="field wide"><label>Indicaciones y seguimiento</label><textarea class="textarea" placeholder="Medicamento, curaciones y frecuencia de recordatorios"></textarea></div>`;
-    if (type === 'user') fields = `<div class="field"><label>Nombre de usuario</label><input class="input" required></div><div class="field"><label>Correo</label><input class="input" type="email" required></div><div class="field"><label>Rol</label><select class="select"><option>Administrador</option><option>Asistente</option><option>Recepcionista</option></select></div><div class="field"><label>Invitación</label><select class="select"><option>Enviar enlace por correo</option><option>Copiar enlace seguro</option></select></div>`;
-    return `<div class="modal-head"><div><h2>${title}</h2><p style="margin:5px 0 0;color:var(--muted);font-size:10px">${subtitle}</p></div>${close}</div><form id="demoForm"><div class="form-grid">${fields}</div><div class="form-actions"><button type="button" class="button secondary" data-close-modal>Cancelar</button><button class="button primary" type="submit">Guardar</button></div></form>`;
+
+    if (type === 'appointment') {
+      fields = `
+    <div class="field wide">
+      <label>Paciente</label>
+
+      <input
+        class="input"
+        name="patient"
+        required
+        placeholder="Buscar o registrar paciente"
+      >
+    </div>
+
+    <div class="field">
+      <label>Fecha</label>
+
+      <input
+        class="input"
+        name="date"
+        type="date"
+        required
+      >
+    </div>
+
+    <div class="field">
+      <label>Hora</label>
+
+      <input
+        class="input"
+        name="time"
+        type="time"
+        required
+      >
+    </div>
+
+    <div class="field">
+      <label>Tratamiento</label>
+
+      <select
+        class="select"
+        name="treatment"
+        required
+      >
+        ${(seed.treatments || [])
+          .map((t) => `
+            <option value="${esc(t.name)}">
+              ${esc(t.name)}
+            </option>
+          `)
+          .join('')}
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Duración</label>
+
+      <select
+        class="select"
+        name="duration"
+        required
+      >
+        <option value="30">30 minutos</option>
+        <option value="45">45 minutos</option>
+        <option value="60">60 minutos</option>
+        <option value="90">90 minutos</option>
+      </select>
+    </div>
+
+    <div class="field wide">
+      <label>Complejidad / nota roja</label>
+
+      <textarea
+        class="textarea"
+        name="notes"
+        placeholder="Manejo especial, tiempo extra o indicaciones para recepción"
+      ></textarea>
+    </div>
+  `;
+    } else if (type === 'patient') {
+      fields = `
+    <div class="field">
+      <label>Nombre(s)</label>
+
+      <input
+        class="input"
+        name="firstName"
+        required
+      >
+    </div>
+
+    <div class="field">
+      <label>Apellidos</label>
+
+      <input
+        class="input"
+        name="lastName"
+        required
+      >
+    </div>
+
+    <div class="field">
+      <label>Fecha de nacimiento</label>
+
+      <input
+        class="input"
+        name="birthDate"
+        type="date"
+      >
+    </div>
+
+    <div class="field">
+      <label>Familia / tutor</label>
+
+      <input
+        class="input"
+        name="guardian"
+        placeholder="Buscar tutor existente"
+      >
+    </div>
+
+    <div class="field">
+      <label>Teléfono del tutor</label>
+
+      <input
+        class="input"
+        name="guardianPhone"
+        type="tel"
+      >
+    </div>
+
+    <div class="field">
+      <label>Foto de perfil</label>
+
+      <input
+        class="input"
+        name="profilePhoto"
+        type="file"
+        accept="image/*"
+      >
+    </div>
+
+    <div class="field wide">
+      <label>Alertas clínicas</label>
+
+      <textarea
+        class="textarea"
+        name="clinicalAlerts"
+        placeholder="Alergias, medicamentos, manejo o antecedentes"
+      ></textarea>
+    </div>
+  `;
+    } else if (type === 'procedure') {
+      fields = `
+    <div class="field">
+      <label>Procedimiento</label>
+
+      <select
+        class="select"
+        name="procedure"
+        required
+      >
+        ${(seed.treatments || [])
+          .map((t) => `
+            <option value="${esc(t.name)}">
+              ${esc(t.name)}
+            </option>
+          `)
+          .join('')}
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Diente / región</label>
+
+      <input
+        class="input"
+        name="toothRegion"
+        placeholder="Ej. 54 · oclusal"
+      >
+    </div>
+
+    <div class="field wide">
+      <label>Detalle clínico</label>
+
+      <textarea
+        class="textarea"
+        name="clinicalDetail"
+        placeholder="Diagnóstico, hallazgos y procedimiento realizado"
+      ></textarea>
+    </div>
+
+    <div class="field wide">
+      <label>Indicaciones y seguimiento</label>
+
+      <textarea
+        class="textarea"
+        name="followUp"
+        placeholder="Medicamento, curaciones y frecuencia de recordatorios"
+      ></textarea>
+    </div>
+  `;
+    } else if (type === 'user') {
+      fields = `
+    <div class="field">
+      <label>Nombre de usuario</label>
+
+      <input
+        class="input"
+        name="username"
+        required
+      >
+    </div>
+
+    <div class="field">
+      <label>Correo</label>
+
+      <input
+        class="input"
+        name="email"
+        type="email"
+        required
+      >
+    </div>
+
+    <div class="field">
+      <label>Rol</label>
+
+      <select
+        class="select"
+        name="role"
+        required
+      >
+        <option value="Administrador">
+          Administrador
+        </option>
+
+        <option value="Asistente">
+          Asistente
+        </option>
+
+        <option value="Recepcionista">
+          Recepcionista
+        </option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Invitación</label>
+
+      <select
+        class="select"
+        name="invitation"
+      >
+        <option value="email">
+          Enviar enlace por correo
+        </option>
+
+        <option value="copy">
+          Copiar enlace seguro
+        </option>
+      </select>
+    </div>
+  `;
+    }
+
+    return `
+  <div class="modal-head">
+    <div>
+      <h2>${title}</h2>
+
+      <p class="modal-subtitle">
+        ${subtitle}
+      </p>
+    </div>
+
+    ${close}
+  </div>
+
+  <form id="demoForm">
+    <div class="form-grid">
+      ${fields}
+    </div>
+
+    <div class="form-actions">
+      <button
+        type="button"
+        class="button secondary"
+        data-close-modal
+      >
+        Cancelar
+      </button>
+
+      <button
+        class="button primary"
+        type="submit"
+      >
+        Guardar
+      </button>
+    </div>
+  </form>
+`;
   }
 
   function bindCommon() {
@@ -1087,7 +1409,7 @@
         absent: 'Ausente'
       };
       const detail = document.getElementById('toothDetail');
-      if (detail) detail.innerHTML = `<strong>Diente ${tooth.dataset.tooth} · ${labels[next]}</strong><br>Agrega superficie, diagnóstico, evidencia y plan de tratamiento. El cambio quedará ligado al usuario y fecha.`;
+      if (detail) detail.innerHTML = `< strong > Diente ${tooth.dataset.tooth} · ${labels[next]}</strong > <br>Agrega superficie, diagnóstico, evidencia y plan de tratamiento. El cambio quedará ligado al usuario y fecha.`;
     }));
 
     const calcInputs = ['calcHours', 'calcHourly', 'calcMargin', 'calcMaterials', 'calcPlaque'].map((id) => document.getElementById(id)).filter(Boolean);

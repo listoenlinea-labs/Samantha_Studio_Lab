@@ -2151,3 +2151,57 @@ th {
     white-space: nowrap;
   }
 }
+
+/* Mapa de archivos de Reportes */
+.reports-source-map {
+  margin-top: 16px;
+}
+
+.source-files-grid {
+  align-items: stretch;
+}
+
+.source-file-card {
+  min-width: 0;
+  padding: 15px;
+  border-left: 4px solid var(--dc-teal);
+  background: linear-gradient(135deg,
+      #f4fbfc,
+      #faf7fb);
+}
+
+.source-file-card strong,
+.source-file-card span {
+  display: block;
+}
+
+.source-file-card strong {
+  margin-bottom: 8px;
+  color: var(--dc-navy);
+  font-size: 13px;
+}
+
+.source-file-card span {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+@media (max-width: 760px) {
+  .source-files-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .source-file-card {
+    padding: 12px;
+  }
+
+  .source-file-card strong {
+    font-size: 12px;
+  }
+
+  .source-file-card span {
+    font-size: 10px;
+  }
+}
