@@ -1410,10 +1410,6 @@ th {
     grid-template-columns: repeat(2, minmax(0, 1fr))
   }
 
-  .dc-month-view {
-    overflow: auto
-  }
-
   .app-nav a {
     font-size: 13px
   }
@@ -1896,4 +1892,159 @@ th {
 .dc-agenda-toolbar.followup-mode .dc-view-selector {
   opacity: 0.35;
   pointer-events: none;
+}
+
+/* =========================================================
+   AGENDA MENSUAL OPTIMIZADA PARA CELULAR
+   ========================================================= */
+
+@media (max-width: 760px) {
+
+  /*
+   * El calendario ocupa exactamente el ancho disponible.
+   * Se elimina el mínimo de 840px utilizado en escritorio.
+   */
+  .dc-month-view {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    border-radius: 10px;
+  }
+
+  .dc-month-head,
+  .dc-month-grid {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  /*
+   * Encabezados compactos:
+   * Lun, Mar, Mié, etc.
+   */
+  .dc-month-head span {
+    min-width: 0;
+    padding: 8px 1px;
+    overflow: hidden;
+    font-size: 8px;
+    letter-spacing: 0;
+    text-align: center;
+    text-overflow: clip;
+    white-space: nowrap;
+  }
+
+  /*
+   * Cada semana ocupa solamente 72px.
+   * Cinco semanas quedan en aproximadamente 360px.
+   */
+  .dc-month-grid {
+    grid-auto-rows: 72px;
+  }
+
+  .dc-month-day {
+    min-width: 0;
+    min-height: 72px;
+    padding: 4px;
+    overflow: hidden;
+  }
+
+  /*
+   * Número del día más pequeño.
+   */
+  .dc-month-day>strong {
+    width: 22px;
+    height: 22px;
+    margin-bottom: 2px;
+    font-size: 10px;
+  }
+
+  /*
+   * En móvil las citas se muestran como barras de color.
+   * El texto sigue existiendo y el botón continúa funcionando.
+   */
+  .dc-month-chip {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: 7px;
+    min-height: 7px;
+    margin-top: 3px;
+    padding: 0;
+    overflow: hidden;
+
+    border: 0;
+    border-radius: 4px;
+
+    color: transparent;
+    background: var(--chip);
+
+    font-size: 0;
+    line-height: 0;
+    text-indent: -9999px;
+
+    box-shadow: none;
+  }
+
+  .dc-month-chip:hover,
+  .dc-month-chip:focus {
+    transform: none;
+    background: var(--chip);
+    box-shadow:
+      0 0 0 2px #fff,
+      0 0 0 3px var(--chip);
+  }
+
+  /*
+   * Evita que el día actual altere el ancho del calendario.
+   */
+  .dc-month-day.today {
+    box-shadow: inset 0 0 0 2px rgba(69, 170, 177, 0.55);
+  }
+
+  .dc-month-day.today>strong {
+    width: 22px;
+    height: 22px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 760px) {
+  .dc-month-chip {
+    position: relative;
+  }
+
+  .dc-month-chip::after {
+    content: "";
+    position: absolute;
+    inset: -3px 0;
+  }
+}
+
+@media (max-width: 390px) {
+  .dc-month-grid {
+    grid-auto-rows: 66px;
+  }
+
+  .dc-month-day {
+    min-height: 66px;
+    padding: 3px;
+  }
+
+  .dc-month-head span {
+    padding: 7px 0;
+    font-size: 7px;
+  }
+
+  .dc-month-day>strong,
+  .dc-month-day.today>strong {
+    width: 20px;
+    height: 20px;
+    font-size: 9px;
+  }
+
+  .dc-month-chip {
+    height: 6px;
+    min-height: 6px;
+    margin-top: 2px;
+  }
 }
