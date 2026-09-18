@@ -55,18 +55,9 @@
   }
 
   function navigation(role) {
-    let groupOpen = false;
-    return nav.map((item) => {
-      if (item.section) {
-        groupOpen = true;
-        return `<p class="nav-kicker">${item.section}</p><nav class="app-nav">`;
-      }
-      const allowed = item.permissions.includes(role);
-      if (!allowed) return '';
-      const nextIsSection = nav[nav.indexOf(item) + 1]?.section;
-      const itemHtml = `<a href="${item.href}" class="${page === item.id ? 'active' : ''}"><span class="nav-icon">${item.icon}</span>${item.label}${item.badge ? `<span class="nav-badge">${item.badge}</span>` : ''}</a>`;
-      return itemHtml + (nextIsSection && groupOpen ? '</nav>' : '');
-    }).join('') + '</nav>';
+    return nav.filter((item) => item.id && item.permissions.includes(role)).map((item) =>
+      `<a href="${item.href}" class="${page === item.id ? 'active' : ''}" data-module="${item.id}"><span class="nav-icon">${item.icon}</span><span>${item.label}</span>${item.badge ? `<span class="nav-badge">${item.badge}</span>` : ''}</a>`
+    ).join('');
   }
 
   function shell(content) {
@@ -75,16 +66,22 @@
     const allowed = nav.find((item) => item.id === page)?.permissions?.includes(role) ?? true;
     document.getElementById('app').innerHTML = `
       <div class="app-shell">
-        <aside class="app-sidebar" id="appSidebar">
-          <a class="brand" href="index.html"><img src="assets/img/logo-ssl.svg" alt="Logo Samantha's Studio Lab"><div><strong>samantha's<br>studio lab</strong><span>odontopediatría</span></div></a>
-          ${navigation(role)}
-          <div class="sidebar-user"><label for="activeRole">Vista por rol</label><select id="activeRole"><option ${role === 'Administrador' ? 'selected' : ''}>Administrador</option><option ${role === 'Asistente' ? 'selected' : ''}>Asistente</option><option ${role === 'Recepcionista' ? 'selected' : ''}>Recepcionista</option></select></div>
-        </aside>
+        <header class="dc-header">
+          <a class="brand" href="index.html"><img src="assets/img/logo-ssl.svg" alt="Logo Samantha's Studio Lab"><div><strong>samantha's studio lab</strong><span>odontopediatría</span></div></a>
+          <button class="dc-menu-button" id="menuButton" aria-label="Abrir navegación" aria-controls="appSidebar">☰</button>
+          <nav class="app-nav" id="appSidebar" aria-label="Navegación principal">${navigation(role)}</nav>
+          <div class="dc-header-tools">
+            <button class="dc-search" data-toast="La búsqueda global se conectará al expediente clínico.">⌕ <span>Buscar</span></button>
+            <button class="dc-create" data-modal="appointment">＋ Crear</button>
+            <button class="dc-notification" data-toast="No tienes alertas críticas nuevas." aria-label="Notificaciones">♧<span></span></button>
+            <div class="dc-profile"><span class="dc-avatar">SS</span><span class="dc-profile-copy"><strong>Samantha Studio</strong><small>${role}</small></span></div>
+          </div>
+        </header>
         <div class="sidebar-scrim" id="sidebarScrim"></div>
         <main class="app-main">
           <header class="app-topbar">
-            <div style="display:flex;align-items:center;gap:11px;min-width:0"><button class="icon-button menu-button" id="menuButton" aria-label="Abrir menú">☰</button><div class="page-identity"><small>${meta[0]}</small><strong>${meta[1]}</strong></div></div>
-            <div class="top-actions"><button class="button secondary" data-toast="La búsqueda global quedará conectada al backend clínico.">⌕ <span class="top-label">Buscar</span></button><button class="icon-button" data-toast="No tienes alertas críticas nuevas." aria-label="Notificaciones">♧</button><button class="button primary" data-modal="appointment">＋ <span class="top-label">Nueva cita</span></button></div>
+            <div class="page-identity"><small>${meta[0]}</small><strong>${meta[1]}</strong></div>
+            <div class="top-actions"><span class="dc-live"><i></i> Sistema operativo</span><label class="dc-role"><span>Vista</span><select id="activeRole"><option ${role === 'Administrador' ? 'selected' : ''}>Administrador</option><option ${role === 'Asistente' ? 'selected' : ''}>Asistente</option><option ${role === 'Recepcionista' ? 'selected' : ''}>Recepcionista</option></select></label><button class="button primary" data-modal="appointment">＋ <span class="top-label">Nueva cita</span></button></div>
           </header>
           <div class="content">${allowed ? content : accessDenied(role)}</div>
         </main>
@@ -135,11 +132,17 @@
 
   function renderAgenda() {
     shell(
-      hero('Agenda móvil', 'Cada cita con el tiempo y contexto correctos.', 'Complejidad, duración, estado de confirmación y notas visibles antes de recibir al paciente.', `${button('＋ Nueva cita', 'primary', 'data-modal="appointment"')}${button('Conectar Google Calendar', 'secondary', 'data-toast="Integración preparada: falta autorizar la cuenta de Google del consultorio."')}`) +
-      `<div class="toolbar"><input class="input search" id="agendaSearch" placeholder="Buscar por paciente o tratamiento"><input class="input" type="date" value="2026-09-17" style="width:auto"><select class="select" style="width:auto"><option>Todos los profesionales</option><option>Profesional A</option><option>Profesional B</option></select></div>
-      <section class="grid layout"><article class="card"><div class="card-head"><div><h2>Jueves 17 de septiembre</h2><p>8 citas · 6 h 25 min de atención programada</p></div>${status('2 por confirmar', 'warning')}</div><div id="agendaList">${appointmentRows()}</div></article>
-      <aside class="grid"><article class="card"><div class="card-head"><div><h2>Reglas de la cita</h2><p>Valores demostrativos y configurables.</p></div></div><div class="list"><div class="list-item"><span class="list-icon">36</span><span class="list-copy"><strong>Procedimientos generales</strong><span>Ejemplo: cancelar con 36 horas</span></span></div><div class="list-item"><span class="list-icon">60</span><span class="list-copy"><strong>Especialidad</strong><span>Ejemplo: cancelar con 60 horas</span></span></div><div class="list-item"><span class="list-icon">✉</span><span class="list-copy"><strong>Recordatorios</strong><span>Ejemplo: mensaje 36 h · confirmación 18 h</span></span></div></div></article>
-      <article class="card"><div class="card-head"><div><h2>Capacidad de hoy</h2><p>Evita saturar al equipo.</p></div></div><div class="metric-row"><div class="metric-label"><span>Horas ocupadas</span><strong>6 h 25 / 8 h</strong></div><div class="progress"><span style="width:80%"></span></div></div><div class="callout warning"><strong>Atención:</strong> la cita de las 10:00 requiere 90 minutos y está marcada como compleja.</div></article></aside></section>`
+      `<section class="dc-agenda-toolbar"><div class="dc-date-nav"><button class="icon-button">‹</button><button class="button secondary">Hoy</button><button class="icon-button">›</button><div><strong>14 – 19 septiembre 2026</strong><small>Semana clínica · 38 citas</small></div></div><div class="toolbar"><input class="input search" id="agendaSearch" placeholder="Buscar paciente o tratamiento"><select class="select"><option>Semana</option><option>Día</option><option>Mes</option></select><button class="button secondary" data-toast="Integración preparada: falta autorizar Google Calendar.">Sincronizar Google</button></div></section>
+      <section class="dc-agenda-layout"><article class="dc-calendar card"><div class="dc-calendar-head"><div class="dc-time-label">Hora</div><div>Lun <strong>14</strong></div><div>Mar <strong>15</strong></div><div>Mié <strong>16</strong></div><div class="today">Jue <strong>17</strong></div><div>Vie <strong>18</strong></div><div>Sáb <strong>19</strong></div></div><div class="dc-calendar-body" id="agendaList">
+        ${['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'].map((time) => `<div class="dc-hour"><span>${time}</span></div>`).join('')}
+        <button class="dc-event lilac" style="--day:1;--start:1;--span:2" data-modal="appointment"><b>09:00</b><strong>Paciente demo A</strong><span>Profilaxis · 45 min</span></button>
+        <button class="dc-event coral complex" style="--day:2;--start:2;--span:3" data-modal="appointment"><b>10:00</b><strong>Paciente demo B</strong><span>Tiempo extra · nota clínica</span></button>
+        <button class="dc-event sage" style="--day:3;--start:4;--span:2" data-modal="appointment"><b>12:00</b><strong>Paciente demo C</strong><span>Revisión ortopedia</span></button>
+        <button class="dc-event gold" style="--day:4;--start:1;--span:2" data-modal="appointment"><b>09:00</b><strong>Paciente demo D</strong><span>Por confirmar</span></button>
+        <button class="dc-event lilac" style="--day:4;--start:5;--span:2" data-modal="appointment"><b>13:00</b><strong>Paciente demo E</strong><span>Primera consulta</span></button>
+        <button class="dc-event coral" style="--day:5;--start:3;--span:2" data-modal="appointment"><b>11:00</b><strong>Paciente demo F</strong><span>Resina · 60 min</span></button>
+        <button class="dc-event sage" style="--day:6;--start:2;--span:2" data-modal="appointment"><b>10:00</b><strong>Paciente demo G</strong><span>Estudio RX</span></button>
+      </div></article><aside class="dc-agenda-rail"><article class="card"><div class="card-head"><div><h2>Profesionales</h2><p>Visibilidad en agenda</p></div></div><label class="dc-doctor"><span class="avatar">SA</span><span><strong>Samantha</strong><small>5 citas hoy</small></span><input type="checkbox" checked></label><label class="dc-doctor"><span class="avatar peach">AS</span><span><strong>Asistente</strong><small>3 apoyos</small></span><input type="checkbox" checked></label><label class="dc-doctor"><span class="avatar sage">RX</span><span><strong>Samantha RX</strong><small>2 estudios</small></span><input type="checkbox" checked></label></article><article class="card"><div class="card-head"><div><h2>Estado de hoy</h2><p>Jueves 17</p></div></div><div class="dc-legend"><span><i class="lilac"></i>Confirmadas <b>6</b></span><span><i class="gold"></i>Por confirmar <b>2</b></span><span><i class="coral"></i>Complejas <b>1</b></span><span><i class="sage"></i>RX / apoyo <b>2</b></span></div><div class="callout warning"><strong>Atención:</strong> una cita requiere 90 minutos y manejo especial.</div></article></aside></section>`
     );
   }
 
