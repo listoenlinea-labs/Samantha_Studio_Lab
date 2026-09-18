@@ -583,7 +583,24 @@
         <button class="dc-event sage" style="--day:6;--start:2;--span:2" data-modal="appointment"><b>10:00</b><strong>Paciente demo G</strong><span>Estudio RX</span></button>
       </div></article><aside class="dc-agenda-rail"><article class="card"><div class="card-head"><div><h2>Profesionales</h2><p>Visibilidad en agenda</p></div></div><label class="dc-doctor"><span class="avatar">SA</span><span><strong>Samantha</strong><small>5 citas hoy</small></span><input type="checkbox" checked></label><label class="dc-doctor"><span class="avatar peach">AS</span><span><strong>Asistente</strong><small>3 apoyos</small></span><input type="checkbox" checked></label><label class="dc-doctor"><span class="avatar sage">RX</span><span><strong>Samantha RX</strong><small>2 estudios</small></span><input type="checkbox" checked></label></article><article class="card"><div class="card-head"><div><h2>Estado de hoy</h2><p>Jueves 17</p></div></div><div class="dc-legend"><span><i class="lilac"></i>Confirmadas <b>6</b></span><span><i class="gold"></i>Por confirmar <b>2</b></span><span><i class="coral"></i>Complejas <b>1</b></span><span><i class="sage"></i>RX / apoyo <b>2</b></span></div><div class="callout warning"><strong>Atención:</strong> una cita requiere 90 minutos y manejo especial.</div></article></aside></section></section>
       <section class="dc-agenda-view dc-day-view" data-agenda-view="day" hidden><article class="card"><div class="card-head"><div><h2 id="agendaDayTitle">Jueves 17 de septiembre</h2><p>Citas ordenadas por hora, duración y complejidad.</p></div>${status('8 citas', 'info')}</div>${appointmentRows(demoAppointments)}</article><aside class="dc-day-summary"><article class="card"><div class="card-head"><div><h2>Resumen del día</h2><p>Estado operativo</p></div></div><div class="dc-legend"><span><i class="lilac"></i>Confirmadas <b>6</b></span><span><i class="gold"></i>Por confirmar <b>2</b></span><span><i class="coral"></i>Complejas <b>1</b></span><span><i class="sage"></i>RX / apoyo <b>2</b></span></div></article><div class="callout warning"><strong>Atención:</strong> una cita requiere 90 minutos y manejo especial.</div></aside></section>
-      <section class="dc-agenda-view dc-month-view card" data-agenda-view="month" hidden><div class="dc-month-head">${['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((day) => `<span>${day}</span>`).join('')}</div><div class="dc-month-grid">${monthDays.map((item) => `<div class="dc-month-day${item.muted ? ' muted' : ''}${item.today ? ' today' : ''}"><strong>${item.day}</strong>${(item.events || []).map(([label, tone]) => `<button class="dc-month-chip ${tone}" data-modal="appointment">${label}</button>`).join('')}</div>`).join('')}</div></section></div>
+      <section class="dc-agenda-view dc-month-view card" data-agenda-view="month" hidden><div class="dc-month-head">${['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((day) => `<span>${day}</span>`).join('')}</div><div class="dc-month-grid">${monthDays.map((item) => `<div class="dc-month-day${item.muted ? ' muted' : ''}${item.today ? ' today' : ''}"><strong>${item.day}</strong>${(item.events || []).map(([label, tone]) => {
+        const appointmentTime = label.split(' · ')[0];
+        const appointmentName = label.split(' · ')[1] || label;
+
+        return `
+    <button
+      class="dc-month-chip ${tone}"
+      type="button"
+      data-modal="appointment"
+      data-time="${appointmentTime}"
+      aria-label="${label}"
+      title="${label}"
+    >
+      <span class="dc-month-chip-time">${appointmentTime}</span>
+      <span class="dc-month-chip-name">${appointmentName}</span>
+    </button>
+  `;
+      }).join('')}</div>`).join('')}</div></section></div>
       <section
   class="dc-agenda-mode-view dc-followup-view"
   data-agenda-mode-view="followups"
