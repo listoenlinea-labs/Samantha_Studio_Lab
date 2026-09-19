@@ -116,8 +116,9 @@
     time: '09:00',
     minutes: 45,
     patient: 'Paciente demo A',
-    treatment: 'Procedimiento preventivo',
+    treatment: 'Camitas · procedimiento preventivo',
     doctor: 'Profesional A',
+    chair: 'A',
     state: 'Confirmada',
     kind: 'normal'
   },
@@ -127,6 +128,7 @@
     patient: 'Paciente demo B',
     treatment: 'Procedimiento clínico demo',
     doctor: 'Profesional A',
+    chair: 'B',
     state: 'Confirmada',
     kind: 'complex',
     note: 'Paciente sensible · reservar tiempo adicional'
@@ -137,6 +139,7 @@
     patient: 'Paciente demo C',
     treatment: 'Revisión especializada',
     doctor: 'Profesional B',
+    chair: 'C',
     state: 'Por confirmar',
     kind: 'pending'
   },
@@ -144,8 +147,9 @@
     time: '12:30',
     minutes: 60,
     patient: 'Paciente demo D',
-    treatment: 'Procedimiento demo',
+    treatment: 'Camitas · adaptación',
     doctor: 'Profesional C',
+    chair: 'A',
     state: 'Confirmada',
     kind: 'normal'
   },
@@ -155,6 +159,7 @@
     patient: 'Paciente demo E',
     treatment: 'Valoración inicial',
     doctor: 'Profesional A',
+    chair: 'B',
     state: 'Por confirmar',
     kind: 'pending'
   },
@@ -164,10 +169,34 @@
     patient: 'Paciente demo F',
     treatment: 'Procedimiento restaurativo',
     doctor: 'Profesional A',
+    chair: 'C',
     state: 'Confirmada',
     kind: 'normal'
   },
   ];
+
+  const dentalChairs = [{
+    id: 'A',
+    name: 'Silla A',
+    specialty: 'Silla de camitas',
+    rule: 'Exclusiva para citas de camitas',
+    nextAvailable: '09:45',
+    tone: 'camitas'
+  }, {
+    id: 'B',
+    name: 'Silla B',
+    specialty: 'Atención general',
+    rule: 'No admite camitas',
+    nextAvailable: '11:30',
+    tone: 'general'
+  }, {
+    id: 'C',
+    name: 'Silla C',
+    specialty: 'Atención general',
+    rule: 'No admite camitas',
+    nextAvailable: '09:00',
+    tone: 'general'
+  }];
 
   const esc = (value) => String(value ?? '').replace(/[&<>'"]/g, (character) => ({
     '&': '&amp;',
@@ -202,7 +231,6 @@
           <nav class="app-nav" id="appSidebar" aria-label="Navegación principal">${navigation(role)}</nav>
           <div class="dc-header-tools">
             <button class="dc-search" data-toast="La búsqueda global se conectará al expediente clínico.">⌕ <span>Buscar</span></button>
-            <button class="dc-create" data-modal="appointment"> Crear</button>
             <button class="dc-notification" data-toast="No tienes alertas críticas nuevas." aria-label="Notificaciones">♧<span></span></button>
             <div class="dc-profile"><span class="dc-avatar">SS</span><span class="dc-profile-copy"><strong>Samantha Studio</strong><small>${role}</small></span></div>
           </div>
@@ -211,7 +239,7 @@
         <main class="app-main">
           <header class="app-topbar">
             <div class="page-identity"><small>${meta[0]}</small><strong>${meta[1]}</strong></div>
-            <div class="top-actions"><span class="dc-live"><i></i> Sistema operativo</span><label class="dc-role"><span>Vista</span><select id="activeRole"><option ${role === 'Administrador' ? 'selected' : ''}>Administrador</option><option ${role === 'Asistente' ? 'selected' : ''}>Asistente</option><option ${role === 'Recepcionista' ? 'selected' : ''}>Recepcionista</option></select></label><button class="button primary" data-modal="appointment"> <span class="top-label">Nueva cita</span></button></div>
+            <div class="top-actions"><span class="dc-live"><i></i> Sistema operativo</span><label class="dc-role"><span>Vista</span><select id="activeRole"><option ${role === 'Administrador' ? 'selected' : ''}>Administrador</option><option ${role === 'Asistente' ? 'selected' : ''}>Asistente</option><option ${role === 'Recepcionista' ? 'selected' : ''}>Recepcionista</option></select></label></div>
           </header>
           <div class="content">${allowed ? content : accessDenied(role)}</div>
         </main>
@@ -229,13 +257,42 @@
   }
 
   function appointmentRows(items = demoAppointments, clinical = false) {
-    return `<div class="agenda-day">${items.map((a) => `<article class="appointment ${a.kind}"><div class="appointment-time"><strong>${a.time}</strong><span>${a.minutes} min</span></div><div class="appointment-copy"><strong>${a.patient}</strong><span>${a.treatment} · ${a.doctor}</span>${a.note ? `<span class="negative">● ${a.note}</span>` : ''}</div><div class="appointment-actions">${status(a.state, a.state === 'Confirmada' ? 'success' : 'warning')}${clinical ? button('Registrar', 'soft', `data-modal="procedure" data-patient="${esc(a.patient)}"`) : button('WhatsApp', 'soft', 'data-toast="Recordatorio preparado; requiere conectar WhatsApp Business API."')}</div></article>`).join('')}</div>`;
+    return `<div class="agenda-day">${items.map((a) => `<article class="appointment ${a.kind}"><div class="appointment-time"><strong>${a.time}</strong><span>${a.minutes} min</span></div><div class="appointment-copy"><strong>${a.patient}</strong><span>${a.treatment} · ${a.doctor}</span>${a.chair ? `<span class="appointment-chair chair-${a.chair.toLowerCase()}">Silla ${a.chair}${a.chair === 'A' ? ' · Camitas' : ' · General'}</span>` : ''}${a.note ? `<span class="negative">● ${a.note}</span>` : ''}</div><div class="appointment-actions">${status(a.state, a.state === 'Confirmada' ? 'success' : 'warning')}${clinical ? button('Registrar', 'soft', `data-modal="procedure" data-patient="${esc(a.patient)}"`) : button('WhatsApp', 'soft', 'data-toast="Recordatorio preparado; requiere conectar WhatsApp Business API."')}</div></article>`).join('')}</div>`;
+  }
+
+  function chairAvailabilityBoard() {
+    return `<section class="dc-chair-section" aria-labelledby="chairAvailabilityTitle">
+      <div class="dc-chair-section-head">
+        <div><p class="eyebrow">Disponibilidad por espacio</p><h2 id="chairAvailabilityTitle">Agenda de las tres sillas</h2><p>La Silla A está reservada exclusivamente para camitas. Las sillas B y C atienden el resto de las citas.</p></div>
+        ${status('3 sillas activas', 'success')}
+      </div>
+      <div class="dc-chair-grid">
+        ${dentalChairs.map((chair) => {
+          const appointments = demoAppointments.filter((appointment) => appointment.chair === chair.id);
+          const availableSlots = Math.max(0, 6 - appointments.length);
+          const usage = Math.round((appointments.length / 6) * 100);
+          return `<article class="dc-chair-card ${chair.tone}">
+            <div class="dc-chair-card-head">
+              <div><span class="dc-chair-id">${chair.name}</span><h3>${chair.specialty}</h3></div>
+              <span class="dc-chair-rule">${chair.id === 'A' ? 'Sólo camitas' : 'Sin camitas'}</span>
+            </div>
+            <p>${chair.rule}</p>
+            <div class="dc-chair-capacity"><strong>${availableSlots} espacios disponibles</strong><span>${appointments.length} citas asignadas</span></div>
+            <div class="dc-chair-progress" aria-label="${usage}% de ocupación"><span style="width:${usage}%"></span></div>
+            <div class="dc-chair-next"><span>Próximo espacio</span><strong>${chair.nextAvailable}</strong></div>
+            <div class="dc-chair-slots">
+              ${appointments.map((appointment) => `<div class="dc-chair-slot"><time>${appointment.time}</time><span><strong>${appointment.patient}</strong><small>${appointment.treatment}</small></span></div>`).join('')}
+            </div>
+          </article>`;
+        }).join('')}
+      </div>
+    </section>`;
   }
 
   function renderDashboard() {
     const monthlyTarget = seed.goals?.monthlyIncomeTarget || 95000;
     shell(
-      hero('Vista integral · Septiembre', 'La clínica, sin perder ningún detalle.', 'Agenda, expediente, cobro, materiales y seguimiento conectados alrededor de cada paciente.', `${button('Nueva cita', 'primary', 'data-modal="appointment"')}${button('Registrar paciente', 'secondary', 'data-modal="patient"')}`, 'assets/img/logo-ssl.svg') +
+      hero('Vista integral · Septiembre', 'La clínica, sin perder ningún detalle.', 'Agenda, expediente, cobro, materiales y seguimiento conectados alrededor de cada paciente.', `${button('Registrar paciente', 'secondary', 'data-modal="patient"')}`, 'assets/img/logo-ssl.svg') +
       `<section class="grid kpis">
         ${kpi('Pacientes del último mes', number.format(seed.meta?.patientsLastMonth || 128), '<span class="positive">Datos ficticios</span>', 'var(--lilac-200)')}
         ${kpi('Citas de hoy', '8', '6 confirmadas · 2 pendientes', 'var(--peach-200)')}
@@ -261,6 +318,7 @@
   }
 
   function renderAgenda() {
+    const canCreateAppointment = ['Administrador', 'Recepcionista'].includes(currentRole());
     const monthDays = [{
       day: 31,
       muted: true
@@ -403,6 +461,7 @@
         </div>
 
         <div class="dc-agenda-actions">
+          ${canCreateAppointment ? button('+ Nueva cita', 'primary dc-agenda-create', 'data-modal="appointment"') : ''}
           <!-- Conservamos tu buscador -->
           <input
             class="input dc-agenda-search"
@@ -544,6 +603,7 @@
         </div>
       </section>
       <div class="dc-agenda-mode-view" data-agenda-mode-view="calendar">
+      ${chairAvailabilityBoard()}
       <section class="dc-agenda-view" data-agenda-view="week"><section class="dc-agenda-layout"><article class="dc-calendar card"><div class="dc-calendar-head"><div class="dc-time-label">Hora</div><div data-week-day="0">
   <span>Lun</span>
   <strong>14</strong>
@@ -574,13 +634,13 @@
   <strong>19</strong>
 </div></div><div class="dc-calendar-body">
         ${['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'].map((time) => `<div class="dc-hour"><span>${time}</span></div>`).join('')}
-        <button class="dc-event lilac" style="--day:1;--start:1;--span:2" data-modal="appointment"><b>09:00</b><strong>Paciente demo A</strong><span>Profilaxis · 45 min</span></button>
-        <button class="dc-event coral complex" style="--day:2;--start:2;--span:3" data-modal="appointment"><b>10:00</b><strong>Paciente demo B</strong><span>Tiempo extra · nota clínica</span></button>
-        <button class="dc-event sage" style="--day:3;--start:4;--span:2" data-modal="appointment"><b>12:00</b><strong>Paciente demo C</strong><span>Revisión ortopedia</span></button>
-        <button class="dc-event gold" style="--day:4;--start:1;--span:2" data-modal="appointment"><b>09:00</b><strong>Paciente demo D</strong><span>Por confirmar</span></button>
-        <button class="dc-event lilac" style="--day:4;--start:5;--span:2" data-modal="appointment"><b>13:00</b><strong>Paciente demo E</strong><span>Primera consulta</span></button>
-        <button class="dc-event coral" style="--day:5;--start:3;--span:2" data-modal="appointment"><b>11:00</b><strong>Paciente demo F</strong><span>Resina · 60 min</span></button>
-        <button class="dc-event sage" style="--day:6;--start:2;--span:2" data-modal="appointment"><b>10:00</b><strong>Paciente demo G</strong><span>Estudio RX</span></button>
+        <button class="dc-event lilac" style="--day:1;--start:1;--span:2" data-modal="appointment"><b>09:00 · Silla A</b><strong>Paciente demo A</strong><span>Camitas · 45 min</span></button>
+        <button class="dc-event coral complex" style="--day:2;--start:2;--span:3" data-modal="appointment"><b>10:00 · Silla B</b><strong>Paciente demo B</strong><span>General · tiempo extra</span></button>
+        <button class="dc-event sage" style="--day:3;--start:4;--span:2" data-modal="appointment"><b>12:00 · Silla C</b><strong>Paciente demo C</strong><span>General · revisión ortopedia</span></button>
+        <button class="dc-event gold" style="--day:4;--start:1;--span:2" data-modal="appointment"><b>09:00 · Silla A</b><strong>Paciente demo D</strong><span>Camitas · por confirmar</span></button>
+        <button class="dc-event lilac" style="--day:4;--start:5;--span:2" data-modal="appointment"><b>13:00 · Silla B</b><strong>Paciente demo E</strong><span>General · primera consulta</span></button>
+        <button class="dc-event coral" style="--day:5;--start:3;--span:2" data-modal="appointment"><b>11:00 · Silla C</b><strong>Paciente demo F</strong><span>General · resina · 60 min</span></button>
+        <button class="dc-event sage" style="--day:6;--start:2;--span:2" data-modal="appointment"><b>10:00 · Silla B</b><strong>Paciente demo G</strong><span>General · estudio RX</span></button>
       </div></article><aside class="dc-agenda-rail"><article class="card"><div class="card-head"><div><h2>Profesionales</h2><p>Visibilidad en agenda</p></div></div><label class="dc-doctor"><span class="avatar">SA</span><span><strong>Samantha</strong><small>5 citas hoy</small></span><input type="checkbox" checked></label><label class="dc-doctor"><span class="avatar peach">AS</span><span><strong>Asistente</strong><small>3 apoyos</small></span><input type="checkbox" checked></label><label class="dc-doctor"><span class="avatar sage">RX</span><span><strong>Samantha RX</strong><small>2 estudios</small></span><input type="checkbox" checked></label></article><article class="card"><div class="card-head"><div><h2>Estado de hoy</h2><p>Jueves 17</p></div></div><div class="dc-legend"><span><i class="lilac"></i>Confirmadas <b>6</b></span><span><i class="gold"></i>Por confirmar <b>2</b></span><span><i class="coral"></i>Complejas <b>1</b></span><span><i class="sage"></i>RX / apoyo <b>2</b></span></div><div class="callout warning"><strong>Atención:</strong> una cita requiere 90 minutos y manejo especial.</div></article></aside></section></section>
       <section class="dc-agenda-view dc-day-view" data-agenda-view="day" hidden><article class="card"><div class="card-head"><div><h2 id="agendaDayTitle">Jueves 17 de septiembre</h2><p>Citas ordenadas por hora, duración y complejidad.</p></div>${status('8 citas', 'info')}</div>${appointmentRows(demoAppointments)}</article><aside class="dc-day-summary"><article class="card"><div class="card-head"><div><h2>Resumen del día</h2><p>Estado operativo</p></div></div><div class="dc-legend"><span><i class="lilac"></i>Confirmadas <b>6</b></span><span><i class="gold"></i>Por confirmar <b>2</b></span><span><i class="coral"></i>Complejas <b>1</b></span><span><i class="sage"></i>RX / apoyo <b>2</b></span></div></article><div class="callout warning"><strong>Atención:</strong> una cita requiere 90 minutos y manejo especial.</div></aside></section>
       <section class="dc-agenda-view dc-month-view card" data-agenda-view="month" hidden><div class="dc-month-head">${['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((day) => `<span>${day}</span>`).join('')}</div><div class="dc-month-grid">${monthDays.map((item) => `<div class="dc-month-day${item.muted ? ' muted' : ''}${item.today ? ' today' : ''}"><strong>${item.day}</strong>${(item.events || []).map(([label, tone]) => {
@@ -1076,6 +1136,24 @@
       </select>
     </div>
 
+    <div class="field">
+      <label for="appointmentType">Tipo de cita</label>
+      <select class="select" id="appointmentType" name="appointmentType" required>
+        <option value="general">Atención general</option>
+        <option value="camitas">Camitas</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="appointmentChair">Silla</label>
+      <select class="select" id="appointmentChair" name="chair" required>
+        <option value="A" disabled>Silla A · sólo camitas</option>
+        <option value="B" selected>Silla B · atención general</option>
+        <option value="C">Silla C · atención general</option>
+      </select>
+      <small class="field-help" id="chairRestrictionHint">Las citas generales sólo pueden usar las sillas B o C.</small>
+    </div>
+
     <div class="field wide">
       <label>Complejidad / nota roja</label>
 
@@ -1342,6 +1420,23 @@
       if (modalTrigger) {
         const backdrop = document.getElementById('modalBackdrop');
         document.getElementById('modal').innerHTML = modalContent(modalTrigger.dataset.modal, modalTrigger);
+        if (modalTrigger.dataset.modal === 'appointment') {
+          const appointmentType = document.getElementById('appointmentType');
+          const appointmentChair = document.getElementById('appointmentChair');
+          const chairHint = document.getElementById('chairRestrictionHint');
+          const syncChairRules = () => {
+            const isCamitas = appointmentType?.value === 'camitas';
+            Array.from(appointmentChair?.options || []).forEach((option) => {
+              option.disabled = isCamitas ? option.value !== 'A' : option.value === 'A';
+            });
+            if (appointmentChair) appointmentChair.value = isCamitas ? 'A' : (appointmentChair.value === 'A' ? 'B' : appointmentChair.value);
+            if (chairHint) chairHint.textContent = isCamitas ?
+              'Camitas requiere la Silla A; las sillas B y C no están disponibles para este tipo de cita.' :
+              'Las citas generales sólo pueden usar las sillas B o C.';
+          };
+          appointmentType?.addEventListener('change', syncChairRules);
+          syncChairRules();
+        }
         backdrop.classList.add('open');
         backdrop.setAttribute('aria-hidden', 'false');
       }
