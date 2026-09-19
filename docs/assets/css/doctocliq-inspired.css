@@ -25,9 +25,9 @@ body {
   align-items: center;
   height: 58px;
   padding: 0 22px;
-  color: #fff;
-  background: linear-gradient(90deg, var(--dc-navy-2), var(--dc-navy));
-  box-shadow: 0 5px 18px rgba(33, 33, 32, .16);
+  color: var(--brand-charcoal);
+  background: var(--brand-lavender);
+  box-shadow: 0 5px 18px rgba(102, 88, 111, .16);
 }
 
 .dc-header .brand {
@@ -75,7 +75,7 @@ body {
   gap: 6px;
   min-width: max-content;
   padding: 0 11px;
-  color: rgba(255, 255, 255, .68);
+  color: rgba(33, 33, 32, .66);
   font-size: 10px;
   font-weight: 650;
   transition: .2s ease;
@@ -95,13 +95,13 @@ body {
 }
 
 .app-nav a:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, .055);
+  color: var(--brand-charcoal);
+  background: rgba(255, 255, 255, .28);
 }
 
 .app-nav a.active {
-  color: #fff;
-  background: rgba(255, 255, 255, .08);
+  color: var(--brand-charcoal);
+  background: rgba(255, 255, 255, .38);
 }
 
 .app-nav a.active::after {
@@ -138,19 +138,20 @@ body {
 .dc-notification {
   height: 32px;
   border-radius: 7px;
-  color: #fff;
+  color: var(--brand-charcoal);
 }
 
 .dc-search {
   padding: 0 10px;
-  background: rgba(255, 255, 255, .08);
-  color: rgba(255, 255, 255, .78);
+  color: rgba(33, 33, 32, .78);
+  background: rgba(255, 255, 255, .32);
   font-size: 9px;
 }
 
 .dc-create {
   padding: 0 13px;
-  background: var(--dc-teal);
+  color: #fff;
+  background: var(--brand-charcoal);
   font-size: 9px;
   font-weight: 850;
   box-shadow: 0 5px 12px rgba(69, 170, 177, .22);
@@ -180,7 +181,7 @@ body {
   gap: 7px;
   margin-left: 3px;
   padding-left: 10px;
-  border-left: 1px solid rgba(255, 255, 255, .13);
+  border-left: 1px solid rgba(33, 33, 32, .16);
 }
 
 .dc-avatar {
@@ -210,14 +211,14 @@ body {
 
 .dc-profile-copy small {
   margin-top: 2px;
-  color: rgba(255, 255, 255, .52);
+  color: rgba(33, 33, 32, .58);
   font-size: 7px;
 }
 
 .dc-menu-button {
   display: none;
   margin-left: auto;
-  color: #fff;
+  color: var(--brand-charcoal);
   background: transparent;
   font-size: 20px;
 }
