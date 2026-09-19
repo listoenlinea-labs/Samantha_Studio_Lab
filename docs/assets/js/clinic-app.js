@@ -746,10 +746,366 @@
   }
 
   function teeth() {
-    const upper = [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28];
-    const lower = [48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38];
-    const tooth = (id) => `<button class="tooth ${id === 54 ? 'caries' : id === 64 ? 'treated' : ''}" data-tooth="${id}" aria-label="Diente ${id}">${id}</button>`;
-    return `<div class="odontogram"><div class="tooth-row">${upper.map(tooth).join('')}</div><div class="tooth-row">${[55, 54, 53, 52, 51, 61, 62, 63, 64, 65].map(tooth).join('')}</div><div class="tooth-row">${[85, 84, 83, 82, 81, 71, 72, 73, 74, 75].map(tooth).join('')}</div><div class="tooth-row">${lower.map(tooth).join('')}</div><div class="odontogram-legend"><span>○ Sano</span><span style="color:#b34d5d">● Caries</span><span style="color:#497d6b">● Tratado</span><span style="opacity:.5">╳ Ausente</span></div></div>`;
+    const permanentUpper = [
+      18, 17, 16, 15, 14, 13, 12, 11,
+      21, 22, 23, 24, 25, 26, 27, 28,
+    ];
+
+    const permanentLower = [
+      48, 47, 46, 45, 44, 43, 42, 41,
+      31, 32, 33, 34, 35, 36, 37, 38,
+    ];
+
+    const temporaryUpper = [
+      55, 54, 53, 52, 51,
+      61, 62, 63, 64, 65,
+    ];
+
+    const temporaryLower = [
+      85, 84, 83, 82, 81,
+      71, 72, 73, 74, 75,
+    ];
+
+    /*
+     * Alturas en porcentaje para formar las arcadas.
+     * Los dientes centrales quedan más cerca del centro
+     * y los molares se desplazan hacia los extremos.
+     */
+    const permanentUpperY = [
+      68, 54, 42, 31, 23, 17, 12, 9,
+      9, 12, 17, 23, 31, 42, 54, 68,
+    ];
+
+    const permanentLowerY = [
+      14, 26, 38, 49, 58, 65, 71, 75,
+      75, 71, 65, 58, 49, 38, 26, 14,
+    ];
+
+    const temporaryUpperY = [
+      58, 36, 21, 12, 8,
+      8, 12, 21, 36, 58,
+    ];
+
+    const temporaryLowerY = [
+      18, 39, 57, 69, 75,
+      75, 69, 57, 39, 18,
+    ];
+
+    function getToothType(id) {
+      const position = Number(String(id).slice(-1));
+
+      if (position === 1 || position === 2) {
+        return {
+          key: 'incisor',
+          name: 'Incisivo',
+          short: 'I',
+        };
+      }
+
+      if (position === 3) {
+        return {
+          key: 'canine',
+          name: 'Canino',
+          short: 'C',
+        };
+      }
+
+      /*
+       * En dentición temporal las posiciones 4 y 5
+       * corresponden a molares.
+       */
+      if (id >= 50 && (position === 4 || position === 5)) {
+        return {
+          key: 'molar',
+          name: 'Molar temporal',
+          short: 'M',
+        };
+      }
+
+      if (position === 4 || position === 5) {
+        return {
+          key: 'premolar',
+          name: 'Premolar',
+          short: 'P',
+        };
+      }
+
+      return {
+        key: 'molar',
+        name: 'Molar',
+        short: 'M',
+      };
+    }
+
+    function getRotation(index, total, arch) {
+      const middle = (total - 1) / 2;
+      const distance = index - middle;
+
+      const rotation =
+        distance * (total === 16 ? 2.6 : 4);
+
+      return arch === 'upper'
+        ? rotation
+        : rotation * -1;
+    }
+
+    function createTooth(id, index, teethList, yPositions, arch) {
+      const type = getToothType(id);
+
+      /*
+       * Dejamos espacio en ambos extremos para que los molares
+       * no se corten ni tapen los textos laterales.
+       */
+      const x =
+        teethList.length === 16
+          ? 8 + index * (84 / 15)
+          : 16 + index * (68 / 9);
+
+      return `
+    <button
+      class="tooth dental-tooth ${type.key}"
+      type="button"
+      data-tooth="${id}"
+      data-type="${type.name}"
+      data-type-key="${type.key}"
+      aria-label="Seleccionar diente ${id}, ${type.name}"
+      aria-pressed="false"
+      title="Diente ${id} · ${type.name}"
+      style="
+        --tooth-x:${x}%;
+        --tooth-y:${yPositions[index]}%;
+        --tooth-rotation:${getRotation(
+        index,
+        teethList.length,
+        arch
+      )}deg;
+      "
+    >
+      <span class="tooth-number">${id}</span>
+
+      <span class="tooth-shape" aria-hidden="true">
+        <i class="tooth-surface surface-top"></i>
+        <i class="tooth-surface surface-center"></i>
+        <i class="tooth-surface surface-left"></i>
+        <i class="tooth-surface surface-right"></i>
+        <i class="tooth-surface surface-bottom"></i>
+      </span>
+    </button>
+  `;
+    }
+
+    function createArch(
+      title,
+      subtitle,
+      teethList,
+      yPositions,
+      arch
+    ) {
+      return `
+    <section class="dental-arch dental-arch-${arch}">
+      <div class="dental-arch-heading">
+        <strong>${title}</strong>
+        <span>${subtitle}</span>
+      </div>
+
+      <div class="dental-arch-stage">
+        <span class="dental-side dental-side-right">
+          Derecha
+        </span>
+
+        <span class="dental-side dental-side-left">
+          Izquierda
+        </span>
+
+        <div class="dental-gum" aria-hidden="true"></div>
+
+        ${teethList
+          .map((id, index) =>
+            createTooth(
+              id,
+              index,
+              teethList,
+              yPositions,
+              arch
+            )
+          )
+          .join('')}
+      </div>
+    </section>
+  `;
+    }
+
+    return `
+    <div class="odontogram-professional">
+      <div class="dentition-selector">
+        <button
+          class="dentition-button active"
+          type="button"
+          data-dentition-button="permanent"
+        >
+          Dentición permanente
+        </button>
+
+        <button
+          class="dentition-button"
+          type="button"
+          data-dentition-button="temporary"
+        >
+          Dentición temporal
+        </button>
+      </div>
+
+      <div
+        class="dentition-panel active"
+        data-dentition-panel="permanent"
+      >
+        ${createArch(
+      'Maxila',
+      'Dentición permanente superior',
+      permanentUpper,
+      permanentUpperY,
+      'upper'
+    )}
+
+        <div class="dental-midline">
+          <span>Derecha del paciente</span>
+          <i></i>
+          <span>Izquierda del paciente</span>
+        </div>
+
+        ${createArch(
+      'Mandíbula',
+      'Dentición permanente inferior',
+      permanentLower,
+      permanentLowerY,
+      'lower'
+    )}
+      </div>
+
+      <div
+        class="dentition-panel"
+        data-dentition-panel="temporary"
+        hidden
+      >
+        ${createArch(
+      'Maxila temporal',
+      'Dentición temporal superior',
+      temporaryUpper,
+      temporaryUpperY,
+      'upper'
+    )}
+
+        <div class="dental-midline">
+          <span>Derecha del paciente</span>
+          <i></i>
+          <span>Izquierda del paciente</span>
+        </div>
+
+        ${createArch(
+      'Mandíbula temporal',
+      'Dentición temporal inferior',
+      temporaryLower,
+      temporaryLowerY,
+      'lower'
+    )}
+      </div>
+
+      <div class="odontogram-selection-help">
+        <span class="selection-help-sample"></span>
+
+        <span>
+          El contorno turquesa indica el diente seleccionado.
+          Seleccionarlo no modifica su diagnóstico.
+        </span>
+      </div>
+
+      <section class="dental-reference">
+        <div class="dental-reference-head">
+          <div>
+            <h3>Tabla de referencia dental</h3>
+
+            <p>
+              Clasificación anatómica y numeración FDI.
+            </p>
+          </div>
+        </div>
+
+        <div class="dental-reference-grid">
+          <article class="dental-type-card incisor">
+            <span class="dental-type-letter">I</span>
+
+            <div>
+              <strong>Incisivos</strong>
+              <p>Cortan los alimentos.</p>
+
+              <small>
+                Permanentes:
+                11, 12, 21, 22, 31, 32, 41, 42
+              </small>
+
+              <small>
+                Temporales:
+                51, 52, 61, 62, 71, 72, 81, 82
+              </small>
+            </div>
+          </article>
+
+          <article class="dental-type-card canine">
+            <span class="dental-type-letter">C</span>
+
+            <div>
+              <strong>Caninos</strong>
+              <p>Desgarran los alimentos.</p>
+
+              <small>
+                Permanentes: 13, 23, 33, 43
+              </small>
+
+              <small>
+                Temporales: 53, 63, 73, 83
+              </small>
+            </div>
+          </article>
+
+          <article class="dental-type-card premolar">
+            <span class="dental-type-letter">P</span>
+
+            <div>
+              <strong>Premolares</strong>
+              <p>Trituran y desgarran.</p>
+
+              <small>
+                14, 15, 24, 25, 34, 35, 44, 45
+              </small>
+
+              <small>
+                No existen en la dentición temporal.
+              </small>
+            </div>
+          </article>
+
+          <article class="dental-type-card molar">
+            <span class="dental-type-letter">M</span>
+
+            <div>
+              <strong>Molares</strong>
+              <p>Trituran los alimentos.</p>
+
+              <small>
+                Permanentes:
+                16–18, 26–28, 36–38, 46–48
+              </small>
+
+              <small>
+                Temporales:
+                54, 55, 64, 65, 74, 75, 84, 85
+              </small>
+            </div>
+          </article>
+        </div>
+      </section>
+    </div>
+  `;
   }
 
   function renderPatients() {
@@ -765,7 +1121,19 @@
         <div class="tabs"><button class="tab active" data-tab="summary">Resumen</button><button class="tab" data-tab="history">Historial</button><button class="tab" data-tab="odontogram">Odontograma</button><button class="tab" data-tab="rx">Rayos X</button><button class="tab" data-tab="documents">Documentos</button></div>
         <div class="tab-panel active" data-panel="summary"><div class="grid two"><div><div class="card-head"><div><h3>Próxima cita</h3><p>Viernes 18 · 10:00</p></div></div><div class="callout"><strong>Procedimiento clínico demo</strong><br>Duración estimada 90 min · nota de manejo especial.</div></div><div><div class="card-head"><div><h3>Familia / tutor</h3><p>Un contacto, tres pacientes vinculados.</p></div></div><div class="list"><div class="list-item"><span class="avatar">FD</span><span class="list-copy"><strong>Familia demo</strong><span>Responsable de PA, PB y PC</span></span></div></div></div></div></div>
         <div class="tab-panel" data-panel="history"><div class="timeline"><div class="timeline-item"><strong>17 sep 2026 · Procedimiento demo</strong><p>Procedimiento finalizado. Indicaciones preventivas enviadas por WhatsApp.</p></div><div class="timeline-item"><strong>02 sep 2026 · Valoración inicial</strong><p>Valoración, odontograma y estudio vinculados al expediente.</p></div></div></div>
-        <div class="tab-panel" data-panel="odontogram"><div class="callout"><strong>Odontograma interactivo:</strong> selecciona un diente para cambiar su condición. Cada cambio deberá generar una entrada auditada en el expediente.</div>${teeth()}<div id="toothDetail" class="callout">Selecciona un diente para registrar diagnóstico, superficie y plan.</div></div>
+        <div class="tab-panel" data-panel="odontogram">
+  <div class="callout">
+    <strong>Odontograma interactivo:</strong>
+    selecciona un diente para consultar o registrar su diagnóstico,
+    superficies y plan de tratamiento.
+  </div>
+
+  ${teeth()}
+
+  <div id="toothDetail" class="callout">
+    Selecciona un diente para registrar diagnóstico, superficie y plan.
+  </div>
+</div>
         <div class="tab-panel" data-panel="rx"><div class="list"><a class="list-item" href="radiografias.html"><span class="list-icon">RX</span><span class="list-copy"><strong>Panorámica · 02 sep 2026</strong><span>Vinculada a primera consulta</span></span>${status('Disponible', 'success')}</a></div></div>
         <div class="tab-panel" data-panel="documents"><div class="list"><div class="list-item"><span class="list-icon">PDF</span><span class="list-copy"><strong>Consentimiento informado</strong><span>Firmado · 02 sep 2026</span></span></div><div class="list-item"><span class="list-icon">PDF</span><span class="list-copy"><strong>Política de cancelaciones</strong><span>Aceptada por el tutor</span></span></div></div></div>
       </article></section>`
@@ -1470,6 +1838,32 @@
         'Registro guardado en la demostración. El backend persistirá y auditará el cambio.'
       );
     });
+    document
+      .querySelectorAll('[data-dentition-button]')
+      .forEach((button) => {
+        button.addEventListener('click', () => {
+          const dentition = button.dataset.dentitionButton;
+
+          document
+            .querySelectorAll('[data-dentition-button]')
+            .forEach((item) => {
+              item.classList.toggle(
+                'active',
+                item === button
+              );
+            });
+
+          document
+            .querySelectorAll('[data-dentition-panel]')
+            .forEach((panel) => {
+              const isActive =
+                panel.dataset.dentitionPanel === dentition;
+
+              panel.hidden = !isActive;
+              panel.classList.toggle('active', isActive);
+            });
+        });
+      });
 
     function closeModal() {
       const backdrop = document.getElementById('modalBackdrop');
@@ -1494,32 +1888,61 @@
       }
     }));
 
-    document.querySelectorAll('.tooth').forEach((tooth) => tooth.addEventListener('click', () => {
-      const states = ['', 'caries', 'treated', 'absent'];
-      const current = states.findIndex((state) => state && tooth.classList.contains(state));
-      states.slice(1).forEach((state) => tooth.classList.remove(state));
-      const next = states[(current + 1) % states.length];
-      if (next) tooth.classList.add(next);
-      const labels = {
-        '': 'Sano',
-        caries: 'Caries',
-        treated: 'Tratado',
-        absent: 'Ausente'
-      };
-      const detail = document.getElementById('toothDetail');
-      if (detail) {
-        detail.innerHTML = `
-    <strong>
-      Diente ${tooth.dataset.tooth} · ${labels[next]}
-    </strong>
+    document.querySelectorAll('.dental-tooth').forEach((tooth) => {
+      tooth.addEventListener('click', () => {
+        const wasSelected = tooth.classList.contains('selected');
 
-    <br>
+        /*
+         * Solamente puede haber un diente seleccionado.
+         * No cambiamos aquí su condición clínica.
+         */
+        document.querySelectorAll('.dental-tooth').forEach((item) => {
+          item.classList.remove('selected');
+          item.setAttribute('aria-pressed', 'false');
+        });
 
-    Agrega superficie, diagnóstico, evidencia y plan de tratamiento.
-    El cambio quedará ligado al usuario y fecha.
-  `;
-      }
-    }));
+        const detail = document.getElementById('toothDetail');
+
+        /*
+         * Si se pulsa nuevamente el mismo diente,
+         * queda deseleccionado y recupera su aspecto normal.
+         */
+        if (wasSelected) {
+          if (detail) {
+            detail.innerHTML =
+              'Selecciona un diente para registrar diagnóstico, superficie y plan.';
+          }
+
+          return;
+        }
+
+        tooth.classList.add('selected');
+        tooth.setAttribute('aria-pressed', 'true');
+
+        if (detail) {
+          detail.innerHTML = `
+        <div class="selected-tooth-detail">
+          <span class="selected-tooth-number">
+            ${tooth.dataset.tooth}
+          </span>
+
+          <div>
+            <strong>
+              Diente ${tooth.dataset.tooth}
+              · ${tooth.dataset.type}
+            </strong>
+
+            <p>
+              Diente seleccionado. Aquí podrás registrar
+              su condición, superficies, diagnóstico,
+              evidencia y plan de tratamiento.
+            </p>
+          </div>
+        </div>
+      `;
+        }
+      });
+    });
 
     const calcInputs = ['calcHours', 'calcHourly', 'calcMargin', 'calcMaterials', 'calcPlaque'].map((id) => document.getElementById(id)).filter(Boolean);
     const calculate = () => {

@@ -2283,7 +2283,7 @@ th {
   font-size: 15px;
 }
 
-.dc-chair-card > p {
+.dc-chair-card>p {
   min-height: 30px;
   margin: 7px 0 11px;
   color: var(--muted);
@@ -2427,7 +2427,7 @@ th {
     grid-template-columns: 1fr;
   }
 
-  .dc-chair-card > p {
+  .dc-chair-card>p {
     min-height: auto;
   }
 }
@@ -2443,5 +2443,815 @@ th {
 
   .dc-chair-section-head {
     flex-direction: column;
+  }
+}
+
+/* =========================================================
+   ODONTOGRAMA PROFESIONAL INTERACTIVO
+   ========================================================= */
+
+.odontogram-professional {
+  display: grid;
+  gap: 18px;
+  margin-top: 16px;
+}
+
+.dentition-selector {
+  display: inline-flex;
+  width: fit-content;
+  padding: 3px;
+  border: 1px solid var(--dc-line);
+  border-radius: 10px;
+  background: #f3f7f8;
+}
+
+.dentition-button {
+  min-height: 36px;
+  padding: 0 15px;
+  border: 0;
+  border-radius: 7px;
+  color: var(--muted);
+  background: transparent;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.dentition-button.active {
+  color: #fff;
+  background: var(--dc-teal);
+  box-shadow: 0 5px 12px rgba(69, 170, 177, 0.24);
+}
+
+.dentition-panel {
+  display: grid;
+  gap: 4px;
+  padding: 18px;
+  border: 1px solid var(--dc-line);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 50% 25%,
+      rgba(250, 173, 125, 0.1),
+      transparent 42%),
+    #fff;
+}
+
+.dentition-panel[hidden] {
+  display: none !important;
+}
+
+.dental-arch {
+  position: relative;
+  width: min(680px, 100%);
+  margin: 0 auto;
+  aspect-ratio: 2.45 / 1;
+  overflow: hidden;
+}
+
+.dental-arch-heading {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  z-index: 4;
+  text-align: center;
+  transform: translateX(-50%);
+}
+
+.dental-arch-heading strong,
+.dental-arch-heading span {
+  display: block;
+  white-space: nowrap;
+}
+
+.dental-arch-heading strong {
+  color: var(--dc-navy);
+  font-size: 15px;
+}
+
+.dental-arch-heading span {
+  margin-top: 3px;
+  margin-bottom: 4%;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.dental-gum {
+  position: absolute;
+  left: 15%;
+  width: 70%;
+  height: 72%;
+  border: 1px solid rgba(190, 105, 107, 0.25);
+  background:
+    radial-gradient(ellipse at center,
+      #d98486 0%,
+      #c86f74 58%,
+      #a9505a 100%);
+  box-shadow:
+    inset 0 10px 24px rgba(255, 255, 255, 0.22),
+    0 8px 18px rgba(108, 54, 59, 0.12);
+}
+
+.dental-arch-upper .dental-gum {
+  top: 17%;
+  border-radius: 48% 48% 34% 34%;
+}
+
+.dental-arch-lower .dental-gum {
+  bottom: 12%;
+  border-radius: 34% 34% 48% 48%;
+}
+
+.dental-side {
+  position: absolute;
+  top: 48%;
+  z-index: 3;
+  width: 58px;
+  color: var(--muted);
+  font-size: 8px;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.dental-side-right {
+  left: 0;
+}
+
+.dental-side-left {
+  right: 0;
+}
+
+.dental-tooth {
+  position: absolute;
+  top: var(--tooth-y);
+  left: var(--tooth-x);
+  z-index: 5;
+  display: grid;
+  width: clamp(24px, 4.3vw, 39px);
+  padding: 0;
+  place-items: center;
+  border: 0;
+  color: var(--dc-navy);
+  background: transparent;
+  cursor: pointer;
+  transform:
+    translate(-50%, -50%) rotate(var(--tooth-rotation));
+  transition:
+    transform 150ms ease,
+    filter 150ms ease;
+}
+
+.dental-tooth:hover,
+.dental-tooth:focus-visible {
+  z-index: 10;
+  outline: 0;
+  filter: drop-shadow(0 7px 7px rgba(38, 61, 73, 0.2));
+  transform:
+    translate(-50%, -50%) rotate(var(--tooth-rotation)) scale(1.13);
+}
+
+.tooth-number {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  color: var(--tooth-type-color);
+  font-size: 8px;
+  font-weight: 850;
+  transform: translateX(-50%);
+}
+
+.tooth-shape {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 0.78;
+  overflow: hidden;
+  border: 1px solid #cbc7bc;
+  border-radius: 45% 45% 34% 34%;
+  background:
+    radial-gradient(circle at 50% 32%,
+      #fffef7,
+      #eeeade 72%,
+      #d5d0c3);
+  box-shadow:
+    inset 0 -4px 7px rgba(137, 128, 111, 0.17),
+    0 3px 5px rgba(49, 54, 57, 0.13);
+}
+
+.dental-tooth.incisor {
+  --tooth-type-color: #dda620;
+}
+
+.dental-tooth.canine {
+  --tooth-type-color: #36a96d;
+}
+
+.dental-tooth.premolar {
+  --tooth-type-color: #b24f9a;
+}
+
+.dental-tooth.molar {
+  --tooth-type-color: #395fd2;
+}
+
+.dental-tooth.incisor .tooth-shape {
+  width: 78%;
+  border-radius: 38% 38% 28% 28%;
+}
+
+.dental-tooth.canine .tooth-shape {
+  width: 83%;
+  border-radius: 50% 50% 32% 32%;
+}
+
+.dental-tooth.molar .tooth-shape {
+  width: 110%;
+  border-radius: 42% 42% 31% 31%;
+}
+
+.tooth-surface {
+  position: absolute;
+  display: block;
+  opacity: 0;
+  background: currentColor;
+  transition: opacity 150ms ease;
+}
+
+.dental-tooth.caries .tooth-shape {
+  color: #c94b5d;
+  border-color: #c94b5d;
+  background: #ffe8eb;
+}
+
+.dental-tooth.caries .surface-center {
+  top: 35%;
+  left: 35%;
+  width: 30%;
+  height: 30%;
+  opacity: 1;
+  border-radius: 50%;
+}
+
+.dental-tooth.treated .tooth-shape {
+  color: #3d9a7f;
+  border-color: #3d9a7f;
+  background: #e1f5ee;
+}
+
+.dental-tooth.treated .surface-center {
+  inset: 18%;
+  opacity: 0.55;
+  border-radius: 35%;
+}
+
+.dental-tooth.absent {
+  opacity: 0.45;
+}
+
+.dental-tooth.absent .tooth-shape {
+  background: transparent;
+  border-style: dashed;
+}
+
+.dental-tooth.absent .tooth-shape::before,
+.dental-tooth.absent .tooth-shape::after {
+  content: "";
+  position: absolute;
+  top: 48%;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  background: #8b9397;
+}
+
+.dental-tooth.absent .tooth-shape::before {
+  transform: rotate(45deg);
+}
+
+.dental-tooth.absent .tooth-shape::after {
+  transform: rotate(-45deg);
+}
+
+.dental-midline {
+  display: grid;
+  grid-template-columns: 1fr 50px 1fr;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 9px;
+  text-align: center;
+}
+
+.dental-midline i {
+  height: 1px;
+  background: linear-gradient(90deg,
+      transparent,
+      var(--dc-line),
+      transparent);
+}
+
+.odontogram-status-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+.odontogram-status-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.status-sample {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border: 1px solid #bfc8cc;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.status-sample.caries {
+  border-color: #c94b5d;
+  background: #c94b5d;
+}
+
+.status-sample.treated {
+  border-color: #3d9a7f;
+  background: #3d9a7f;
+}
+
+.status-sample.absent {
+  border-style: dashed;
+  background:
+    linear-gradient(45deg,
+      transparent 42%,
+      #8b9397 43%,
+      #8b9397 57%,
+      transparent 58%);
+}
+
+.dental-reference {
+  padding: 17px;
+  border: 1px solid var(--dc-line);
+  border-radius: 12px;
+  background: #f8fbfc;
+}
+
+.dental-reference-head h3 {
+  margin: 0;
+  color: var(--dc-navy);
+  font-size: 15px;
+}
+
+.dental-reference-head p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.dental-reference-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.dental-type-card {
+  display: grid;
+  grid-template-columns: 37px 1fr;
+  gap: 11px;
+  padding: 13px;
+  border: 1px solid var(--dc-line);
+  border-left: 4px solid var(--type-color);
+  border-radius: 9px;
+  background: #fff;
+}
+
+.dental-type-card.incisor {
+  --type-color: #dda620;
+}
+
+.dental-type-card.canine {
+  --type-color: #36a96d;
+}
+
+.dental-type-card.premolar {
+  --type-color: #b24f9a;
+}
+
+.dental-type-card.molar {
+  --type-color: #395fd2;
+}
+
+.dental-type-letter {
+  display: grid;
+  width: 35px;
+  height: 35px;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--type-color);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.dental-type-card strong,
+.dental-type-card p,
+.dental-type-card small {
+  display: block;
+}
+
+.dental-type-card strong {
+  color: var(--dc-navy);
+  font-size: 12px;
+}
+
+.dental-type-card p {
+  margin: 4px 0 7px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.dental-type-card small {
+  margin-top: 3px;
+  color: #718189;
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.selected-tooth-detail {
+  display: grid;
+  grid-template-columns: 45px 1fr;
+  align-items: center;
+  gap: 12px;
+}
+
+.selected-tooth-number {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--dc-teal);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.selected-tooth-detail p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+@media (max-width: 760px) {
+  .dentition-panel {
+    padding: 10px 5px;
+  }
+
+  .dental-arch {
+    width: 100%;
+    aspect-ratio: 1.65 / 1;
+  }
+
+  .dental-arch-heading strong {
+    font-size: 12px;
+  }
+
+  .dental-arch-heading span,
+  .dental-side {
+    display: none;
+  }
+
+  .dental-tooth {
+    width: clamp(19px, 6vw, 27px);
+  }
+
+  .tooth-number {
+    top: -12px;
+    font-size: 7px;
+  }
+
+  .dental-reference-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dentition-selector {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .dentition-button {
+    padding: 0 8px;
+    font-size: 9px;
+  }
+
+  .dental-midline {
+    grid-template-columns: 1fr 25px 1fr;
+    font-size: 7px;
+  }
+}
+
+/* =========================================================
+   AJUSTE FINAL DEL ODONTOGRAMA
+   ========================================================= */
+
+/*
+ * El expediente deja mayor espacio a la ficha clínica
+ * cuando contiene el odontograma.
+ */
+.grid.layout:has(.tab-panel[data-panel="odontogram"]) {
+  grid-template-columns:
+    minmax(250px, 0.52fr) minmax(700px, 1.48fr);
+  align-items: start;
+}
+
+/*
+ * Evita que los tabs, arcadas y números sean recortados.
+ */
+.tab-panel[data-panel="odontogram"],
+.odontogram-professional,
+.dentition-panel,
+.dental-arch,
+.dental-arch-stage {
+  min-width: 0;
+  overflow: visible;
+}
+
+.dentition-panel {
+  gap: 18px;
+  padding: 24px 18px;
+}
+
+/*
+ * Cada arcada ahora tiene un encabezado independiente
+ * y una zona exclusiva para dibujar la dentadura.
+ */
+.dental-arch {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  aspect-ratio: auto;
+}
+
+.dental-arch-heading {
+  position: relative;
+  top: auto;
+  left: auto;
+  z-index: 1;
+  margin-bottom: 10px;
+  text-align: center;
+  transform: none;
+}
+
+.dental-arch-heading strong {
+  display: block;
+  color: var(--dc-navy);
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.dental-arch-heading span {
+  display: block;
+  margin-top: 4px;
+  margin-bottom: 4%;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.dental-arch-stage {
+  position: relative;
+  width: 100%;
+  height: 290px;
+  isolation: isolate;
+}
+
+/*
+ * Encía más contenida para que los dientes sean
+ * los elementos predominantes.
+ */
+.dental-gum {
+  left: 17%;
+  width: 66%;
+  height: 68%;
+}
+
+.dental-arch-upper .dental-gum {
+  top: 17%;
+}
+
+.dental-arch-lower .dental-gum {
+  bottom: 10%;
+}
+
+/*
+ * Orientación del paciente visible, pero fuera
+ * del área ocupada por los molares.
+ */
+.dental-side {
+  top: 50%;
+  z-index: 2;
+  width: 65px;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.dental-side-right {
+  left: -4px;
+}
+
+.dental-side-left {
+  right: -4px;
+}
+
+/*
+ * Dientes más grandes y fáciles de seleccionar.
+ */
+.dental-tooth {
+  width: clamp(30px, 4.1vw, 46px);
+  min-width: 0;
+}
+
+.tooth-number {
+  top: -18px;
+  z-index: 3;
+  font-size: 10px;
+  line-height: 1;
+}
+
+/*
+ * Apariencia neutral permanente.
+ */
+.dental-tooth .tooth-shape,
+.dental-tooth.caries .tooth-shape,
+.dental-tooth.treated .tooth-shape,
+.dental-tooth.absent .tooth-shape {
+  color: var(--dc-navy);
+  border: 1px solid #c9c4b7;
+  border-style: solid;
+  background:
+    radial-gradient(circle at 50% 28%,
+      #fffef9 0%,
+      #f4f0e6 55%,
+      #d9d3c5 100%);
+  opacity: 1;
+}
+
+.dental-tooth.caries,
+.dental-tooth.treated,
+.dental-tooth.absent {
+  opacity: 1;
+}
+
+/*
+ * Neutraliza cualquier marca de estado anterior.
+ */
+.dental-tooth .tooth-surface,
+.dental-tooth.caries .tooth-surface,
+.dental-tooth.treated .tooth-surface,
+.dental-tooth.absent .tooth-surface {
+  opacity: 0;
+}
+
+.dental-tooth.absent .tooth-shape::before,
+.dental-tooth.absent .tooth-shape::after {
+  content: none;
+}
+
+/*
+ * La selección sólo muestra un contorno turquesa.
+ */
+.dental-tooth.selected {
+  z-index: 20;
+  filter:
+    drop-shadow(0 0 3px rgba(69, 170, 177, 0.35)) drop-shadow(0 7px 8px rgba(38, 61, 73, 0.16));
+}
+
+.dental-tooth.selected .tooth-shape {
+  border: 3px solid var(--dc-teal);
+  background:
+    radial-gradient(circle at 50% 28%,
+      #ffffff 0%,
+      #f0fbfa 58%,
+      #d9efec 100%);
+  box-shadow:
+    0 0 0 4px rgba(69, 170, 177, 0.15),
+    inset 0 -4px 7px rgba(85, 135, 132, 0.12);
+}
+
+.dental-tooth.selected .tooth-number {
+  color: var(--dc-teal);
+  font-size: 11px;
+}
+
+/*
+ * Texto explicativo de selección.
+ */
+.odontogram-selection-help {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 12px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.selection-help-sample {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 13px;
+  height: 13px;
+  border: 2px solid var(--dc-teal);
+  border-radius: 50%;
+  background: #fff;
+}
+
+/*
+ * En pantallas medianas apilamos directorio y expediente.
+ * Así el odontograma puede usar todo el ancho disponible.
+ */
+@media (max-width: 1180px) {
+  .grid.layout:has(.tab-panel[data-panel="odontogram"]) {
+    grid-template-columns: 1fr;
+  }
+
+  .grid.layout:has(.tab-panel[data-panel="odontogram"])>aside {
+    max-height: 360px;
+    overflow: auto;
+  }
+}
+
+/*
+ * Adaptación móvil sin scroll horizontal.
+ */
+@media (max-width: 760px) {
+  .dentition-panel {
+    gap: 12px;
+    padding: 16px 5px;
+  }
+
+  .dental-arch {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .dental-arch-heading {
+    margin-bottom: 5px;
+  }
+
+  .dental-arch-heading strong {
+    font-size: 15px;
+  }
+
+  .dental-arch-heading span {
+    display: block;
+    font-size: 9px;
+  }
+
+  .dental-arch-stage {
+    height: 215px;
+  }
+
+  .dental-side {
+    display: none;
+  }
+
+  .dental-tooth {
+    width: clamp(20px, 6.4vw, 30px);
+  }
+
+  .tooth-number {
+    top: -13px;
+    font-size: 7px;
+  }
+
+  .dental-tooth.selected .tooth-number {
+    font-size: 8px;
+  }
+
+  .dental-gum {
+    left: 13%;
+    width: 74%;
+  }
+
+  .dental-midline {
+    margin: 2px 0;
+  }
+
+  .odontogram-selection-help {
+    align-items: flex-start;
+    font-size: 10px;
+    text-align: left;
   }
 }
