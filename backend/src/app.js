@@ -46,8 +46,15 @@ app.get('/api/health', async (req, res, next) => {
     }
 });
 
+const authRoutes = require('./routes/auth.routes');
 const pacientesRoutes = require('./routes/pacientes.routes');
-
+const odontogramasRoutes = require('./routes/odontogramas.routes');
+const periodontogramasRoutes = require('./routes/periodontogramas.routes');
+const archivosRoutes = require('./routes/archivos.routes');
+app.use('/api/auth', authRoutes);
 app.use('/api/pacientes', pacientesRoutes);
+app.use('/api/odontogramas', odontogramasRoutes);
+app.use('/api/periodontogramas', periodontogramasRoutes);
+app.use('/api/archivos', archivosRoutes);
 
 module.exports = app;
