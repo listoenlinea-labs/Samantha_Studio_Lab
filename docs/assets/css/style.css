@@ -3,51 +3,60 @@
        IDENTIDAD SAMANTHA'S STUDIO LAB
        ========================================= */
 
-    /* Color principal - logo */
-    --primary: #cbbbe2;
-    --primary-dark: #9d83bd;
-    --primary-deep: #715a8d;
-    --primary-soft: #eee7f6;
-    --primary-light: #f8f4fc;
+    /* Paleta oficial extraída de las variantes del logotipo SSL */
+    --brand-charcoal: #212120;
+    --brand-sage: #9ab2b3;
+    --brand-lavender: #d8cce6;
+    --brand-lilac-soft: #eae1ea;
+    --brand-peach: #fbba91;
+    --brand-peach-soft: #ffdbc7;
+    --brand-gold: #e6d8a1;
+    --brand-cream: #fff7e3;
+
+    --primary: var(--brand-lavender);
+    --primary-dark: #66586f;
+    --primary-deep: var(--brand-charcoal);
+    --primary-soft: var(--brand-lilac-soft);
+    --primary-light: #f8f3f8;
 
     /* Colores del consultorio */
-    --clinic-blue: #b9d8e5;
-    --clinic-blue-soft: #eaf5f8;
+    --clinic-blue: var(--brand-sage);
+    --clinic-blue-soft: #f0f4f3;
 
-    --clinic-pink: #e8b9c4;
-    --clinic-pink-soft: #faeaee;
+    --clinic-pink: var(--brand-peach);
+    --clinic-pink-soft: var(--brand-peach-soft);
 
-    --clinic-yellow: #f2d46f;
-    --clinic-yellow-soft: #fff6d9;
+    --clinic-yellow: var(--brand-gold);
+    --clinic-yellow-soft: var(--brand-cream);
 
-    --clinic-lilac: #cbbbe2;
-    --clinic-lilac-soft: #f0e9f8;
+    --clinic-lilac: var(--brand-lavender);
+    --clinic-lilac-soft: var(--brand-lilac-soft);
 
     /* Neutros cálidos */
-    --cream: #fffaf6;
-    --surface: #fffdfb;
+    --cream: var(--brand-cream);
+    --surface: #fffdf8;
     --white: #ffffff;
 
     /* Texto */
-    --ink: #40384c;
-    --ink-soft: #746d7c;
-    --ink-muted: #9b93a1;
+    --ink: var(--brand-charcoal);
+    --ink-soft: #696565;
+    --ink-muted: #8c8784;
 
     /* Estados */
-    --success: #6f9f8b;
-    --warning: #c49754;
+    --success: #536f70;
+    --warning: #75652f;
 
     /* Compatibilidad con estilos anteriores */
     --lavender-50: #fbf9fe;
     --lavender-100: #f4effb;
     --lavender-200: #e9e0f6;
-    --lavender-300: #d8c9ed;
-    --lavender-400: #cbbbe2;
-    --lavender-500: #b79bd8;
-    --lavender-600: #9d83bd;
+    --lavender-300: var(--brand-lavender);
+    --lavender-400: var(--brand-lavender);
+    --lavender-500: #a99bb5;
+    --lavender-600: #66586f;
 
     --shadow:
-        0 24px 60px rgba(105, 82, 126, .13);
+        0 24px 60px rgba(33, 33, 32, .12);
 }
 
 * {
@@ -69,18 +78,18 @@ body.login-page {
     color: var(--ink);
     background:
         radial-gradient(circle at 10% 15%,
-            rgba(203, 187, 226, .62),
+            rgba(216, 204, 230, .62),
             transparent 28%),
         radial-gradient(circle at 88% 18%,
-            rgba(185, 216, 229, .52),
+            rgba(154, 178, 179, .45),
             transparent 27%),
         radial-gradient(circle at 80% 86%,
-            rgba(232, 185, 196, .38),
+            rgba(251, 186, 145, .38),
             transparent 28%),
         linear-gradient(145deg,
-            #fffdfb 0%,
-            #f9f5fb 45%,
-            #f5f9fa 100%);
+            #fffdf8 0%,
+            #f8f3f8 45%,
+            #fff7e3 100%);
     overflow-x: hidden;
 }
 
@@ -105,7 +114,7 @@ body.login-page {
     height: 320px;
     left: -100px;
     top: -80px;
-    background: rgba(199, 180, 227, .55);
+    background: rgba(216, 204, 230, .62);
 }
 
 .orb.two {
@@ -113,7 +122,7 @@ body.login-page {
     height: 250px;
     right: -70px;
     bottom: -70px;
-    background: rgba(227, 213, 244, .8);
+    background: rgba(230, 216, 161, .65);
     animation-delay: -4s;
 }
 
@@ -122,8 +131,8 @@ body.login-page {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: rgba(183, 155, 216, .55);
-    box-shadow: 0 0 0 9px rgba(183, 155, 216, .06);
+    background: rgba(154, 178, 179, .68);
+    box-shadow: 0 0 0 9px rgba(154, 178, 179, .1);
     animation: twinkle 4s ease-in-out infinite;
 }
 
@@ -170,15 +179,15 @@ body.login-page {
 
     background:
         radial-gradient(circle at 90% 10%,
-            rgba(185, 216, 229, .70),
+            rgba(154, 178, 179, .62),
             transparent 28%),
         radial-gradient(circle at 8% 92%,
-            rgba(232, 185, 196, .52),
+            rgba(251, 186, 145, .52),
             transparent 30%),
         linear-gradient(145deg,
-            #d8c9ed 0%,
-            #eee5f5 50%,
-            #f9eef1 100%);
+            #d8cce6 0%,
+            #eae1ea 50%,
+            #ffdbc7 100%);
 
     overflow: hidden;
 }
@@ -222,7 +231,7 @@ body.login-page {
     width: 80px;
     height: 80px;
     flex: 0 0 80px;
-    filter: drop-shadow(0 12px 18px rgba(98, 77, 131, .12));
+    filter: drop-shadow(0 12px 18px rgba(33, 33, 32, .12));
     animation: float 4.8s ease-in-out infinite;
 }
 
@@ -235,7 +244,7 @@ body.login-page {
     font-size: 18px;
     font-weight: 760;
     letter-spacing: -.02em;
-    color: #6d5d84;
+    color: var(--brand-charcoal);
 }
 
 .logo-text span {
@@ -244,7 +253,7 @@ body.login-page {
     font-size: 13px;
     letter-spacing: .12em;
     text-transform: uppercase;
-    color: #8d7ca7;
+    color: #536f70;
 }
 
 .eyebrow {
@@ -253,7 +262,7 @@ body.login-page {
     font-weight: 800;
     letter-spacing: .14em;
     text-transform: uppercase;
-    color: #7d67a0;
+    color: #536f70;
 }
 
 .login-page h1 {
@@ -262,7 +271,7 @@ body.login-page {
     font-size: clamp(38px, 5vw, 58px);
     line-height: .98;
     letter-spacing: -.045em;
-    color: #4e405f;
+    color: var(--brand-charcoal);
 }
 
 .lead {
@@ -270,7 +279,7 @@ body.login-page {
     max-width: 430px;
     font-size: 17px;
     line-height: 1.65;
-    color: #716782;
+    color: var(--ink-soft);
 }
 
 .features {
@@ -286,7 +295,7 @@ body.login-page {
     align-items: center;
     gap: 11px;
     font-size: 13px;
-    color: #6f647e;
+    color: var(--ink-soft);
 }
 
 .check {
@@ -296,9 +305,9 @@ body.login-page {
     place-items: center;
     border-radius: 50%;
     background: rgba(255, 255, 255, .65);
-    color: #9273b7;
+    color: #536f70;
     font-weight: 900;
-    box-shadow: inset 0 0 0 1px rgba(146, 115, 183, .10);
+    box-shadow: inset 0 0 0 1px rgba(154, 178, 179, .24);
 }
 
 .brand-footer {
@@ -330,7 +339,7 @@ body.login-page {
     margin: 0;
     font-size: 33px;
     letter-spacing: -.035em;
-    color: #39445a;
+    color: var(--brand-charcoal);
 }
 
 .login-card>p {
@@ -350,7 +359,7 @@ label {
     font-size: 12px;
     font-weight: 800;
     letter-spacing: .02em;
-    color: #596379;
+    color: var(--ink-soft);
 }
 
 .input-wrap {
@@ -364,7 +373,7 @@ label {
     transform: translateY(-50%);
     width: 19px;
     height: 19px;
-    stroke: #9a8bab;
+    stroke: #536f70;
     pointer-events: none;
 }
 
@@ -374,19 +383,19 @@ input[type="text"] {
     width: 100%;
     height: 54px;
     padding: 0 48px 0 48px;
-    border: 1px solid #e5dfeb;
+    border: 1px solid var(--brand-lilac-soft);
     border-radius: 16px;
     outline: none;
-    background: #fbfafe;
-    color: #414b60;
+    background: #fffdf8;
+    color: var(--brand-charcoal);
     font-size: 14px;
     transition: .22s ease;
 }
 
 input:focus {
-    border-color: #bca5d8;
+    border-color: var(--brand-sage);
     background: white;
-    box-shadow: 0 0 0 4px rgba(183, 155, 216, .12);
+    box-shadow: 0 0 0 4px rgba(154, 178, 179, .18);
 }
 
 input::placeholder {
@@ -442,11 +451,11 @@ input::placeholder {
 }
 
 .remember input {
-    accent-color: #b79bd8;
+    accent-color: #536f70;
 }
 
 .login-page a {
-    color: #876aa8;
+    color: #536f70;
     text-decoration: none;
     font-weight: 700;
 }
@@ -462,10 +471,7 @@ input::placeholder {
     border-radius: 16px;
     cursor: pointer;
 
-    background:
-        linear-gradient(135deg,
-            #cbbbe2 0%,
-            #aa8aca 100%);
+    background: var(--brand-charcoal);
 
     color: white;
     font-size: 14px;
@@ -473,7 +479,7 @@ input::placeholder {
     letter-spacing: .02em;
 
     box-shadow:
-        0 14px 26px rgba(157, 131, 189, .28);
+        0 14px 26px rgba(33, 33, 32, .22);
 
     transition:
         transform .2s ease,
@@ -483,7 +489,7 @@ input::placeholder {
 
 .submit:hover {
     transform: translateY(-2px);
-    box-shadow: 0 18px 32px rgba(151, 119, 188, .30);
+    box-shadow: 0 18px 32px rgba(33, 33, 32, .26);
     filter: saturate(1.05);
 }
 
