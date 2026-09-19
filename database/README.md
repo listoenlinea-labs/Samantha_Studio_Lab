@@ -37,3 +37,9 @@ El esquema conecta:
 - Toda consulta, exportación o cambio sensible debe registrarse en `audit_log`.
 
 No ejecutes este esquema directamente sobre producción sin respaldo, revisión de privacidad y una migración versionada.
+
+## Migraciones incrementales
+
+Si la base ya existe, ejecuta únicamente las migraciones pendientes en orden.
+Para habilitar las fotos de perfil almacenadas en MySQL, ejecuta
+`migrations/003_paciente_fotos.sql` antes de iniciar esta versión de la API.

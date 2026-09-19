@@ -1,0 +1,378 @@
+From 7dc3eb0628292b79ea0caea599487c33bac8e9df Mon Sep 17 00:00:00 2001
+From: Codex <codex@openai.com>
+Date: Sat, 19 Sep 2026 12:36:46 +0900
+Subject: [PATCH] feat: agregar expediente dental avanzado de pacientes
+
+---
+ docs/assets/css/patient-experience.css        |  11 ++
+ .../assets/css/patient-history-responsive.css |   9 ++
+ docs/assets/css/patient-history.css           |   1 +
+ docs/assets/img/patient-demo.svg              |  19 +++
+ docs/assets/js/patient-experience.js          | 101 ++++++++++++++
+ docs/assets/js/patient-history.js             | 132 ++++++++++++++++++
+ docs/historial-paciente.html                  |  19 +++
+ docs/pacientes.html                           |   2 +
+ 8 files changed, 294 insertions(+)
+ create mode 100644 docs/assets/css/patient-experience.css
+ create mode 100644 docs/assets/css/patient-history-responsive.css
+ create mode 100644 docs/assets/css/patient-history.css
+ create mode 100644 docs/assets/img/patient-demo.svg
+ create mode 100644 docs/assets/js/patient-experience.js
+ create mode 100644 docs/assets/js/patient-history.js
+ create mode 100644 docs/historial-paciente.html
+
+diff --git a/docs/assets/css/patient-experience.css b/docs/assets/css/patient-experience.css
+new file mode 100644
+index 0000000..8271f62
+--- /dev/null
++++ b/docs/assets/css/patient-experience.css
+@@ -0,0 +1,11 @@
++/* Experiencia de pacientes y ficha rápida — Samantha's Studio Lab */
++.px-page{margin:-20px -26px -50px;min-height:calc(100vh - 119px);background:#fff;color:var(--dc-navy)}
++.px-section-tabs{display:flex;gap:30px;padding:0 34px;border-bottom:1px solid var(--dc-line);background:#eef7fa}
++.px-section-tabs button{padding:18px 4px 15px;border:0;border-bottom:4px solid transparent;color:#71848c;background:transparent;font:700 14px inherit;cursor:pointer}.px-section-tabs button.active{border-color:#55cddd;color:var(--dc-navy)}
++.px-toolbar{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:25px 30px 22px}.px-toolbar>div:first-child{display:flex;align-items:center;gap:16px}.px-toolbar h1{margin:0;padding-right:16px;border-right:1px solid #9db3bc;font-size:16px}.px-toolbar span{font-size:14px}.px-toolbar-actions{display:flex;gap:12px}.px-primary{min-height:42px;padding:0 20px;border:0;border-radius:9px;color:#fff;background:#0095a9;font:800 13px inherit;cursor:pointer;box-shadow:0 6px 15px rgba(0,149,169,.15)}
++.px-search{position:relative;display:flex;align-items:center;width:min(330px,38vw);border:1px solid #bcdbe5;border-radius:9px;background:#fff}.px-search span{position:absolute;right:15px;color:#0095a9;font-size:25px}.px-search input{width:100%;height:44px;padding:0 48px 0 17px;border:0;outline:0;background:transparent;font:italic 13px inherit}
++.px-table-shell{min-height:485px;margin:0 28px;overflow:auto;border:1px solid var(--dc-line);border-radius:12px;background:#fff;box-shadow:0 4px 15px rgba(27,55,68,.08)}.px-patient-table{width:100%;min-width:1180px;border-collapse:collapse;font-size:13px}.px-patient-table th{height:58px;padding:0 18px;color:#fff;background:#365568;font-size:13px;text-align:left}.px-patient-table th:first-child{width:25%}.px-patient-table td{height:75px;padding:10px 18px;border-bottom:1px solid #d8e4e8;color:#52636b}.px-patient-table tbody tr{cursor:pointer;transition:.18s}.px-patient-table tbody tr:hover,.px-patient-table tbody tr:focus{outline:0;background:#f1fbfc;box-shadow:inset 4px 0 #55cddd}.px-patient-table td strong,.px-patient-table td small{display:block}.px-patient-table td small{margin-top:4px;color:#8babb7}
++.px-patient-cell{display:flex;align-items:center;gap:14px}.px-patient-cell>span{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:4px 8px}.px-patient-cell strong{grid-column:1;color:#008fa4;font-size:14px}.px-patient-cell small{grid-column:1}.px-avatar{display:grid;flex:0 0 auto;width:47px;height:47px;place-items:center;border:2px solid #d7eef1;border-radius:50%;object-fit:cover;color:#fff;background:linear-gradient(135deg,#86cbd0,#766083);font-size:13px;font-weight:900}.px-avatar.large{width:94px;height:94px;border-width:4px}.px-avatar-2{background:linear-gradient(135deg,#d8a47d,#8b5e56)}.px-avatar-3{background:linear-gradient(135deg,#7dc2a8,#3f7973)}.px-avatar-4{background:linear-gradient(135deg,#e3bd68,#bb724a)}.px-tag{grid-column:2;grid-row:1/3;width:max-content;padding:3px 8px;border-radius:999px;font-size:9px;font-style:normal;font-weight:800}.px-tag.active,.px-tags-menu .loyal{color:#277a66;background:#dff5ec}.px-tag.vip,.px-tags-menu .vip{color:#4e45a5;background:#e3e2ff}.px-tag.new,.px-tags-menu .new{color:#278154;background:#daf3df}.px-tag.follow,.px-tags-menu .late{color:#b94652;background:#ffe1e4}.px-check{display:grid;width:25px;height:25px;place-items:center;border:2px solid #0095a9;border-radius:50%;color:#0095a9;font-weight:900}.px-pagination{display:flex;align-items:center;justify-content:center;gap:16px;padding:21px;background:#f3fafb;font-size:13px}.px-pagination button{width:38px;height:30px;border:1px solid #bad9e2;border-radius:8px;background:#fff}.px-pagination .current{color:#008fa4;border-color:#55cddd}
++.px-no-scroll{overflow:hidden}.px-drawer-scrim{position:fixed;inset:0;z-index:89;visibility:hidden;background:rgba(13,33,42,.45);opacity:0;transition:.25s}.px-drawer-scrim.open{visibility:visible;opacity:1}.px-drawer{position:fixed;top:0;right:0;bottom:0;z-index:90;width:min(59vw,1080px);overflow:auto;background:#fff;box-shadow:-18px 0 50px rgba(19,45,55,.2);transform:translateX(104%);transition:transform .32s cubic-bezier(.22,.8,.25,1)}.px-drawer.open{transform:none}.px-drawer-close{position:absolute;top:18px;right:20px;z-index:2;width:38px;height:38px;border:0;border-radius:50%;color:#677d87;background:#eff7f8;font-size:25px;cursor:pointer}.px-patient-header{display:grid;grid-template-columns:auto 1fr auto;gap:22px;padding:22px 52px 14px 32px}.px-patient-header h2{margin:4px 0;font-size:20px}.px-name-line{display:flex;align-items:center;gap:10px}.px-history-button{padding:9px 13px;border-radius:8px;color:#fff;background:#0095a9;font-size:12px;font-weight:800}.px-patient-header p{display:flex;align-items:center;gap:13px;margin:10px 0;color:#53656d}.px-patient-header p i{width:1px;height:23px;background:#cae0e6}.px-patient-header>small{padding-top:9px;color:#9ab6c0}.px-add-tags{border:0;color:#0095a9;background:transparent;font:700 13px inherit;cursor:pointer}.px-tags-menu{position:absolute;z-index:5;margin-top:8px;padding:16px 19px;border-radius:7px;background:#fff;box-shadow:0 8px 25px rgba(20,44,54,.2)}.px-tags-menu span{display:inline-block;margin:0 5px 7px 0;padding:7px 12px;border-radius:20px;font-size:11px;font-weight:800}.px-tags-menu hr{border:0;border-top:1px solid #d9e6e9}.px-tags-menu small{color:#78929d}.px-note{display:grid;gap:8px;padding:8px 32px 15px;color:#43565f;font-size:13px}.px-note textarea{min-height:74px;padding:15px;border:1px solid #bcdbe5;border-radius:8px;resize:vertical;font:italic 13px inherit}.px-drawer-tabs{display:flex;gap:8px;margin:0 32px;border-bottom:1px solid #bdd8e1}.px-drawer-tabs button{padding:17px 23px 14px;border:0;border-bottom:4px solid transparent;color:#647984;background:transparent;font:800 13px inherit;cursor:pointer}.px-drawer-tabs button.active{border-color:#55cddd;color:#324c59}.px-drawer-panel{padding:19px 32px 40px}.px-drawer-actions{display:flex;justify-content:flex-end;margin-bottom:14px}.px-mini-table{overflow:auto;border-radius:10px;box-shadow:0 3px 12px rgba(25,52,63,.08)}.px-mini-table .head,.px-mini-table .row{display:grid;grid-template-columns:1.1fr 1fr 1fr 1fr 1.1fr;min-width:720px}.px-mini-table .head{color:#fff;background:#087cb4}.px-mini-table b,.px-mini-table .row span{padding:14px;border-right:1px solid rgba(255,255,255,.45);font-size:11px}.px-mini-table .row{margin-top:10px;background:#f1f8fa}.px-mini-table .row span{border-right-color:#c9e1e7}.px-affiliation{display:grid;gap:12px;padding:20px;border-radius:9px;box-shadow:0 5px 18px rgba(31,61,72,.1)}.px-affiliation label{display:grid;grid-template-columns:170px 1fr;align-items:center;color:#77909a;font-size:12px}.px-affiliation input,.px-affiliation select{height:38px;padding:0 15px;border:0;border-radius:20px;background:#f1f7f8;font:12px inherit}.px-affiliation button{justify-self:center;margin-top:15px}.px-empty{display:grid;min-height:330px;place-items:center;align-content:center;text-align:center}.px-empty-icon{display:grid;width:95px;height:95px;place-items:center;border-radius:50%;color:#0095a9;background:#eaf9fb;font-size:52px}.px-empty h3{margin:16px 0 4px}.px-empty p{color:#8399a2}.px-task-section{display:grid;gap:20px}.px-task-section h3{margin:5px 0;color:#008fa4}.px-empty-row{min-width:720px;padding:50px;text-align:center}.positive{color:#368c72}
++@media(max-width:1000px){.px-drawer{width:min(760px,88vw)}.px-patient-header{grid-template-columns:auto 1fr}.px-patient-header>small{grid-column:2}}
++@media(max-width:760px){.px-page{margin:-14px -12px -86px}.px-section-tabs{padding:0 14px}.px-toolbar{align-items:stretch;flex-direction:column;padding:18px 14px}.px-toolbar-actions{display:grid;grid-template-columns:auto 1fr}.px-search{width:100%}.px-table-shell{min-height:0;margin:0 12px}.px-patient-table{min-width:0}.px-patient-table th:not(:first-child),.px-patient-table td:not(:first-child){display:none}.px-patient-table th:first-child{width:100%}.px-pagination{flex-wrap:wrap}.px-drawer{width:100%}.px-patient-header{grid-template-columns:auto 1fr;padding:20px 45px 12px 16px}.px-avatar.large{width:70px;height:70px}.px-name-line{align-items:flex-start;flex-direction:column}.px-patient-header>small{grid-column:1/-1;padding:0}.px-note,.px-drawer-panel{padding-right:16px;padding-left:16px}.px-drawer-tabs{margin:0 16px;overflow:auto}.px-drawer-tabs button{padding-right:15px;padding-left:15px;white-space:nowrap}.px-affiliation label{grid-template-columns:1fr;gap:6px}.px-mini-table .head,.px-mini-table .row{min-width:650px}}
+diff --git a/docs/assets/css/patient-history-responsive.css b/docs/assets/css/patient-history-responsive.css
+new file mode 100644
+index 0000000..9b1c18c
+--- /dev/null
++++ b/docs/assets/css/patient-history-responsive.css
+@@ -0,0 +1,9 @@
++.ph-tooth.hidden-dentition{visibility:hidden;pointer-events:none}
++.ph-tooth.mixed-dentition svg .crown{fill:#e9f8f6;stroke:#70bfb3}
++@media(max-width:760px){
++  .ph-body{min-width:0}.ph-header{padding:0 12px}.ph-brand{min-width:0}.ph-brand strong,.ph-header>div span{display:none}.ph-layout{display:block}.ph-sidebar{padding:10px}
++  .ph-profile{display:grid;grid-template-columns:64px 1fr auto;align-items:center;padding:10px;text-align:left}.ph-profile-cover{display:none}.ph-profile>img{grid-row:1/4;width:58px;height:58px;margin:0}.ph-profile h1,.ph-profile p,.ph-profile small{margin:2px 10px}.ph-contact{grid-column:3;grid-row:1/4;margin:0;gap:5px}.ph-contact button{width:31px}
++  .ph-record-nav{display:flex;overflow:auto}.ph-record-nav button{flex:0 0 auto;padding:0 14px}.ph-workspace{padding:10px}.ph-info-strip{grid-template-columns:1fr}.ph-info-strip article:not(:first-child){display:none}
++  .ph-card{min-height:560px;padding:10px}.ph-card-tabs{align-items:flex-start;flex-direction:column}.ph-card-tabs>div{width:100%;overflow:auto}.ph-state-key{justify-content:flex-end;padding-bottom:8px}.ph-odo-controls{justify-content:flex-start;overflow:auto}.ph-odo-controls label{flex:0 0 auto}
++  .ph-teeth-chart{overflow:auto}.ph-tooth-row{min-width:820px}.ph-treatment-plan{padding:15px 0;overflow:auto}.ph-plan-table{min-width:600px}.ph-finding-popover{right:10px!important;bottom:10px;left:10px!important;top:auto!important;width:auto}.ph-generic-grid{grid-template-columns:1fr}.ph-clinical-rail{display:none}
++}
+diff --git a/docs/assets/css/patient-history.css b/docs/assets/css/patient-history.css
+new file mode 100644
+index 0000000..d5180e6
+--- /dev/null
++++ b/docs/assets/css/patient-history.css
+@@ -0,0 +1 @@
++:root{--ph-navy:#263d49;--ph-navy-2:#1b303a;--ph-teal:#54cbd8;--ph-teal-dark:#0095a9;--ph-canvas:#eff8fa;--ph-line:#cfe0e5;--ph-muted:#77909a;--ph-red:#e75b63;--ph-blue:#1978c8}.ph-body{min-width:1100px;margin:0;color:var(--ph-navy);background:var(--ph-canvas);font-family:Inter,"Segoe UI",sans-serif}.ph-header{position:sticky;top:0;z-index:50;display:flex;align-items:center;height:64px;padding:0 24px;color:#fff;background:linear-gradient(90deg,var(--ph-navy-2),#365568);box-shadow:0 3px 12px rgba(20,43,53,.18)}.ph-brand{display:flex;align-items:center;gap:8px;min-width:250px;color:#fff}.ph-brand img{width:38px;height:38px;filter:brightness(0) invert(1)}.ph-brand strong{font-size:14px}.ph-header nav{display:flex;align-self:stretch;gap:4px}.ph-header nav a{display:flex;align-items:center;padding:0 17px;border-bottom:3px solid transparent;color:#d6e3e7;font-size:12px}.ph-header nav a.active{border-color:var(--ph-teal);color:#fff}.ph-header>div{display:flex;align-items:center;gap:16px;margin-left:auto;font-size:11px}.ph-header>div button,.ph-clinical-rail button,.ph-generic>button{min-height:35px;padding:0 15px;border:0;border-radius:7px;color:#fff;background:var(--ph-teal-dark);font-weight:800;cursor:pointer}.ph-layout{display:grid;grid-template-columns:228px minmax(720px,1fr) 300px;min-height:calc(100vh - 64px)}.ph-sidebar{padding:20px 14px;background:#eaf5f8}.ph-profile{position:relative;padding:0 0 15px;border-radius:10px;background:#fff;text-align:center;box-shadow:0 4px 15px rgba(29,59,70,.05)}.ph-profile-cover{height:58px;border-radius:10px 10px 0 0;background:linear-gradient(180deg,#50d3dc,#0086c1)}.ph-profile>img{width:82px;height:82px;margin-top:-41px;border:4px solid #fff;border-radius:50%;object-fit:cover}.ph-profile h1{margin:12px 8px 0;font-size:15px}.ph-profile p{margin:10px 0;color:#52636b;font-size:12px}.ph-profile small{color:#86a3ad;font-size:9px}.ph-contact{display:flex;justify-content:center;gap:18px;margin-top:18px}.ph-contact button{width:36px;height:31px;border:1px solid #bcd3da;border-radius:6px;color:#536c77;background:#fff;cursor:pointer}.ph-more-menu{position:absolute;right:10px;z-index:10;width:165px;padding:7px;border-radius:7px;background:#fff;box-shadow:0 8px 24px rgba(20,43,52,.22);text-align:left}.ph-more-menu button{display:block;width:100%;padding:8px;border:0;background:#fff;color:#52636b;text-align:left;cursor:pointer}.ph-more-menu .danger{color:#c94b58}.ph-record-nav{display:grid;margin-top:14px;border-radius:9px;background:#fff;overflow:hidden}.ph-record-nav button{display:flex;align-items:center;gap:11px;min-height:46px;padding:0 13px;border:0;border-bottom:1px solid var(--ph-line);color:#536870;background:#fff;font:500 11px inherit;cursor:pointer}.ph-record-nav i{width:20px;font-style:normal;text-align:center}.ph-record-nav button.active{color:#fff;background:var(--ph-teal);font-weight:800}.ph-workspace{min-width:0;padding:20px}.ph-info-strip{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-bottom:18px;border-radius:9px;overflow:hidden}.ph-info-strip article{display:grid;grid-template-columns:1fr auto;min-height:65px;padding:12px 15px;background:#fff}.ph-info-strip b{font-size:10px}.ph-info-strip button{grid-column:2;grid-row:1/3;border:0;color:var(--ph-teal-dark);background:transparent;font-size:10px;cursor:pointer}.ph-info-strip span{color:#738a94;font-size:9px}.ph-card{position:relative;min-height:630px;padding:16px;border-radius:10px;background:#fff;box-shadow:0 4px 18px rgba(25,54,65,.05)}.ph-card-tabs{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--ph-line)}.ph-card-tabs>div{display:flex;align-items:center}.ph-card-tabs button,.ph-simple-tabs button{min-height:44px;padding:0 18px;border:0;border-bottom:3px solid transparent;background:transparent;color:#52656e;font:600 11px inherit;cursor:pointer}.ph-card-tabs button.active,.ph-simple-tabs button.active{border-color:var(--ph-teal);color:#2e50a6}.ph-state-key{gap:8px;font-size:9px}.ph-state-key .bad{color:var(--ph-red)}.ph-state-key .good{color:var(--ph-blue)}.ph-state-key button{min-height:31px;padding:0 12px;border:0;border-radius:6px;background:#f4f4f4}.ph-odo-controls{display:flex;align-items:end;justify-content:center;gap:9px;padding:15px 0 18px}.ph-odo-controls label{display:grid;padding:4px 10px 0;border:1px solid #b9d6df;border-radius:7px;color:#6d858e;font-size:9px}.ph-odo-controls select{min-width:135px;height:25px;border:0;outline:0;background:#fff;color:#435962;font:11px inherit}.ph-odo-controls .ph-multi{display:flex;align-items:center;gap:7px;padding:0 7px;border:0;color:var(--ph-teal-dark);font-size:11px}.ph-teeth-chart{border-top:1px solid var(--ph-line);border-bottom:1px solid var(--ph-line)}.ph-tooth-row{display:grid;grid-template-columns:repeat(16,minmax(36px,1fr));align-items:end;min-height:165px;padding:8px 5px}.ph-tooth-row.lower{align-items:start}.ph-midline{height:1px;background:var(--ph-line)}.ph-tooth{position:relative;display:grid;justify-items:center;align-self:stretch;padding:0;border:0;background:transparent;cursor:pointer}.ph-tooth>span{display:grid;width:100%;height:30px;place-items:center;color:#142e38;background:#f4f6f7;font-size:12px;font-weight:850}.ph-tooth svg{width:var(--tw);height:108px;margin-top:8px;overflow:visible}.ph-tooth svg.lower{order:-1;margin-top:0;margin-bottom:8px;transform:rotate(180deg)}.ph-tooth svg g{fill:#f0e6cf;stroke:#d8d0be;stroke-width:1.2;filter:drop-shadow(0 3px 3px rgba(50,45,35,.1))}.ph-tooth svg .crown{fill:#fff;stroke:#e1e3e3}.ph-tooth:hover svg,.ph-tooth.selected svg{filter:drop-shadow(0 0 5px rgba(0,149,169,.5));transform:translateY(-3px)}.ph-tooth svg.lower:hover,.ph-tooth.selected svg.lower{transform:rotate(180deg) translateY(3px)}.ph-tooth.selected>span{color:#fff;background:var(--ph-teal-dark)}.ph-tooth.bad svg .crown{fill:#ffe1e2;stroke:var(--ph-red);stroke-width:2}.ph-tooth.good svg .crown{fill:#dff2ff;stroke:var(--ph-blue);stroke-width:2}.ph-treatment-plan{padding:28px 10px}.ph-treatment-plan h2{font-size:16px}.ph-plan-table{display:grid;grid-template-columns:1fr 2fr 2fr 1.5fr;border-radius:7px;overflow:hidden}.ph-plan-table>b{padding:12px;color:#fff;background:#365568;font-size:10px}.ph-plan-table>#phPlanEmpty{grid-column:1/-1;padding:28px;color:#8298a1;background:#f8fbfc;text-align:center;font-size:11px}.ph-plan-row{display:contents}.ph-plan-row span{padding:12px;border-bottom:1px solid var(--ph-line);font-size:10px}.ph-finding-popover{position:fixed;z-index:80;width:370px;max-height:350px;padding:15px;border-radius:10px;background:#fff;box-shadow:0 10px 35px rgba(20,44,54,.28)}.ph-finding-popover header{display:flex;justify-content:space-between}.ph-finding-popover header button{border:0;background:transparent;font-size:20px}.ph-finding-tags{display:flex;gap:6px;margin:10px 0}.ph-finding-tags button{padding:5px 8px;border:0;border-radius:5px;color:#fff}.ph-finding-tags .bad{background:#e40016}.ph-finding-tags .good{background:#0878bd}.ph-finding-search{display:flex;align-items:center;border:1px solid #b9d7df;border-radius:7px;padding:0 10px}.ph-finding-search input{width:100%;height:38px;border:0;outline:0}.ph-findings{display:grid;margin-top:10px;max-height:210px;overflow:auto}.ph-findings button{display:flex;align-items:center;justify-content:space-between;padding:12px;border:0;background:#fff;color:#596970;text-align:left;cursor:pointer}.ph-findings button:hover{background:#eef9fb}.ph-findings i{display:grid;width:40px;height:34px;place-items:center;color:var(--ph-red);background:#f5fbfc;font-style:normal}.ph-clinical-rail{display:grid;align-content:start;gap:30px;padding:20px;background:#fff}.ph-clinical-rail section{min-height:230px}.ph-clinical-rail h3{font-size:13px}.ph-illustration{display:grid;width:100px;height:100px;margin:35px auto 18px;place-items:center;border-radius:50%;color:var(--ph-teal-dark);background:#eafafa;font-size:55px}.ph-illustration.note{font-size:45px}.ph-clinical-rail section>button{display:block;margin:auto}.ph-rail-title{display:flex;align-items:center;justify-content:space-between}.ph-rail-title button{min-width:34px;padding:0;color:#5f7680;background:#fff;border:1px solid #a8c2ca}.ph-simple-tabs{display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--ph-line)}.ph-simple-tabs label{display:flex;align-items:center;gap:8px;margin-left:auto;color:#6d858e;font-size:9px}.ph-simple-tabs select{height:30px;border:1px solid #bad5dd;border-radius:6px}.ph-simple-tabs .ph-save{min-height:32px;margin-left:10px;border:0;border-radius:16px;color:#fff;background:var(--ph-teal);font-weight:800}.ph-perio-status{margin:15px auto;padding:9px;border-radius:7px;background:#e8f9fb;color:#52717c;font-size:10px;text-align:center}.ph-perio-scroll{overflow:auto}.ph-perio-table{display:grid;grid-template-columns:145px minmax(700px,1fr);min-width:845px;margin:15px 0}.ph-perio-labels{display:grid;grid-template-rows:25px repeat(5,29px);text-align:right}.ph-perio-labels>*{display:flex;align-items:center;justify-content:flex-end;padding-right:8px;border-bottom:1px solid #7e8b91;font-size:9px}.ph-perio-cells{display:grid;grid-template-columns:repeat(8,1fr)}.ph-perio-col{display:grid;grid-template-rows:25px repeat(5,29px);border-left:1px solid #7e8b91}.ph-perio-col>*{display:flex;align-items:center;justify-content:center;border:0;border-bottom:1px solid #7e8b91;font-size:9px}.ph-perio-col>b{font-size:12px}.ph-perio-col>input{width:100%;text-align:center}.ph-triple{display:grid!important;grid-template-columns:repeat(3,1fr)}.ph-triple input{width:100%;height:100%;min-width:0;border:0;border-right:1px solid #d6dde0;text-align:center;font-size:9px}.ph-triple input[type=checkbox]{appearance:none;background:#f0f1f2}.ph-triple input[type=checkbox]:checked{background:#ff646b;box-shadow:inset 0 0 0 7px #fff}.ph-perio-chart{position:relative;min-width:845px;height:260px;margin:12px 0}.ph-perio-chart svg{position:absolute;inset:0;width:100%;height:100%}.ph-perio-chart .grid line{stroke:#d7dde0;stroke-width:1}.ph-perio-chart path{fill:none;stroke-width:3}.ph-perio-chart .margin-line{stroke:var(--ph-blue)}.ph-perio-chart .depth-line{stroke:var(--ph-red)}.ph-perio-teeth{position:absolute;inset:18px 0 0 145px;display:grid;grid-template-columns:repeat(16,1fr);align-items:center;opacity:.38}.ph-perio-teeth .ph-tooth>span{display:none}.ph-perio-teeth .ph-tooth svg{height:190px}.ph-perio-chart.lower .ph-perio-teeth{inset:18px 0 0 145px}.ph-generic{display:grid;align-content:start;gap:10px;padding:30px}.ph-generic h2{margin-bottom:0}.ph-generic>p{color:var(--ph-muted)}.ph-generic-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:30px 0}.ph-generic-grid article{display:grid;gap:10px;padding:22px;border:1px solid var(--ph-line);border-radius:9px}.ph-generic-grid strong{font-size:18px}.ph-generic-grid span{color:var(--ph-muted);font-size:11px}.ph-generic>button{justify-self:start}.ph-toast{position:fixed;right:22px;bottom:22px;z-index:100;padding:12px 18px;border-radius:8px;color:#fff;background:var(--ph-navy);font-size:12px;opacity:0;transform:translateY(12px);transition:.2s;pointer-events:none}.ph-toast.show{opacity:1;transform:none}@media(max-width:1300px){.ph-layout{grid-template-columns:210px minmax(720px,1fr)}.ph-clinical-rail{display:none}}@media(max-width:1100px){.ph-body{overflow-x:auto}.ph-header nav{display:none}}
+diff --git a/docs/assets/img/patient-demo.svg b/docs/assets/img/patient-demo.svg
+new file mode 100644
+index 0000000..687b5d9
+--- /dev/null
++++ b/docs/assets/img/patient-demo.svg
+@@ -0,0 +1,19 @@
++<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title">
++  <title id="title">Paciente de demostración</title>
++  <defs>
++    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
++      <stop offset="0" stop-color="#dff5f4"/><stop offset="1" stop-color="#d8cce6"/>
++    </linearGradient>
++    <linearGradient id="shirt" x1="0" y1="0" x2="0" y2="1">
++      <stop stop-color="#47aeb5"/><stop offset="1" stop-color="#286f7b"/>
++    </linearGradient>
++  </defs>
++  <rect width="160" height="160" rx="80" fill="url(#bg)"/>
++  <circle cx="80" cy="63" r="35" fill="#f0b995"/>
++  <path d="M45 59c0-29 15-42 36-42 25 0 38 17 36 44-9-6-15-16-19-27-13 13-32 20-53 20z" fill="#3b2c2a"/>
++  <path d="M59 64c4-3 9-3 13 0M89 64c4-3 9-3 13 0" fill="none" stroke="#5d3a32" stroke-width="3" stroke-linecap="round"/>
++  <circle cx="66" cy="67" r="2.4" fill="#263d49"/><circle cx="96" cy="67" r="2.4" fill="#263d49"/>
++  <path d="M73 84c5 5 11 5 16 0" fill="none" stroke="#9f554f" stroke-width="3" stroke-linecap="round"/>
++  <path d="M53 104c8 9 46 9 54 0 22 9 37 28 42 56H11c5-28 20-47 42-56z" fill="url(#shirt)"/>
++  <path d="M66 105l14 16 14-16" fill="#fff" opacity=".92"/>
++</svg>
+diff --git a/docs/assets/js/patient-experience.js b/docs/assets/js/patient-experience.js
+new file mode 100644
+index 0000000..b4bf3e3
+--- /dev/null
++++ b/docs/assets/js/patient-experience.js
+@@ -0,0 +1,101 @@
++(function () {
++  'use strict';
++
++  const patients = [
++    { id: 1, name: 'Paciente demo A', initials: 'PA', age: 8, phone: '33 1234 5678', created: '02 sep 2026', next: '20 sep 2026 · 11:00', last: '02 sep 2026', tag: 'Activo', tone: 'active', source: 'Recomendación familiar' },
++    { id: 2, name: 'Paciente demo B', initials: 'PB', age: 11, phone: '33 2468 1357', created: '04 sep 2026', next: '21 sep 2026 · 16:00', last: '11 sep 2026', tag: 'VIP', tone: 'vip', source: 'Paciente existente' },
++    { id: 3, name: 'Paciente demo C', initials: 'PC', age: 5, phone: '33 9876 4321', created: '09 sep 2026', next: 'Sin próxima cita', last: '09 sep 2026', tag: 'Nuevo', tone: 'new', source: 'Redes sociales' },
++    { id: 4, name: 'Paciente demo D', initials: 'PD', age: 13, phone: '33 5555 0182', created: '12 sep 2026', next: '24 sep 2026 · 10:30', last: '12 sep 2026', tag: 'Seguimiento', tone: 'follow', source: 'Campaña escolar' },
++  ];
++
++  const content = document.querySelector('.content');
++  if (!content) return;
++
++  const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
++  const avatar = (patient, large = false) => patient.id === 1
++    ? `<img class="px-avatar${large ? ' large' : ''}" src="assets/img/patient-demo.svg" alt="Foto de ${escapeHtml(patient.name)}">`
++    : `<span class="px-avatar${large ? ' large' : ''} px-avatar-${patient.id}" aria-hidden="true">${patient.initials}</span>`;
++
++  content.innerHTML = `
++    <section class="px-page" aria-labelledby="patientTitle">
++      <div class="px-section-tabs" role="tablist">
++        <button class="active" type="button">Mis pacientes</button>
++        <button type="button" data-demo-toast="Asistencias estará conectada con la agenda clínica.">Asistencias</button>
++      </div>
++      <header class="px-toolbar">
++        <div><h1 id="patientTitle">Todos los pacientes</h1><span id="patientCount">${patients.length} pacientes</span></div>
++        <div class="px-toolbar-actions">
++          <button class="px-primary" type="button" data-modal="patient">＋ Nuevo paciente</button>
++          <label class="px-search"><span aria-hidden="true">⌕</span><input id="pxSearch" type="search" placeholder="Nombre, tutor, teléfono..." aria-label="Buscar paciente"></label>
++        </div>
++      </header>
++      <div class="px-table-shell">
++        <table class="px-patient-table">
++          <thead><tr><th>Paciente</th><th>Última cita</th><th>Próxima cita</th><th>Tarea</th><th>Presupuesto</th><th>Fuente de captación</th><th>Comentario</th></tr></thead>
++          <tbody id="pxPatientRows">${patients.map((patient) => `
++            <tr tabindex="0" data-patient-id="${patient.id}" aria-label="Abrir ficha de ${escapeHtml(patient.name)}">
++              <td><div class="px-patient-cell">${avatar(patient)}<span><strong>${escapeHtml(patient.name)}</strong><small>${patient.age} años</small><em class="px-tag ${patient.tone}">${patient.tag}</em></span></div></td>
++              <td><strong>${patient.last}</strong><small>Control clínico</small></td>
++              <td><strong>${patient.next}</strong><small>${patient.id === 3 ? 'Programar seguimiento' : 'Odontopediatría'}</small></td>
++              <td><span class="px-check">✓</span></td><td>—</td><td>${patient.source}</td><td>—</td>
++            </tr>`).join('')}</tbody>
++        </table>
++      </div>
++      <footer class="px-pagination"><span>${patients.length} resultados</span><button disabled>‹</button><button class="current">1</button><button disabled>›</button><span>Mostrar <b>20</b> resultados por página</span></footer>
++    </section>
++    <div class="px-drawer-scrim" id="pxDrawerScrim"></div>
++    <aside class="px-drawer" id="pxDrawer" aria-hidden="true" aria-label="Ficha rápida del paciente">
++      <button class="px-drawer-close" id="pxDrawerClose" aria-label="Cerrar ficha">×</button>
++      <div id="pxDrawerContent"></div>
++    </aside>`;
++
++  const drawer = document.getElementById('pxDrawer');
++  const scrim = document.getElementById('pxDrawerScrim');
++
++  function appointments(patient) {
++    return `<div class="px-drawer-actions"><button class="px-primary" data-quick-action="Nueva cita">＋ Nuevo</button></div>
++      <div class="px-mini-table"><div class="head"><b>Fecha</b><b>Doctor</b><b>Motivo</b><b>Estado</b><b>Comentario</b></div>
++      <div class="row"><span>${patient.next.replace(' · ', '<br>')}</span><span>Dra. Samantha</span><span>Control preventivo</span><span>Por confirmar</span><span>—</span></div>
++      <div class="row"><span>${patient.last}<br>10:00</span><span>Dra. Samantha</span><span>Valoración inicial</span><span class="positive">Finalizada</span><span>Buena evolución</span></div></div>`;
++  }
++
++  function affiliation(patient) {
++    return `<form class="px-affiliation" id="pxAffiliation"><label>Teléfono <input value="${patient.phone}"></label><label>E-mail <input type="email" value="tutor.demo@ejemplo.com"></label><label>Fuente de captación <select><option>${patient.source}</option><option>Redes sociales</option><option>Recomendación</option></select></label><label>Adicional <input value="Tutor: Familia demo"></label><label>N.º HC <input value="SSL-${String(patient.id).padStart(4, '0')}"></label><label>Grupo <select><option>Odontopediatría</option><option>Ortodoncia</option></select></label><button class="px-primary" type="submit">Guardar cambios</button></form>`;
++  }
++
++  function budgets() {
++    return `<div class="px-empty"><span class="px-empty-icon">◔</span><h3>Presupuestos</h3><p>Aún no hay presupuestos registrados para este paciente.</p><button class="px-primary" data-quick-action="Crear presupuesto">＋ Crear presupuesto</button></div>`;
++  }
++
++  function tasks() {
++    return `<section class="px-task-section"><h3>Manuales</h3><div class="px-mini-table"><div class="head"><b>Nombre de la tarea</b><b>F. creación</b><b>Estado</b><b>Responsable</b><b>Descripción</b></div><div class="px-empty-row">No se encontró ninguna información</div></div><h3>Automáticas</h3><div class="px-mini-table"><div class="head"><b>Tipo de mensaje</b><b>Plantilla enviada</b><b>Enviado por</b><b>F. envío</b><b>Estado</b></div><div class="px-empty-row">No se encontró ninguna información</div></div></section>`;
++  }
++
++  function openDrawer(patient) {
++    document.getElementById('pxDrawerContent').innerHTML = `
++      <header class="px-patient-header">${avatar(patient, true)}<div><div class="px-name-line"><h2>${escapeHtml(patient.name)}</h2><a class="px-history-button" href="historial-paciente.html?id=${patient.id}" target="_blank" rel="noopener">Abrir historial ↗</a></div><p>${patient.age} años <i></i> ☎ ${patient.phone}</p><button class="px-add-tags" id="pxAddTags">⊕ Agregar</button><div class="px-tags-menu" id="pxTagsMenu" hidden><span class="new">Nuevo</span><span class="vip">VIP</span><span class="late">Impuntual</span><span class="loyal">Fidelizado</span><hr><small>Crea y gestiona etiquetas desde configuración.</small></div></div><small>Creado el ${patient.created}</small></header>
++      <label class="px-note">Nota general<textarea placeholder="Escribe aquí..."></textarea></label>
++      <nav class="px-drawer-tabs" role="tablist">${['Citas','Filiación','Presupuestos','Tareas'].map((tab, index) => `<button class="${index === 0 ? 'active' : ''}" data-drawer-tab="${tab.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}">${tab}</button>`).join('')}</nav>
++      <div class="px-drawer-panel" id="pxDrawerPanel">${appointments(patient)}</div>`;
++    drawer.dataset.patientId = patient.id;
++    drawer.classList.add('open'); scrim.classList.add('open'); drawer.setAttribute('aria-hidden', 'false'); document.body.classList.add('px-no-scroll');
++  }
++
++  function closeDrawer() { drawer.classList.remove('open'); scrim.classList.remove('open'); drawer.setAttribute('aria-hidden', 'true'); document.body.classList.remove('px-no-scroll'); }
++
++  document.getElementById('pxPatientRows').addEventListener('click', (event) => { const row = event.target.closest('[data-patient-id]'); if (row) openDrawer(patients.find((p) => p.id === Number(row.dataset.patientId))); });
++  document.getElementById('pxPatientRows').addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); event.target.click(); } });
++  document.getElementById('pxDrawerClose').addEventListener('click', closeDrawer); scrim.addEventListener('click', closeDrawer);
++  document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeDrawer(); });
++  document.getElementById('pxSearch').addEventListener('input', (event) => { const query = event.target.value.trim().toLowerCase(); let visible = 0; document.querySelectorAll('#pxPatientRows tr').forEach((row) => { row.hidden = !row.textContent.toLowerCase().includes(query); if (!row.hidden) visible += 1; }); document.getElementById('patientCount').textContent = `${visible} pacientes`; });
++  drawer.addEventListener('click', (event) => {
++    if (event.target.closest('#pxAddTags')) document.getElementById('pxTagsMenu').hidden = !document.getElementById('pxTagsMenu').hidden;
++    const tab = event.target.closest('[data-drawer-tab]');
++    if (tab) { drawer.querySelectorAll('[data-drawer-tab]').forEach((item) => item.classList.toggle('active', item === tab)); const patient = patients.find((p) => p.id === Number(drawer.dataset.patientId)); const views = { citas: appointments(patient), filiacion: affiliation(patient), presupuestos: budgets(), tareas: tasks() }; document.getElementById('pxDrawerPanel').innerHTML = views[tab.dataset.drawerTab]; }
++    const action = event.target.closest('[data-quick-action]'); if (action) notify(`${action.dataset.quickAction}: demostración preparada para conectar al backend.`);
++  });
++  drawer.addEventListener('submit', (event) => { if (event.target.id === 'pxAffiliation') { event.preventDefault(); notify('Datos de filiación guardados en la demostración.'); } });
++
++  function notify(message) { const toast = document.getElementById('toast'); if (!toast) return; toast.textContent = message; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2800); }
++  document.querySelectorAll('[data-demo-toast]').forEach((button) => button.addEventListener('click', () => notify(button.dataset.demoToast)));
++})();
+diff --git a/docs/assets/js/patient-history.js b/docs/assets/js/patient-history.js
+new file mode 100644
+index 0000000..ac14126
+--- /dev/null
++++ b/docs/assets/js/patient-history.js
+@@ -0,0 +1,132 @@
++(function () {
++  'use strict';
++
++  const patientId = Number(new URLSearchParams(location.search).get('id')) || 1;
++  const patients = {
++    1: { name: 'Paciente demo A', age: 8, phone: '33 1234 5678', created: '02 sep 2026', record: 'SSL-0001' },
++    2: { name: 'Paciente demo B', age: 11, phone: '33 2468 1357', created: '04 sep 2026', record: 'SSL-0002' },
++    3: { name: 'Paciente demo C', age: 5, phone: '33 9876 4321', created: '09 sep 2026', record: 'SSL-0003' },
++    4: { name: 'Paciente demo D', age: 13, phone: '33 5555 0182', created: '12 sep 2026', record: 'SSL-0004' },
++  };
++  const patient = patients[patientId] || patients[1];
++  const upper = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28];
++  const lower = [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
++  const app = document.getElementById('patientHistoryApp');
++
++  const icons = {
++    filiation: '♙', history: '▤', odontogram: '♧', perio: '♧', ortho: '♜', account: '▱', prescriptions: '▧', files: '▭',
++  };
++  const nav = [
++    ['filiation','Filiación'],['history','Historia clínica'],['odontogram','Odontograma'],['perio','Periodontograma'],['ortho','Ortodoncia'],['account','Estado de cuenta'],['prescriptions','Prescripciones'],['files','Archivos'],
++  ];
++
++  function toothType(id) { const n = id % 10; return n <= 2 ? 'incisor' : n === 3 ? 'canine' : n <= 5 ? 'premolar' : 'molar'; }
++  function toothSvg(id, arch) {
++    const type = toothType(id); const widths = { incisor: 31, canine: 34, premolar: 42, molar: 49 }; const width = widths[type];
++    const crown = type === 'molar' ? 'M7 27 Q7 7 17 8 Q25 1 32 8 Q43 6 43 27 Q42 38 35 40 L14 40 Q7 37 7 27Z' : type === 'premolar' ? 'M9 28 Q9 8 19 8 Q25 3 31 8 Q41 9 41 28 Q39 39 31 41 L18 41 Q10 38 9 28Z' : type === 'canine' ? 'M12 30 Q12 9 25 3 Q38 10 38 30 Q35 40 28 42 L21 42 Q14 40 12 30Z' : 'M13 29 Q12 8 20 8 L30 8 Q38 8 37 29 Q35 40 29 42 L21 42 Q15 40 13 29Z';
++    const roots = type === 'molar' ? '<path d="M14 39L12 76Q17 70 23 43M34 39L38 76Q31 70 27 43"/>' : type === 'premolar' ? '<path d="M20 40L19 76Q25 69 29 40"/>' : '<path d="M21 40L24 78Q30 68 29 40"/>';
++    return `<button class="ph-tooth ${type}" data-tooth="${id}" aria-label="Diente ${id}" style="--tw:${width}px"><span>${id}</span><svg viewBox="0 0 50 82" aria-hidden="true" class="${arch}"><g>${roots}<path class="crown" d="${crown}"/></g></svg></button>`;
++  }
++
++  app.innerHTML = `
++    <header class="ph-header"><a href="pacientes.html" class="ph-brand"><img src="assets/img/logo-ssl.svg" alt=""><strong>samantha's studio lab</strong></a><nav><a href="agenda.html">Agenda</a><a class="active" href="pacientes.html">Pacientes</a><a href="finanzas.html">Finanzas</a><a href="inventario.html">Inventario</a></nav><div><button data-notify="Nueva cita preparada">＋ Crear</button><span>Administrador</span></div></header>
++    <main class="ph-layout">
++      <aside class="ph-sidebar">
++        <section class="ph-profile"><div class="ph-profile-cover"></div><img src="assets/img/patient-demo.svg" alt="Foto de ${patient.name}"><h1>${patient.name}</h1><p>${patient.age} años</p><small>Creado el ${patient.created}</small><div class="ph-contact"><button data-notify="Abriendo conversación de WhatsApp">◉</button><button data-notify="Preparando correo para el tutor">✉</button><button id="phMoreButton">⋮</button></div><div class="ph-more-menu" id="phMoreMenu" hidden><button>Subir foto</button><button>Descargar expediente</button><button>Fusionar paciente</button><button>Desactivar paciente</button><button class="danger">Eliminar paciente</button></div></section>
++        <nav class="ph-record-nav">${nav.map(([id,label]) => `<button class="${id === 'odontogram' ? 'active' : ''}" data-record-view="${id}"><i>${icons[id]}</i>${label}</button>`).join('')}</nav>
++      </aside>
++      <section class="ph-workspace">
++        <div class="ph-info-strip"><article><b>▮ Etiquetas</b><button data-notify="Editor de etiquetas abierto">＋ Agregar</button><span>Paciente activo</span></article><article><b>▰ Notas</b><button data-notify="Nota rápida lista para editar">Escribe aquí</button></article><article><b>● Alergias</b><button data-notify="Registro de alergias abierto">Sin alergias registradas</button></article></div>
++        <div id="phView"></div>
++      </section>
++      <aside class="ph-clinical-rail"><section><h3>Presupuesto</h3><div class="ph-illustration">◔</div><button data-notify="Nuevo presupuesto iniciado">＋ Crear presupuesto</button></section><section><div class="ph-rail-title"><h3>Notas de evolución</h3><button data-notify="Nueva nota de evolución">＋</button></div><div class="ph-illustration note">▤</div><button data-notify="Registro de evolución abierto">＋ Registrar evolución</button></section></aside>
++    </main>
++    <div class="ph-toast" id="phToast" role="status"></div>`;
++
++  const view = document.getElementById('phView');
++
++  function controls() {
++    return `<div class="ph-odo-controls"><label>Doctor<select><option>Dra. Samantha</option><option>Asistente clínica</option></select></label><label>Tipo<select id="dentitionType"><option value="adult">Adulto</option><option value="mixed">Mixto</option><option value="child">Niño</option></select></label><label>Nomenclatura<select id="nomenclature"><option value="fdi">Internacional (FDI)</option><option value="ada">ADA</option></select></label><label class="ph-multi"><input id="multiSelect" type="checkbox"> Marcado múltiple</label></div>`;
++  }
++
++  function renderOdontogram(stage = 'initial') {
++    view.innerHTML = `<section class="ph-card ph-odontogram"><header class="ph-card-tabs"><div>${[['initial','Odo. inicial'],['evolution','Odo. evolución'],['discharge','Odo. alta']].map(([id,label]) => `<button class="${stage === id ? 'active' : ''}" data-odo-stage="${id}">${label}</button>`).join('')}</div><div class="ph-state-key"><span class="bad">● Mal estado</span><span class="good">● Buen estado</span><button data-notify="Nuevo odontograma creado">Nuevo odontog.</button><button data-notify="Configuración del odontograma">⚙</button></div></header>${controls()}<div class="ph-teeth-chart"><div class="ph-tooth-row upper">${upper.map((id) => toothSvg(id,'upper')).join('')}</div><div class="ph-midline"></div><div class="ph-tooth-row lower">${lower.map((id) => toothSvg(id,'lower')).join('')}</div></div><section class="ph-treatment-plan"><h2>Plan de tratamiento</h2><div class="ph-plan-table"><b>N.º diente</b><b>Hallazgo</b><b>Servicios vinculados</b><b>Nota</b><div id="phPlanEmpty">Selecciona un diente para registrar un hallazgo.</div></div></section></section><div class="ph-finding-popover" id="phFindingPopover" hidden></div>`;
++    bindOdontogram();
++  }
++
++  function bindOdontogram() {
++    const selected = new Set(); const popover = document.getElementById('phFindingPopover');
++    const upperChild = [55,54,53,52,51,61,62,63,64,65];
++    const lowerChild = [85,84,83,82,81,71,72,73,74,75];
++    const upperAda = Array.from({ length: 16 }, (_, index) => index + 1);
++    const lowerAda = Array.from({ length: 16 }, (_, index) => 32 - index);
++    const applyChartOptions = () => {
++      const type = document.getElementById('dentitionType').value;
++      const notation = document.getElementById('nomenclature').value;
++      document.querySelectorAll('.ph-tooth-row').forEach((row, rowIndex) => {
++        const original = rowIndex === 0 ? upper : lower;
++        const adultAda = rowIndex === 0 ? upperAda : lowerAda;
++        const childFdi = rowIndex === 0 ? upperChild : lowerChild;
++        const childAda = (rowIndex === 0 ? 'ABCDEFGHIJ' : 'TSRQPONMLK').split('');
++        row.querySelectorAll('.ph-tooth').forEach((tooth, index) => {
++          const childIndex = index - 3;
++          const isChildSlot = childIndex >= 0 && childIndex < 10;
++          tooth.classList.toggle('hidden-dentition', type === 'child' && !isChildSlot);
++          tooth.classList.toggle('mixed-dentition', type === 'mixed' && [3,4,11,12].includes(index));
++          let id = original[index];
++          let label = notation === 'ada' ? adultAda[index] : id;
++          if (type === 'child' && isChildSlot) {
++            id = childFdi[childIndex];
++            label = notation === 'ada' ? childAda[childIndex] : id;
++          }
++          tooth.dataset.tooth = id;
++          tooth.querySelector(':scope > span').textContent = label;
++          tooth.setAttribute('aria-label', `Diente ${id}`);
++        });
++      });
++    };
++    document.querySelectorAll('[data-odo-stage]').forEach((button) => button.addEventListener('click', () => renderOdontogram(button.dataset.odoStage)));
++    document.getElementById('dentitionType').addEventListener('change', applyChartOptions);
++    document.getElementById('nomenclature').addEventListener('change', applyChartOptions);
++    document.querySelectorAll('.ph-tooth').forEach((button) => button.addEventListener('click', () => {
++      const multiple = document.getElementById('multiSelect').checked;
++      if (!multiple) { selected.clear(); document.querySelectorAll('.ph-tooth').forEach((tooth) => tooth.classList.remove('selected')); }
++      button.classList.toggle('selected'); if (button.classList.contains('selected')) selected.add(button.dataset.tooth); else selected.delete(button.dataset.tooth);
++      if (!selected.size) { popover.hidden = true; return; }
++      const rect = button.getBoundingClientRect(); popover.style.left = `${Math.min(innerWidth - 390, Math.max(280, rect.left - 80))}px`; popover.style.top = `${Math.min(innerHeight - 360, rect.bottom + 8)}px`; popover.hidden = false;
++      popover.innerHTML = `<header><b>Diente${selected.size > 1 ? 's' : ''} ${[...selected].join(', ')}</b><button aria-label="Cerrar">×</button></header><div class="ph-finding-tags"><button class="bad">Caries</button><button class="bad">Restauración deficiente</button><button class="good">Restauración</button></div><label class="ph-finding-search">⌕ <input placeholder="Buscar hallazgo"></label><div class="ph-findings"><button data-finding="Aparato ortodóntico fijo">Aparato ortodóntico fijo <i>⌗</i></button><button data-finding="Aparato removible">Aparato ortodóntico removible <i>⌃</i></button><button data-finding="Bolsa periodontal">Bolsa periodontal <i>⌒</i></button><button data-finding="Caries oclusal">Caries oclusal <i>●</i></button><button data-finding="Restauración">Restauración <i>◆</i></button></div>`;
++      popover.querySelector('header button').onclick = () => { popover.hidden = true; };
++      popover.querySelectorAll('[data-finding]').forEach((item) => item.onclick = () => { const finding = item.dataset.finding; selected.forEach((id) => { const tooth = document.querySelector(`[data-tooth="${id}"]`); tooth.classList.add(finding.includes('Restauración') ? 'good' : 'bad'); }); document.getElementById('phPlanEmpty').outerHTML = `<div class="ph-plan-row"><span>${[...selected].join(', ')}</span><span>${finding}</span><span>Por vincular</span><span>Demo clínico</span></div>`; popover.hidden = true; notify(`${finding} registrado en el odontograma demostrativo.`); });
++    }));
++    applyChartOptions();
++  }
++
++  function perioTable(ids, group) {
++    return `<div class="ph-perio-table"><div class="ph-perio-labels"><b></b><span>Movilidad</span><span>Sangrado al sondaje</span><span>Placa</span><span>Margen gingival</span><span>Profundidad de sondaje</span></div><div class="ph-perio-cells">${ids.map((id, index) => `<div class="ph-perio-col"><b>${id}</b><input type="number" min="0" max="3" value="0" data-perio="mobility" data-index="${group + index}"><label class="ph-triple">${[0,1,2].map((point) => `<input type="checkbox" data-perio="bleed" data-index="${group + index}" data-point="${point}">`).join('')}</label><label class="ph-triple">${[0,1,2].map((point) => `<input type="checkbox" data-perio="plaque" data-index="${group + index}" data-point="${point}">`).join('')}</label><label class="ph-triple">${[0,1,2].map((point) => `<input type="number" min="-6" max="8" value="0" data-perio="margin" data-index="${group + index}" data-point="${point}">`).join('')}</label><label class="ph-triple">${[0,1,2].map((point) => `<input type="number" min="0" max="12" value="0" data-perio="depth" data-index="${group + index}" data-point="${point}">`).join('')}</label></div>`).join('')}</div></div>`;
++  }
++
++  function renderPeriodontogram() {
++    view.innerHTML = `<section class="ph-card ph-perio"><header class="ph-simple-tabs"><button class="active">Periodontograma</button><button>Plan de tratamiento</button><label>Doctor <select><option>Dra. Samantha</option></select></label><button class="ph-save" data-save-perio>Guardar</button></header><div class="ph-perio-status">Índice de placa <b id="plaquePct">0%</b> · Sangrado <b id="bleedPct">0%</b> · Profundidad media <b id="depthAvg">0.0 mm</b></div><div class="ph-perio-scroll">${perioTable(upper.slice(0,8),0)}${perioTable(upper.slice(8),8)}<div class="ph-perio-chart"><svg viewBox="0 0 1000 220" preserveAspectRatio="none"><g class="grid">${[30,60,90,120,150,180].map((y) => `<line x1="0" y1="${y}" x2="1000" y2="${y}"/>`).join('')}</g><path id="upperMarginLine" class="margin-line" d="M0 112 L1000 112"/><path id="upperDepthLine" class="depth-line" d="M0 112 L1000 112"/></svg><div class="ph-perio-teeth">${upper.map((id) => toothSvg(id,'upper')).join('')}</div></div>${perioTable(lower.slice(0,8),16)}${perioTable(lower.slice(8),24)}<div class="ph-perio-chart lower"><svg viewBox="0 0 1000 220" preserveAspectRatio="none"><g class="grid">${[30,60,90,120,150,180].map((y) => `<line x1="0" y1="${y}" x2="1000" y2="${y}"/>`).join('')}</g><path id="lowerMarginLine" class="margin-line" d="M0 108 L1000 108"/><path id="lowerDepthLine" class="depth-line" d="M0 108 L1000 108"/></svg><div class="ph-perio-teeth">${lower.map((id) => toothSvg(id,'lower')).join('')}</div></div></div></section>`;
++    bindPerio();
++  }
++
++  function bindPerio() {
++    const update = () => {
++      const inputs = [...view.querySelectorAll('[data-perio="depth"]')]; const margins = [...view.querySelectorAll('[data-perio="margin"]')]; const plaques = [...view.querySelectorAll('[data-perio="plaque"]')]; const bleeds = [...view.querySelectorAll('[data-perio="bleed"]')];
++      const average = inputs.reduce((sum,input) => sum + Number(input.value),0) / Math.max(1,inputs.length); document.getElementById('depthAvg').textContent = `${average.toFixed(1)} mm`; document.getElementById('plaquePct').textContent = `${Math.round(plaques.filter((x) => x.checked).length / plaques.length * 100)}%`; document.getElementById('bleedPct').textContent = `${Math.round(bleeds.filter((x) => x.checked).length / bleeds.length * 100)}%`;
++      [['upper',0,48],['lower',48,96]].forEach(([prefix,start,end]) => { const depthValues = inputs.slice(start,end); const marginValues = margins.slice(start,end); const points = (values, base, scale) => values.map((input,index) => `${index/(values.length-1)*1000},${base + Number(input.value)*scale}`).join(' '); document.getElementById(`${prefix}DepthLine`).setAttribute('d', `M${points(depthValues,110,7).replaceAll(' ', ' L')}`); document.getElementById(`${prefix}MarginLine`).setAttribute('d', `M${points(marginValues,110,-7).replaceAll(' ', ' L')}`); });
++    };
++    view.querySelectorAll('[data-perio]').forEach((input) => input.addEventListener('input', update)); view.querySelector('[data-save-perio]').addEventListener('click', () => notify('Periodontograma guardado en la demostración.')); update();
++  }
++
++  function renderGeneric(id) {
++    const copy = { filiation:['Filiación','Datos personales, tutor y medios de contacto'], history:['Historia clínica','Antecedentes, alergias y evolución clínica'], ortho:['Ortodoncia','Diagnóstico, análisis y controles de aparatología'], account:['Estado de cuenta','Cargos, abonos y planes de pago'], prescriptions:['Prescripciones','Recetas e indicaciones clínicas'], files:['Archivos','Radiografías, consentimientos y documentos'] }[id];
++    view.innerHTML = `<section class="ph-card ph-generic"><h2>${copy[0]}</h2><p>${copy[1]}</p><div class="ph-generic-grid"><article><b>Expediente</b><strong>${patient.record}</strong><span>Paciente activo</span></article><article><b>Última actualización</b><strong>18 sep 2026</strong><span>Dra. Samantha</span></article><article><b>Documentación</b><strong>Completa</strong><span>Consentimiento firmado</span></article></div><button data-notify="Formulario de ${copy[0]} abierto">＋ Agregar registro</button></section>`;
++  }
++
++  document.querySelector('.ph-record-nav').addEventListener('click', (event) => { const button = event.target.closest('[data-record-view]'); if (!button) return; document.querySelectorAll('[data-record-view]').forEach((item) => item.classList.toggle('active', item === button)); if (button.dataset.recordView === 'odontogram') renderOdontogram(); else if (button.dataset.recordView === 'perio') renderPeriodontogram(); else renderGeneric(button.dataset.recordView); });
++  document.getElementById('phMoreButton').addEventListener('click', () => { const menu = document.getElementById('phMoreMenu'); menu.hidden = !menu.hidden; });
++  document.addEventListener('click', (event) => { const trigger = event.target.closest('[data-notify]'); if (trigger) notify(trigger.dataset.notify); });
++  function notify(message) { const toast = document.getElementById('phToast'); toast.textContent = message; toast.classList.add('show'); clearTimeout(notify.timer); notify.timer = setTimeout(() => toast.classList.remove('show'),2800); }
++  renderOdontogram();
++})();
+diff --git a/docs/historial-paciente.html b/docs/historial-paciente.html
+new file mode 100644
+index 0000000..142603b
+--- /dev/null
++++ b/docs/historial-paciente.html
+@@ -0,0 +1,19 @@
++<!doctype html>
++<html lang="es">
++<head>
++  <meta charset="utf-8">
++  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
++  <meta name="theme-color" content="#263d49">
++  <meta name="description" content="Expediente clínico demostrativo de Samantha's Studio Lab">
++  <title>Historial clínico | Samantha's Studio Lab</title>
++  <link rel="stylesheet" href="assets/css/clinic-v2.css">
++  <link rel="stylesheet" href="assets/css/doctocliq-inspired.css">
++  <link rel="stylesheet" href="assets/css/patient-history.css">
++  <link rel="stylesheet" href="assets/css/patient-history-responsive.css">
++</head>
++<body class="ph-body">
++  <div id="patientHistoryApp"></div>
++  <noscript>Esta demostración necesita JavaScript para mostrar el expediente clínico.</noscript>
++  <script src="assets/js/patient-history.js"></script>
++</body>
++</html>
+diff --git a/docs/pacientes.html b/docs/pacientes.html
+index 8e7e40e..4b6e592 100644
+--- a/docs/pacientes.html
++++ b/docs/pacientes.html
+@@ -8,11 +8,13 @@
+   <title>Pacientes | Samantha's Studio Lab</title>
+   <link rel="stylesheet" href="assets/css/clinic-v2.css">
+   <link rel="stylesheet" href="assets/css/doctocliq-inspired.css">
++  <link rel="stylesheet" href="assets/css/patient-experience.css?v=20260919">
+ </head>
+ <body data-page="pacientes">
+   <div id="app"></div>
+   <noscript>Esta aplicación necesita JavaScript para mostrar la operación clínica.</noscript>
+   <script src="assets/js/clinic-seed.js"></script>
+   <script src="assets/js/clinic-app.js"></script>
++  <script src="assets/js/patient-experience.js?v=20260919"></script>
+ </body>
+ </html>
+-- 
+2.51.1
+
