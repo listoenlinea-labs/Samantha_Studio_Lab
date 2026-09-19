@@ -1468,6 +1468,14 @@ th {
     background 160ms ease;
 }
 
+.dc-view-button-wide {
+  width: auto;
+  min-width: 62px;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
 .dc-view-button:first-child,
 .dc-agenda-icon:first-child {
   border-radius: 8px 0 0 8px;
@@ -2008,6 +2016,26 @@ th {
   }
 }
 
+.dc-month-context {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--dc-line);
+  background: #fff;
+}
+
+.dc-month-context strong {
+  color: var(--dc-navy);
+  font-size: 18px;
+}
+
+.dc-month-context span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
 @media (max-width: 760px) {
   .dc-month-chip {
     position: relative;
@@ -2047,6 +2075,27 @@ th {
     min-height: 6px;
     margin-top: 2px;
   }
+}
+
+.dc-month-add {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  padding: 3px 6px;
+  border: 0;
+  border-radius: 5px;
+  color: #367d85;
+  background: transparent;
+  font: 700 9px/1.2 inherit;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 150ms ease, background 150ms ease;
+}
+
+.dc-month-day:hover .dc-month-add,
+.dc-month-add:focus-visible {
+  opacity: 1;
+  background: var(--dc-teal-soft);
 }
 
 @media (max-width: 760px) {
@@ -2443,6 +2492,250 @@ th {
 
   .dc-chair-section-head {
     flex-direction: column;
+  }
+}
+
+/* Vista operativa de disponibilidad por silla */
+.dc-chair-schedule {
+  padding: 18px;
+}
+
+.dc-chair-schedule-head {
+  display: grid;
+  grid-template-columns: minmax(240px, .75fr) minmax(420px, 1.25fr);
+  gap: 22px;
+  align-items: end;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--dc-line);
+}
+
+.dc-chair-schedule-head .eyebrow {
+  margin: 0 0 4px;
+}
+
+.dc-chair-schedule-head h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.dc-chair-schedule-head p:not(.eyebrow) {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.dc-chair-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.dc-chair-tab {
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid #d9e6e9;
+  border-radius: 9px;
+  color: var(--dc-navy);
+  background: #fff;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dc-chair-tab strong,
+.dc-chair-tab span {
+  display: block;
+}
+
+.dc-chair-tab strong {
+  font-size: 12px;
+}
+
+.dc-chair-tab span {
+  margin-top: 3px;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dc-chair-tab:hover,
+.dc-chair-tab.active {
+  border-color: var(--dc-teal);
+  background: var(--dc-teal-soft);
+  box-shadow: inset 0 0 0 1px rgba(69, 170, 177, .25);
+}
+
+.dc-chair-tab[data-chair-select="A"].active {
+  border-color: var(--lilac-700);
+  background: #f4edfb;
+}
+
+.dc-chair-timeline {
+  margin-top: 16px;
+}
+
+.dc-chair-day-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 13px 15px;
+  border-radius: 10px;
+  background: #f7fafb;
+}
+
+.dc-chair-day-summary>div:last-child {
+  text-align: right;
+}
+
+.dc-chair-day-summary span,
+.dc-chair-day-summary strong,
+.dc-chair-day-summary small {
+  display: block;
+}
+
+.dc-chair-day-summary span,
+.dc-chair-day-summary small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.dc-chair-day-summary strong {
+  margin: 2px 0;
+  font-size: 13px;
+}
+
+.dc-chair-hours {
+  display: grid;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.dc-chair-hour {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  width: 100%;
+  min-height: 54px;
+  padding: 9px 12px;
+  border: 1px solid #dfe8eb;
+  border-radius: 9px;
+  color: var(--dc-navy);
+  background: #fff;
+  font-family: inherit;
+  text-align: left;
+}
+
+button.dc-chair-hour {
+  cursor: pointer;
+}
+
+.dc-chair-hour time {
+  color: #28747c;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.dc-chair-hour strong,
+.dc-chair-hour span {
+  display: block;
+}
+
+.dc-chair-hour strong {
+  font-size: 11px;
+}
+
+.dc-chair-hour div span {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.dc-chair-hour.available:hover {
+  border-color: var(--dc-teal);
+  background: var(--dc-teal-soft);
+}
+
+.dc-chair-hour.occupied {
+  border-left: 4px solid var(--lilac-700);
+  background: #fbf8fe;
+}
+
+.dc-chair-hour.continuing {
+  border-left-color: #c7afdF;
+  background: #fdfbff;
+}
+
+.dc-slot-state {
+  padding: 5px 8px;
+  border-radius: 999px;
+  color: #28747c;
+  background: var(--dc-teal-soft);
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.dc-chair-hour.occupied .dc-slot-state {
+  color: #76529b;
+  background: #eee4f8;
+}
+
+@media (max-width: 900px) {
+  .dc-chair-schedule-head {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .dc-view-button-wide {
+    min-width: 54px;
+    padding: 0 7px;
+    font-size: 9px;
+  }
+
+  .dc-month-context {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+    padding: 10px;
+  }
+
+  .dc-month-context strong {
+    font-size: 15px;
+  }
+
+  .dc-month-add {
+    display: none;
+  }
+
+  .dc-chair-schedule {
+    padding: 12px;
+  }
+
+  .dc-chair-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .dc-chair-day-summary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dc-chair-day-summary>div:last-child {
+    text-align: left;
+  }
+
+  .dc-chair-hour {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 9px;
+  }
+
+  .dc-chair-hour .dc-slot-state {
+    grid-column: 2;
+    width: max-content;
   }
 }
 
