@@ -155,6 +155,13 @@
         </div>
         <small>Expediente: ${escapeHtml(patient.numeroExpediente || 'Pendiente')}</small>
       </header>
+      <form id="pxPhotoForm" class="px-affiliation">
+        <label>
+          Cambiar foto de perfil
+          <input name="profilePhoto" type="file" accept="image/*" required>
+        </label>
+        <button class="px-primary" type="submit">Guardar foto</button>
+      </form>
 
       <label class="px-note">
         Nota general
@@ -283,12 +290,24 @@
     };
 
     try {
-      const response = await fetch(`${API_URL}/pacientes`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+      const formData = new FormData();
+
+      Object.entries(payload).forEach(([campo, valor]) => {
+        if (valor !== null && valor !== undefined) {
+          formData.append(campo, valor);
+        }
       });
 
+      const archivoFoto = form.querySelector('[name="profilePhoto"]')?.files?.[0];
+
+      if (archivoFoto) {
+        formData.append('profilePhoto', archivoFoto);
+      }
+
+      const response = await fetch(`${API_URL}/pacientes`, {
+        method: 'POST',
+        body: formData
+      });
       const result = await response.json();
 
       if (!response.ok) {
@@ -308,6 +327,46 @@
   document.querySelectorAll('[data-demo-toast]').forEach((button) => {
     button.addEventListener('click', () => showToast(button.dataset.demoToast));
   });
+  document.addEventListener('submit', async (event) => {
+    const form = event.target;
 
+    if (form.id !== 'pxPhotoForm') return;
+
+    event.preventDefault();
+    event.stopImmediatePropagation();
+
+    const idPaciente = Number(document.getElementById('pxDrawer').dataset.patientId);
+    const archivo = form.querySelector('[name="profilePhoto"]').files[0];
+
+    if (!archivo) return;
+
+    const formData = new FormData();
+    formData.append('profilePhoto', archivo);
+
+    try {
+      const response = await fetch(`${API_URL}/pacientes/${idPaciente}`, {
+        method: 'PATCH',
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.mensaje || 'No fue posible actualizar la foto.');
+      }
+
+      const patient = patients.find((item) => item.idPaciente === idPaciente);
+
+      if (patient) {
+        patient.fotoUrl = result.fotoUrl;
+        renderRows();
+        openDrawer(patient);
+      }
+
+      showToast('Foto actualizada correctamente.');
+    } catch (error) {
+      showToast(error.message);
+    }
+  }, true);
   loadPatients();
 })();

@@ -5,6 +5,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const pool = require('./config/database');
+const path = require('path');
 
 const app = express();
 const allowedOrigins = (process.env.FRONTEND_ORIGINS || '')
@@ -20,6 +21,7 @@ app.use(cors({
     }
 }));
 app.use(express.json({ limit: '1mb' }));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 // Muestra cada solicitud atendida y su resultado en la consola.
 app.use((req, res, next) => {
     const inicio = Date.now();

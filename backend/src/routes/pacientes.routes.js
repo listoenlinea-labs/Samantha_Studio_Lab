@@ -1,7 +1,7 @@
 const express = require('express');
 const pool = require('../config/database');
 const routePendiente = require('./route-pendiente');
-
+const upload = require('../middleware/upload');
 const router = express.Router();
 
 /**
@@ -171,7 +171,7 @@ router.get('/', async (req, res, next) => {
  * POST /api/pacientes
  * Creará un paciente nuevo.
  */
-router.post('/', async (req, res, next) => {
+router.post('/', upload.single('profilePhoto'), async (req, res, next) => {
     const conexion = await pool.getConnection();
 
     try {
@@ -223,6 +223,9 @@ router.post('/', async (req, res, next) => {
             });
         }
 
+        const fotoGuardadaUrl = req.file
+            ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
+            : String(fotoUrl || '').trim() || null;
         await conexion.beginTransaction();
 
         const [resultadoPaciente] = await conexion.query(
@@ -252,7 +255,7 @@ router.post('/', async (req, res, next) => {
                 sexo || null,
                 String(telefono || '').trim() || null,
                 String(correo || '').trim() || null,
-                String(fotoUrl || '').trim() || null,
+                fotoGuardadaUrl,
                 String(comoNosConocio || '').trim() || null,
                 String(alergias || '').trim() || null,
                 String(antecedentesMedicos || '').trim() || null,
@@ -351,15 +354,55 @@ router.get('/:id', async (req, res, next) => {
  * PATCH /api/pacientes/:id
  * Actualiza datos generales del paciente.
  */
-router.patch('/:id', async (req, res, next) => {
+router.patch('/:id', upload.single('profilePhoto'), async (req, res, next) => {
     try {
         const idPaciente = obtenerIdPaciente(req, res);
         if (!idPaciente) return;
 
-        res.status(501).json({
-            ok: false,
-            idPaciente,
-            mensaje: 'La edición de pacientes aún no está conectada a MySQL.'
+        if (!req.file) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Selecciona una imagen para actualizar la foto.'
+            });
+        }
+
+        const fotoUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+
+        const [resultado] = await pool.query(
+            `
+                UPDATE pacientes
+                SET foto_url = ?
+                WHERE id_paciente = ?
+                  AND activo = 1
+            `,
+            [fotoUrl, idPaciente]
+        );
+
+        if (!resultado.affectedRows) {
+            return res.status(404).json({
+                ok: false,
+                mensaje: 'Paciente no encontrado o inactivo.'
+            });
+        }
+
+        await pool.query(
+            `
+                INSERT INTO auditoria (entidad, id_entidad, accion, detalle)
+                VALUES (?, ?, 'ACTUALIZAR', ?)
+            `,
+            [
+                'pacientes',
+                idPaciente,
+                JSON.stringify({
+                    mensaje: 'Foto de perfil actualizada.'
+                })
+            ]
+        );
+
+        res.json({
+            ok: true,
+            mensaje: 'Foto actualizada correctamente.',
+            fotoUrl
         });
     } catch (error) {
         next(error);
