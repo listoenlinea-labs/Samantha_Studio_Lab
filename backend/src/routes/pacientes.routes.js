@@ -4,6 +4,10 @@ const routePendiente = require('./route-pendiente');
 const upload = require('../middleware/upload');
 const router = express.Router();
 
+function construirFotoUrl(req, idPaciente, version = Date.now()) {
+    return `${req.protocol}://${req.get('host')}/api/pacientes/${idPaciente}/foto?v=${encodeURIComponent(version)}`;
+}
+
 /**
  * Valida que el id recibido en la URL sea un número entero positivo.
  */
@@ -64,7 +68,7 @@ router.get('/', async (req, res, next) => {
           TIMESTAMPDIFF(YEAR, p.fecha_nacimiento, CURDATE()) AS edad,
           p.telefono,
           p.correo,
-          p.foto_url AS fotoUrl,
+          pf.updated_at AS fotoActualizadaAt,
           ep.numero_expediente AS numeroExpediente,
           ep.nota_general AS notaGeneral,
 
@@ -101,6 +105,8 @@ router.get('/', async (req, res, next) => {
         FROM pacientes p
         LEFT JOIN expedientes_paciente ep
           ON ep.id_paciente = p.id_paciente
+        LEFT JOIN paciente_fotos pf
+          ON pf.id_paciente = p.id_paciente
         WHERE p.activo = 1
           AND ${condicionBusqueda}
         ORDER BY p.nombres, p.apellido_paterno, p.apellido_materno
@@ -148,13 +154,20 @@ router.get('/', async (req, res, next) => {
             });
         }
 
-        const items = pacientes.map((paciente) => ({
-            ...paciente,
-            edad: paciente.edad === null ? null : Number(paciente.edad),
-            tareasPendientes: Number(paciente.tareasPendientes),
-            presupuestoPendiente: Number(paciente.presupuestoPendiente),
-            etiquetas: etiquetasPorPaciente.get(paciente.idPaciente) || []
-        }));
+        const items = pacientes.map((paciente) => {
+            const { fotoActualizadaAt, ...datosPaciente } = paciente;
+
+            return {
+                ...datosPaciente,
+                fotoUrl: fotoActualizadaAt
+                    ? construirFotoUrl(req, paciente.idPaciente, new Date(fotoActualizadaAt).getTime())
+                    : null,
+                edad: paciente.edad === null ? null : Number(paciente.edad),
+                tareasPendientes: Number(paciente.tareasPendientes),
+                presupuestoPendiente: Number(paciente.presupuestoPendiente),
+                etiquetas: etiquetasPorPaciente.get(paciente.idPaciente) || []
+            };
+        });
 
         res.json({
             items,
@@ -183,7 +196,6 @@ router.post('/', upload.single('profilePhoto'), async (req, res, next) => {
             sexo,
             telefono,
             correo,
-            fotoUrl,
             comoNosConocio,
             alergias,
             antecedentesMedicos,
@@ -223,9 +235,6 @@ router.post('/', upload.single('profilePhoto'), async (req, res, next) => {
             });
         }
 
-        const fotoGuardadaUrl = req.file
-            ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
-            : String(fotoUrl || '').trim() || null;
         await conexion.beginTransaction();
 
         const [resultadoPaciente] = await conexion.query(
@@ -238,14 +247,13 @@ router.post('/', upload.single('profilePhoto'), async (req, res, next) => {
           sexo,
           telefono,
           correo,
-          foto_url,
           como_nos_conocio,
           alergias,
           antecedentes_medicos,
           notas_alerta,
           activo
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
       `,
             [
                 nombresLimpios,
@@ -255,7 +263,6 @@ router.post('/', upload.single('profilePhoto'), async (req, res, next) => {
                 sexo || null,
                 String(telefono || '').trim() || null,
                 String(correo || '').trim() || null,
-                fotoGuardadaUrl,
                 String(comoNosConocio || '').trim() || null,
                 String(alergias || '').trim() || null,
                 String(antecedentesMedicos || '').trim() || null,
@@ -266,6 +273,28 @@ router.post('/', upload.single('profilePhoto'), async (req, res, next) => {
         const idPaciente = resultadoPaciente.insertId;
         const anio = new Date().getFullYear();
         const numeroExpediente = `EXP-${anio}-${String(idPaciente).padStart(6, '0')}`;
+
+        if (req.file) {
+            await conexion.query(
+                `
+          INSERT INTO paciente_fotos (
+            id_paciente,
+            nombre_original,
+            mime_type,
+            tamano_bytes,
+            contenido
+          )
+          VALUES (?, ?, ?, ?, ?)
+        `,
+                [
+                    idPaciente,
+                    req.file.originalname,
+                    req.file.mimetype,
+                    req.file.size,
+                    req.file.buffer
+                ]
+            );
+        }
 
         await conexion.query(
             `
@@ -312,7 +341,8 @@ router.post('/', upload.single('profilePhoto'), async (req, res, next) => {
             paciente: {
                 idPaciente,
                 numeroExpediente,
-                nombres: nombresLimpios
+                nombres: nombresLimpios,
+                fotoUrl: req.file ? construirFotoUrl(req, idPaciente) : null
             }
         });
     } catch (error) {
@@ -328,6 +358,49 @@ router.post('/', upload.single('profilePhoto'), async (req, res, next) => {
         next(error);
     } finally {
         conexion.release();
+    }
+});
+
+/**
+ * GET /api/pacientes/:id/foto
+ * Entrega la foto almacenada en MySQL sin exponer una carpeta pública.
+ */
+router.get('/:id/foto', async (req, res, next) => {
+    try {
+        const idPaciente = obtenerIdPaciente(req, res);
+        if (!idPaciente) return;
+
+        const [fotos] = await pool.query(
+            `
+        SELECT mime_type, tamano_bytes, contenido
+        FROM paciente_fotos
+        WHERE id_paciente = ?
+        LIMIT 1
+      `,
+            [idPaciente]
+        );
+
+        if (!fotos.length) {
+            return res.status(404).json({
+                ok: false,
+                mensaje: 'El paciente no tiene una foto registrada.'
+            });
+        }
+
+        const foto = fotos[0];
+
+        res.set({
+            'Content-Type': foto.mime_type,
+            'Content-Length': foto.tamano_bytes,
+            'Cache-Control': req.query.v
+                ? 'private, max-age=31536000, immutable'
+                : 'private, no-cache',
+            'X-Content-Type-Options': 'nosniff'
+        });
+
+        return res.send(foto.contenido);
+    } catch (error) {
+        next(error);
     }
 });
 
@@ -355,6 +428,8 @@ router.get('/:id', async (req, res, next) => {
  * Actualiza datos generales del paciente.
  */
 router.patch('/:id', upload.single('profilePhoto'), async (req, res, next) => {
+    const conexion = await pool.getConnection();
+
     try {
         const idPaciente = obtenerIdPaciente(req, res);
         if (!idPaciente) return;
@@ -366,26 +441,54 @@ router.patch('/:id', upload.single('profilePhoto'), async (req, res, next) => {
             });
         }
 
-        const fotoUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+        await conexion.beginTransaction();
 
-        const [resultado] = await pool.query(
+        const [pacientes] = await conexion.query(
             `
-                UPDATE pacientes
-                SET foto_url = ?
-                WHERE id_paciente = ?
-                  AND activo = 1
+                SELECT id_paciente
+                FROM pacientes
+                WHERE id_paciente = ? AND activo = 1
+                LIMIT 1
             `,
-            [fotoUrl, idPaciente]
+            [idPaciente]
         );
 
-        if (!resultado.affectedRows) {
+        if (!pacientes.length) {
+            await conexion.rollback();
+
             return res.status(404).json({
                 ok: false,
                 mensaje: 'Paciente no encontrado o inactivo.'
             });
         }
 
-        await pool.query(
+        await conexion.query(
+            `
+                INSERT INTO paciente_fotos (
+                    id_paciente,
+                    nombre_original,
+                    mime_type,
+                    tamano_bytes,
+                    contenido
+                )
+                VALUES (?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE
+                    nombre_original = VALUES(nombre_original),
+                    mime_type = VALUES(mime_type),
+                    tamano_bytes = VALUES(tamano_bytes),
+                    contenido = VALUES(contenido),
+                    updated_at = CURRENT_TIMESTAMP
+            `,
+            [
+                idPaciente,
+                req.file.originalname,
+                req.file.mimetype,
+                req.file.size,
+                req.file.buffer
+            ]
+        );
+
+        await conexion.query(
             `
                 INSERT INTO auditoria (entidad, id_entidad, accion, detalle)
                 VALUES (?, ?, 'ACTUALIZAR', ?)
@@ -399,13 +502,20 @@ router.patch('/:id', upload.single('profilePhoto'), async (req, res, next) => {
             ]
         );
 
+        await conexion.commit();
+
+        const fotoUrl = construirFotoUrl(req, idPaciente);
+
         res.json({
             ok: true,
             mensaje: 'Foto actualizada correctamente.',
             fotoUrl
         });
     } catch (error) {
+        await conexion.rollback();
         next(error);
+    } finally {
+        conexion.release();
     }
 });
 
