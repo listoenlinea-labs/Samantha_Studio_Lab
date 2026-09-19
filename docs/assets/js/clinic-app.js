@@ -268,10 +268,10 @@
       </div>
       <div class="dc-chair-grid">
         ${dentalChairs.map((chair) => {
-          const appointments = demoAppointments.filter((appointment) => appointment.chair === chair.id);
-          const availableSlots = Math.max(0, 6 - appointments.length);
-          const usage = Math.round((appointments.length / 6) * 100);
-          return `<article class="dc-chair-card ${chair.tone}">
+      const appointments = demoAppointments.filter((appointment) => appointment.chair === chair.id);
+      const availableSlots = Math.max(0, 6 - appointments.length);
+      const usage = Math.round((appointments.length / 6) * 100);
+      return `<article class="dc-chair-card ${chair.tone}">
             <div class="dc-chair-card-head">
               <div><span class="dc-chair-id">${chair.name}</span><h3>${chair.specialty}</h3></div>
               <span class="dc-chair-rule">${chair.id === 'A' ? 'Sólo camitas' : 'Sin camitas'}</span>
@@ -284,7 +284,7 @@
               ${appointments.map((appointment) => `<div class="dc-chair-slot"><time>${appointment.time}</time><span><strong>${appointment.patient}</strong><small>${appointment.treatment}</small></span></div>`).join('')}
             </div>
           </article>`;
-        }).join('')}
+    }).join('')}
       </div>
     </section>`;
   }
@@ -920,8 +920,8 @@
     ];
     shell(
       hero('Tres roles claros', 'Cada persona ve sólo lo necesario.', 'Administrador, asistente y recepcionista con permisos acordes a la reunión y trazabilidad por usuario.', `${button('＋ Nuevo usuario', 'primary', 'data-modal="user"')}${button('Guardar permisos', 'secondary', 'data-toast="Matriz de permisos guardada en modo demostración."')}`) +
-      `< section class= "grid layout" ><article class="card"><div class="card-head"><div><h2>Matriz de permisos</h2><p>Los controles reales deben validarse también en el servidor.</p></div></div><div class="table-wrap"><div class="permission-matrix"><div class="matrix-head">Capacidad</div><div class="matrix-head">Administrador</div><div class="matrix-head">Asistente</div><div class="matrix-head">Recepcionista</div>${capabilities.map((row) => row.map((value, i) => `<div>${i === 0 ? value : value ? '<span class="check">✓</span>' : '<span class="dash">—</span>'}</div>`).join('')).join('')}</div></div></article>
-      <aside class="grid"><article class="card"><div class="card-head"><div><h2>Usuarios</h2><p>Sin contraseñas almacenadas en el navegador.</p></div></div><div class="list"><div class="list-item"><span class="avatar">SS</span><span class="list-copy"><strong>Administración SSL</strong><span>admin@clinica.example</span></span>${status('Administrador', 'info')}</div><div class="list-item"><span class="avatar">AS</span><span class="list-copy"><strong>Asistente demo</strong><span>asistente@clinica.example</span></span>${status('Asistente', 'success')}</div><div class="list-item"><span class="avatar">RE</span><span class="list-copy"><strong>Recepción demo</strong><span>recepcion@clinica.example</span></span>${status('Recepcionista', 'warning')}</div></div></article><div class="callout warning"><strong>Seguridad:</strong> el backend debe usar hash de contraseña, sesión segura, segundo factor para administración, bitácora y control por permiso; nunca guardar contraseñas en localStorage.</div></aside></section >
+      `<section class="grid layout"><article class="card"><div class="card-head"><div><h2>Matriz de permisos</h2><p>Los controles reales deben validarse también en el servidor.</p></div></div><div class="table-wrap"><div class="permission-matrix"><div class="matrix-head">Capacidad</div><div class="matrix-head">Administrador</div><div class="matrix-head">Asistente</div><div class="matrix-head">Recepcionista</div>${capabilities.map((row) => row.map((value, i) => `<div>${i === 0 ? value : value ? '<span class="check">✓</span>' : '<span class="dash">—</span>'}</div>`).join('')).join('')}</div></div></article>
+      <aside class="grid"><article class="card"><div class="card-head"><div><h2>Usuarios</h2><p>Sin contraseñas almacenadas en el navegador.</p></div></div><div class="list"><div class="list-item"><span class="avatar">SS</span><span class="list-copy"><strong>Administración SSL</strong><span>admin@clinica.example</span></span>${status('Administrador', 'info')}</div><div class="list-item"><span class="avatar">AS</span><span class="list-copy"><strong>Asistente demo</strong><span>asistente@clinica.example</span></span>${status('Asistente', 'success')}</div><div class="list-item"><span class="avatar">RE</span><span class="list-copy"><strong>Recepción demo</strong><span>recepcion@clinica.example</span></span>${status('Recepcionista', 'warning')}</div></div></article><div class="callout warning"><strong>Seguridad:</strong> el backend debe usar hash de contraseña, sesión segura, segundo factor para administración, bitácora y control por permiso; nunca guardar contraseñas en localStorage.</div></aside></section>
     <section class="grid three" style="margin-top:16px"><article class="card"><div class="card-head"><div><h2>Google Calendar</h2><p>Agenda y eventos.</p></div>${status('Pendiente', 'warning')}</div>${button('Autorizar cuenta', 'secondary', 'data-toast="Se requiere OAuth del consultorio."')}</article><article class="card"><div class="card-head"><div><h2>WhatsApp Business</h2><p>Recordatorios y confirmación.</p></div>${status('Pendiente', 'warning')}</div>${button('Configurar API', 'secondary', 'data-toast="Se requieren número, cuenta Meta y plantillas aprobadas."')}</article><article class="card"><div class="card-head"><div><h2>Almacenamiento clínico</h2><p>Fotos, PDF y DICOM.</p></div>${status('Pendiente', 'warning')}</div>${button('Configurar', 'secondary', 'data-toast="Se requiere almacenamiento cifrado y política de retención."')}</article></section>`
     );
   }
@@ -953,16 +953,19 @@
     const [title, subtitle] = headers[type] || headers.appointment;
     if (type === 'agendaConfig') {
       return `
-    < div class= "modal-head" >
-    <div>
-      <h2>${title}</h2>
-      <p>Define cómo quieres visualizar y organizar tu agenda.</p>
-    </div>
+    <div class="modal-head">
+      <div>
+        <h2>${title}</h2>
+
+        <p class="modal-subtitle">
+          ${subtitle}
+        </p>
+      </div>
 
       ${close}
-    </div >
+    </div>
 
-      <form id="agendaConfigForm">
+    <form id="agendaConfigForm">
         <div class="agenda-config-tabs">
           <button type="button">Generales</button>
           <button type="button" class="active">Mi vista</button>
@@ -1504,7 +1507,18 @@
         absent: 'Ausente'
       };
       const detail = document.getElementById('toothDetail');
-      if (detail) detail.innerHTML = `< strong > Diente ${tooth.dataset.tooth} · ${labels[next]}</strong > <br>Agrega superficie, diagnóstico, evidencia y plan de tratamiento. El cambio quedará ligado al usuario y fecha.`;
+      if (detail) {
+        detail.innerHTML = `
+    <strong>
+      Diente ${tooth.dataset.tooth} · ${labels[next]}
+    </strong>
+
+    <br>
+
+    Agrega superficie, diagnóstico, evidencia y plan de tratamiento.
+    El cambio quedará ligado al usuario y fecha.
+  `;
+      }
     }));
 
     const calcInputs = ['calcHours', 'calcHourly', 'calcMargin', 'calcMaterials', 'calcPlaque'].map((id) => document.getElementById(id)).filter(Boolean);
