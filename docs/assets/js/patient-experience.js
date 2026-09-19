@@ -142,9 +142,17 @@
   }
 
   function openDrawer(patient) {
+    const drawer = document.getElementById('pxDrawer');
+
+    drawer.dataset.patientId = String(patient.idPaciente);
     document.getElementById('pxDrawerContent').innerHTML = `
       <header class="px-patient-header">
-        ${avatar(patient, true)}
+        <label class="px-avatar-edit" title="Cambiar foto de perfil">
+          ${avatar(patient, true)}
+          <span class="px-avatar-edit-icon" aria-hidden="true">📷</span>
+          <span class="px-visually-hidden">Cambiar foto de perfil</span>
+          <input id="pxPhotoInput" name="profilePhoto" type="file" accept="image/jpeg,image/png,image/webp">
+        </label>
         <div>
           <div class="px-name-line">
             <h2>${escapeHtml(patient.nombreCompleto)}</h2>
@@ -155,13 +163,6 @@
         </div>
         <small>Expediente: ${escapeHtml(patient.numeroExpediente || 'Pendiente')}</small>
       </header>
-      <form id="pxPhotoForm" class="px-affiliation">
-        <label>
-          Cambiar foto de perfil
-          <input name="profilePhoto" type="file" accept="image/*" required>
-        </label>
-        <button class="px-primary" type="submit">Guardar foto</button>
-      </form>
 
       <label class="px-note">
         Nota general
@@ -173,7 +174,6 @@
         <p>Los apartados de citas, filiación, presupuestos y tareas se conectarán en el siguiente paso.</p>
       </div>`;
 
-    const drawer = document.getElementById('pxDrawer');
     const scrim = document.getElementById('pxDrawerScrim');
 
     drawer.classList.add('open');
@@ -327,23 +327,25 @@
   document.querySelectorAll('[data-demo-toast]').forEach((button) => {
     button.addEventListener('click', () => showToast(button.dataset.demoToast));
   });
-  document.addEventListener('submit', async (event) => {
-    const form = event.target;
-
-    if (form.id !== 'pxPhotoForm') return;
-
-    event.preventDefault();
-    event.stopImmediatePropagation();
+  document.addEventListener('change', async (event) => {
+    if (event.target.id !== 'pxPhotoInput') return;
 
     const idPaciente = Number(document.getElementById('pxDrawer').dataset.patientId);
-    const archivo = form.querySelector('[name="profilePhoto"]').files[0];
+    const archivo = event.target.files?.[0];
 
     if (!archivo) return;
+
+    if (!Number.isInteger(idPaciente) || idPaciente <= 0) {
+      showToast('No fue posible identificar al paciente seleccionado.');
+      return;
+    }
 
     const formData = new FormData();
     formData.append('profilePhoto', archivo);
 
     try {
+      showToast('Guardando foto…');
+
       const response = await fetch(`${API_URL}/pacientes/${idPaciente}`, {
         method: 'PATCH',
         body: formData
@@ -367,6 +369,6 @@
     } catch (error) {
       showToast(error.message);
     }
-  }, true);
+  });
   loadPatients();
 })();
