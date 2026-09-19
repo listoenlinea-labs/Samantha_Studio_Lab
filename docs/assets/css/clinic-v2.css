@@ -1,26 +1,41 @@
 :root {
-  --lilac-900: #604b72;
-  --lilac-700: #8b71a0;
-  --lilac-500: #cdbdde;
-  --lilac-200: #e9ddec;
-  --lilac-100: #f5eff7;
-  --peach-500: #faad7d;
-  --peach-200: #ffd5be;
-  --gold-400: #e6d7a1;
-  --sage-500: #9fb6b7;
-  --sage-100: #edf4f3;
-  --ink: #342d39;
-  --muted: #756d7a;
-  --line: #e9e2eb;
+  /* Paleta oficial extraída de las variantes del logotipo SSL */
+  --brand-charcoal: #212120;
+  --brand-sage: #9ab2b3;
+  --brand-lavender: #d8cce6;
+  --brand-lilac-soft: #eae1ea;
+  --brand-peach: #fbba91;
+  --brand-peach-soft: #ffdbc7;
+  --brand-gold: #e6d8a1;
+  --brand-cream: #fff7e3;
+  --brand-lavender-ink: #66586f;
+  --brand-peach-ink: #8a5240;
+  --brand-sage-ink: #536f70;
+  --brand-gold-ink: #75652f;
+
+  /* Alias de compatibilidad para los componentes existentes */
+  --lilac-900: var(--brand-charcoal);
+  --lilac-700: #5f575f;
+  --lilac-500: var(--brand-lavender);
+  --lilac-200: var(--brand-lilac-soft);
+  --lilac-100: #f7f2f7;
+  --peach-500: var(--brand-peach);
+  --peach-200: var(--brand-peach-soft);
+  --gold-400: var(--brand-gold);
+  --sage-500: var(--brand-sage);
+  --sage-100: #f0f4f3;
+  --ink: var(--brand-charcoal);
+  --muted: #696565;
+  --line: var(--brand-lilac-soft);
   --surface: #ffffff;
-  --canvas: #faf8fb;
-  --danger: #b34d5d;
-  --danger-soft: #fff0f2;
-  --warning: #a56f20;
-  --warning-soft: #fff7df;
-  --success: #497d6b;
-  --success-soft: #eaf5ef;
-  --shadow: 0 16px 45px rgba(76, 58, 88, .09);
+  --canvas: #fffdf8;
+  --danger: #9a564f;
+  --danger-soft: #fff0e9;
+  --warning: #7a682f;
+  --warning-soft: var(--brand-cream);
+  --success: #536f70;
+  --success-soft: #edf3f2;
+  --shadow: 0 16px 45px rgba(33, 33, 32, .08);
   --radius: 18px;
 }
 
@@ -77,7 +92,7 @@ button {
   padding: 22px 16px 18px;
   overflow-y: auto;
   border-right: 1px solid rgba(255, 255, 255, .55);
-  background: linear-gradient(180deg, #725b82 0%, #5d4b6b 100%);
+  background: linear-gradient(180deg, #353432 0%, var(--brand-charcoal) 100%);
   color: #fff;
 }
 
