@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title">
+  <title id="title">Paciente de demostración</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#dff5f4"/><stop offset="1" stop-color="#d8cce6"/>
+    </linearGradient>
+    <linearGradient id="shirt" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#47aeb5"/><stop offset="1" stop-color="#286f7b"/>
+    </linearGradient>
+  </defs>
+  <rect width="160" height="160" rx="80" fill="url(#bg)"/>
+  <circle cx="80" cy="63" r="35" fill="#f0b995"/>
+  <path d="M45 59c0-29 15-42 36-42 25 0 38 17 36 44-9-6-15-16-19-27-13 13-32 20-53 20z" fill="#3b2c2a"/>
+  <path d="M59 64c4-3 9-3 13 0M89 64c4-3 9-3 13 0" fill="none" stroke="#5d3a32" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="66" cy="67" r="2.4" fill="#263d49"/><circle cx="96" cy="67" r="2.4" fill="#263d49"/>
+  <path d="M73 84c5 5 11 5 16 0" fill="none" stroke="#9f554f" stroke-width="3" stroke-linecap="round"/>
+  <path d="M53 104c8 9 46 9 54 0 22 9 37 28 42 56H11c5-28 20-47 42-56z" fill="url(#shirt)"/>
+  <path d="M66 105l14 16 14-16" fill="#fff" opacity=".92"/>
+</svg>
