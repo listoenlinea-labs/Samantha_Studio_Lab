@@ -1468,14 +1468,6 @@ th {
     background 160ms ease;
 }
 
-.dc-view-button-wide {
-  width: auto;
-  min-width: 62px;
-  padding: 0 10px;
-  font-size: 11px;
-  font-weight: 800;
-}
-
 .dc-view-button:first-child,
 .dc-agenda-icon:first-child {
   border-radius: 8px 0 0 8px;
@@ -2496,6 +2488,15 @@ th {
 }
 
 /* Vista operativa de disponibilidad por silla */
+.dc-chair-mode {
+  display: grid;
+  gap: 14px;
+}
+
+.dc-chair-mode .dc-chair-section {
+  margin-bottom: 0;
+}
+
 .dc-chair-schedule {
   padding: 18px;
 }
@@ -2607,6 +2608,209 @@ th {
   font-size: 13px;
 }
 
+.dc-chair-day-count {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 9px 12px;
+  border: 1px solid #dfe8eb;
+  border-radius: 8px;
+  color: var(--muted);
+  background: #fff;
+  font-size: 10px;
+}
+
+.dc-chair-day-count strong {
+  color: var(--dc-navy);
+  font-size: 11px;
+}
+
+.dc-chair-week {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(145px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+  overflow-x: auto;
+}
+
+.dc-chair-week-day {
+  display: flex;
+  min-height: 230px;
+  flex-direction: column;
+  padding: 11px;
+  border: 1px solid #dfe8eb;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.dc-chair-week-day header span,
+.dc-chair-week-day header strong,
+.dc-chair-week-day header small {
+  display: block;
+}
+
+.dc-chair-week-day header span {
+  color: var(--dc-teal);
+  font-size: 9px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.dc-chair-week-day header strong {
+  margin-top: 2px;
+  font-size: 13px;
+}
+
+.dc-chair-week-day header small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.dc-chair-week-day>div {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.dc-chair-week-appointment {
+  padding: 8px;
+  border: 0;
+  border-left: 3px solid var(--lilac-700);
+  border-radius: 6px;
+  color: var(--dc-navy);
+  background: #f5effb;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dc-chair-week-appointment time,
+.dc-chair-week-appointment strong,
+.dc-chair-week-appointment span {
+  display: block;
+}
+
+.dc-chair-week-appointment time {
+  color: #76529b;
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.dc-chair-week-appointment strong {
+  margin-top: 3px;
+  font-size: 10px;
+}
+
+.dc-chair-week-appointment span {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.dc-chair-empty {
+  margin: 0;
+  color: #648087;
+  font-size: 9px;
+}
+
+.dc-chair-week-add {
+  width: 100%;
+  margin-top: auto;
+  padding: 7px;
+  border: 1px dashed #9ccfd5;
+  border-radius: 7px;
+  color: #28747c;
+  background: var(--dc-teal-soft);
+  font-family: inherit;
+  font-size: 9px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.dc-chair-month-head,
+.dc-chair-month {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(85px, 1fr));
+  min-width: 595px;
+}
+
+.dc-chair-month-head {
+  margin-top: 12px;
+  color: #657b85;
+  background: #f5f9fa;
+}
+
+.dc-chair-month-head span {
+  padding: 9px 4px;
+  font-size: 9px;
+  font-weight: 850;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.dc-chair-month {
+  overflow: hidden;
+  border: 1px solid var(--dc-line);
+  border-radius: 0 0 9px 9px;
+}
+
+.dc-chair-month-day {
+  min-height: 82px;
+  padding: 7px;
+  border: 0;
+  border-right: 1px solid var(--dc-line);
+  border-bottom: 1px solid var(--dc-line);
+  color: var(--dc-navy);
+  background: #fff;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dc-chair-month-day strong,
+.dc-chair-month-day span,
+.dc-chair-month-day small {
+  display: block;
+}
+
+.dc-chair-month-day strong {
+  font-size: 11px;
+}
+
+.dc-chair-month-day span {
+  margin-top: 10px;
+  color: #648087;
+  font-size: 8px;
+}
+
+.dc-chair-month-day small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.dc-chair-month-day.reserved {
+  background: #f5effb;
+  box-shadow: inset 3px 0 0 var(--lilac-700);
+}
+
+.dc-chair-month-day.reserved span {
+  color: #76529b;
+  font-weight: 850;
+}
+
+.dc-chair-month-day.muted {
+  color: #a8b3b7;
+  background: #f8fafb;
+}
+
+.dc-chair-month-day:hover {
+  background: var(--dc-teal-soft);
+}
+
 .dc-chair-hours {
   display: grid;
   gap: 5px;
@@ -2690,12 +2894,6 @@ button.dc-chair-hour {
 }
 
 @media (max-width: 760px) {
-  .dc-view-button-wide {
-    min-width: 54px;
-    padding: 0 7px;
-    font-size: 9px;
-  }
-
   .dc-month-context {
     align-items: flex-start;
     flex-direction: column;
@@ -2726,6 +2924,30 @@ button.dc-chair-hour {
 
   .dc-chair-day-summary>div:last-child {
     text-align: left;
+  }
+
+  .dc-chair-week {
+    grid-template-columns: repeat(6, 145px);
+  }
+
+  .dc-chair-month-head,
+  .dc-chair-month {
+    grid-template-columns: repeat(7, minmax(46px, 1fr));
+    min-width: 0;
+  }
+
+  .dc-chair-month-day {
+    min-height: 65px;
+    padding: 4px;
+  }
+
+  .dc-chair-month-day span {
+    margin-top: 7px;
+    font-size: 7px;
+  }
+
+  .dc-chair-month-day small {
+    display: none;
   }
 
   .dc-chair-hour {

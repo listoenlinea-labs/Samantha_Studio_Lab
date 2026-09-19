@@ -270,7 +270,7 @@
   function chairAvailabilityBoard() {
     return `<section class="dc-chair-section" aria-labelledby="chairAvailabilityTitle">
       <div class="dc-chair-section-head">
-        <div><p class="eyebrow">Disponibilidad por espacio</p><h2 id="chairAvailabilityTitle">Agenda de las tres sillas</h2><p>La Silla A está reservada exclusivamente para camitas. Las sillas B y C atienden el resto de las citas.</p></div>
+        <div><p class="eyebrow">Resumen de ocupación de hoy</p><h2 id="chairAvailabilityTitle">Reservas de las tres sillas</h2><p>Compara rápidamente las reservas de hoy y después consulta el detalle diario, semanal o mensual de cada silla.</p></div>
         ${status('3 sillas activas', 'success')}
       </div>
       <div class="dc-chair-grid">
@@ -284,7 +284,7 @@
               <span class="dc-chair-rule">${chair.id === 'A' ? 'Sólo camitas' : 'Sin camitas'}</span>
             </div>
             <p>${chair.rule}</p>
-            <div class="dc-chair-capacity"><strong>${availableSlots} espacios disponibles</strong><span>${appointments.length} citas asignadas</span></div>
+            <div class="dc-chair-capacity"><strong>${availableSlots} espacios disponibles</strong><span>${appointments.length} ${appointments.length === 1 ? 'reserva' : 'reservas'}</span></div>
             <div class="dc-chair-progress" aria-label="${usage}% de ocupación"><span style="width:${usage}%"></span></div>
             <div class="dc-chair-next"><span>Próximo espacio</span><strong>${chair.nextAvailable}</strong></div>
             <div class="dc-chair-slots">
@@ -296,15 +296,18 @@
     </section>`;
   }
 
-  function chairScheduleView() {
-    return `<section class="dc-agenda-view dc-chair-schedule card" data-agenda-view="chairs" hidden>
-      <div class="dc-chair-schedule-head">
-        <div><p class="eyebrow">Disponibilidad sin cálculos</p><h2>Agenda por silla</h2><p>Selecciona una silla para revisar sus citas y abrir directamente un horario disponible.</p></div>
-        <div class="dc-chair-tabs" role="tablist" aria-label="Seleccionar silla">
-          ${dentalChairs.map((chair, index) => `<button class="dc-chair-tab${index === 0 ? ' active' : ''}" type="button" role="tab" data-chair-select="${chair.id}" aria-selected="${index === 0}"><strong>${chair.name}</strong><span>${chair.specialty}</span></button>`).join('')}
+  function chairModeView() {
+    return `<section class="dc-agenda-mode-view dc-chair-mode" data-agenda-mode-view="chairs" hidden>
+      ${chairAvailabilityBoard()}
+      <section class="dc-chair-schedule card">
+        <div class="dc-chair-schedule-head">
+          <div><p class="eyebrow">Disponibilidad sin cálculos</p><h2>Agenda por silla</h2><p>Selecciona una silla y después usa Día, Semana o Mes para revisar únicamente sus citas.</p></div>
+          <div class="dc-chair-tabs" role="tablist" aria-label="Seleccionar silla">
+            ${dentalChairs.map((chair, index) => `<button class="dc-chair-tab${index === 0 ? ' active' : ''}" type="button" role="tab" data-chair-select="${chair.id}" aria-selected="${index === 0}"><strong>${chair.name}</strong><span>${chair.specialty}</span></button>`).join('')}
+          </div>
         </div>
-      </div>
-      <div id="chairScheduleTimeline" class="dc-chair-timeline" aria-live="polite"></div>
+        <div id="chairScheduleTimeline" class="dc-chair-timeline" aria-live="polite"></div>
+      </section>
     </section>`;
   }
 
@@ -403,15 +406,6 @@
               D
             </button>
 
-            <button
-              class="dc-view-button dc-view-button-wide"
-              type="button"
-              data-agenda-set="chairs"
-              title="Vista por sillas"
-            >
-              Sillas
-            </button>
-
             <div class="dc-view-dropdown">
               <button
                 class="dc-view-button dc-dropdown-toggle"
@@ -436,10 +430,6 @@
 
                 <button type="button" data-agenda-set="day">
                   Por día
-                </button>
-
-                <button type="button" data-agenda-set="chairs">
-                  Por sillas
                 </button>
 
                 <button
@@ -483,6 +473,17 @@
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <circle cx="12" cy="12" r="8.5"></circle>
                 <path d="m8.2 12.2 2.5 2.5 5.4-5.8"></path>
+              </svg>
+            </button>
+
+            <button
+              class="dc-agenda-icon"
+              id="agendaChairMode"
+              type="button"
+              aria-label="Mostrar agenda por sillas"
+              title="Mostrar agenda por sillas">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 4.5h14v5H5zM4 13h4v6.5H4zM10 13h4v6.5h-4zM16 13h4v6.5h-4z"></path>
               </svg>
             </button>
           </div>
@@ -569,7 +570,8 @@
       </div></article><aside class="dc-agenda-rail"><article class="card"><div class="card-head"><div><h2>Profesionales</h2><p>Visibilidad en agenda</p></div></div><label class="dc-doctor"><span class="avatar">SA</span><span><strong>Samantha</strong><small>5 citas hoy</small></span><input type="checkbox" checked></label><label class="dc-doctor"><span class="avatar peach">AS</span><span><strong>Asistente</strong><small>3 apoyos</small></span><input type="checkbox" checked></label><label class="dc-doctor"><span class="avatar sage">RX</span><span><strong>Samantha RX</strong><small>2 estudios</small></span><input type="checkbox" checked></label></article><article class="card"><div class="card-head"><div><h2>Estado de hoy</h2><p>Jueves 17</p></div></div><div class="dc-legend"><span><i class="lilac"></i>Confirmadas <b>6</b></span><span><i class="gold"></i>Por confirmar <b>2</b></span><span><i class="coral"></i>Complejas <b>1</b></span><span><i class="sage"></i>RX / apoyo <b>2</b></span></div><div class="callout warning"><strong>Atención:</strong> una cita requiere 90 minutos y manejo especial.</div></article></aside></section></section>
       <section class="dc-agenda-view dc-day-view" data-agenda-view="day" hidden><article class="card"><div class="card-head"><div><h2 id="agendaDayTitle">Jueves 17 de septiembre</h2><p>Citas ordenadas por hora, duración y complejidad.</p></div>${status('8 citas', 'info')}</div>${appointmentRows(demoAppointments)}</article><aside class="dc-day-summary"><article class="card"><div class="card-head"><div><h2>Resumen del día</h2><p>Estado operativo</p></div></div><div class="dc-legend"><span><i class="lilac"></i>Confirmadas <b>6</b></span><span><i class="gold"></i>Por confirmar <b>2</b></span><span><i class="coral"></i>Complejas <b>1</b></span><span><i class="sage"></i>RX / apoyo <b>2</b></span></div></article><div class="callout warning"><strong>Atención:</strong> una cita requiere 90 minutos y manejo especial.</div></aside></section>
       <section class="dc-agenda-view dc-month-view card" data-agenda-view="month" hidden><div class="dc-month-context"><strong id="agendaMonthHeading">Septiembre 2026</strong><span>Usa ‹ y › para consultar y agendar meses futuros.</span></div><div class="dc-month-head">${['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((day) => `<span>${day}</span>`).join('')}</div><div class="dc-month-grid" id="agendaMonthGrid"></div></section>
-      ${chairScheduleView()}</div>
+      </div>
+      ${chairModeView()}
       <section
   class="dc-agenda-mode-view dc-followup-view"
   data-agenda-mode-view="followups"
@@ -1904,6 +1906,9 @@
     let currentAgendaView =
       localStorage.getItem('ssl-agenda-view') || 'week';
 
+    let currentAgendaMode =
+      localStorage.getItem('ssl-agenda-mode') || 'calendar';
+
     let selectedChair = localStorage.getItem('ssl-agenda-chair') || 'A';
 
     const monthNames = [
@@ -1995,18 +2000,66 @@
       }).join('');
     }
 
-    function renderChairTimeline() {
+    function chairAppointmentsForDate(chairId, dateKey) {
+      if (dateKey === '2026-09-17') {
+        return demoAppointments.filter((item) => item.chair === chairId);
+      }
+
+      return monthAppointmentEvents
+        .filter((item) => item.chair === chairId && item.date === dateKey)
+        .map((item) => ({
+          ...item,
+          minutes: 60,
+          treatment: chairId === 'A' ? 'Camitas' : 'Atención general',
+          state: 'Confirmada'
+        }));
+    }
+
+    function renderChairSchedule() {
       const timeline = document.getElementById('chairScheduleTimeline');
       if (!timeline) return;
 
       const chair = dentalChairs.find((item) => item.id === selectedChair) || dentalChairs[0];
       const dateKey = toDateKey(agendaDate);
-      const appointments = dateKey === '2026-09-17' ? demoAppointments.filter((item) => item.chair === chair.id) : [];
+      const appointments = chairAppointmentsForDate(chair.id, dateKey);
       const slots = Array.from({ length: 20 }, (_, index) => 8 * 60 + index * 30);
       const minutesToTime = (minutes) => `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
 
-      timeline.innerHTML = `<div class="dc-chair-day-summary"><div><span>${chair.name}</span><strong>${chair.specialty}</strong><small>${chair.rule}</small></div><div><strong>${appointments.length} citas</strong><span>${20 - appointments.reduce((total, item) => total + Math.ceil(item.minutes / 30), 0)} espacios de 30 min libres</span></div></div>
-        <div class="dc-chair-hours">${slots.map((slotMinutes) => {
+      const summary = `<div class="dc-chair-day-summary"><div><span>${chair.name}</span><strong>${chair.specialty}</strong><small>${chair.rule}</small></div><div><strong>Vista ${currentAgendaView === 'day' ? 'diaria' : currentAgendaView === 'month' ? 'mensual' : 'semanal'}</strong><span>Usa los controles de fecha para cambiar el periodo</span></div></div>`;
+
+      if (currentAgendaView === 'week') {
+        const monday = getMonday(agendaDate);
+        const days = Array.from({ length: 6 }, (_, index) => {
+          const date = new Date(monday);
+          date.setDate(monday.getDate() + index);
+          return date;
+        });
+
+        timeline.innerHTML = `${summary}<div class="dc-chair-week">${days.map((date) => {
+          const key = toDateKey(date);
+          const items = chairAppointmentsForDate(chair.id, key);
+          return `<article class="dc-chair-week-day"><header><span>${shortDayNames[date.getDay()]}</span><strong>${date.getDate()} ${monthNames[date.getMonth()].slice(0, 3)}</strong><small>${items.length} ${items.length === 1 ? 'cita' : 'citas'}</small></header><div>${items.length ? items.map((item) => `<button type="button" class="dc-chair-week-appointment" data-modal="appointment" data-date="${key}" data-time="${item.time}" data-chair="${chair.id}"><time>${item.time}</time><strong>${item.patient}</strong><span>${item.treatment}</span></button>`).join('') : '<p class="dc-chair-empty">Día disponible</p>'}</div><button class="dc-chair-week-add" type="button" data-modal="appointment" data-date="${key}" data-chair="${chair.id}">＋ Agendar</button></article>`;
+        }).join('')}</div>`;
+        return;
+      }
+
+      if (currentAgendaView === 'month') {
+        const year = agendaDate.getFullYear();
+        const month = agendaDate.getMonth();
+        const first = new Date(year, month, 1);
+        const gridStart = new Date(year, month, 1 - ((first.getDay() + 6) % 7));
+        timeline.innerHTML = `${summary}<div class="dc-chair-month-head">${['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((day) => `<span>${day}</span>`).join('')}</div><div class="dc-chair-month">${Array.from({ length: 42 }, (_, index) => {
+          const date = new Date(gridStart);
+          date.setDate(gridStart.getDate() + index);
+          const key = toDateKey(date);
+          const items = chairAppointmentsForDate(chair.id, key);
+          const muted = date.getMonth() !== month;
+          return `<button class="dc-chair-month-day${muted ? ' muted' : ''}${items.length ? ' reserved' : ''}" type="button" data-modal="appointment" data-date="${key}" data-chair="${chair.id}"><strong>${date.getDate()}</strong>${items.length ? `<span>${items.length} ${items.length === 1 ? 'reserva' : 'reservas'}</span><small>${items.map((item) => item.time).join(' · ')}</small>` : (!muted ? '<span>Disponible</span>' : '')}</button>`;
+        }).join('')}</div>`;
+        return;
+      }
+
+      timeline.innerHTML = `${summary}<div class="dc-chair-day-count"><strong>${appointments.length} citas</strong><span>${20 - appointments.reduce((total, item) => total + Math.ceil(item.minutes / 30), 0)} espacios de 30 min libres</span></div><div class="dc-chair-hours">${slots.map((slotMinutes) => {
           const startingAppointment = appointments.find((item) => {
             const [hours, minutes] = item.time.split(':').map(Number);
             return hours * 60 + minutes === slotMinutes;
@@ -2066,11 +2119,15 @@
 
       if (currentAgendaView === 'day') {
         periodTitle.textContent = formatAgendaDate(agendaDate);
-        periodSubtitle.textContent = 'Agenda del día · 8 citas';
+        periodSubtitle.textContent = currentAgendaMode === 'chairs' ?
+          `Vista diaria · Silla ${selectedChair}` :
+          'Agenda del día · 8 citas';
 
         if (dayTitle) {
           dayTitle.textContent = formatAgendaDate(agendaDate);
         }
+
+        if (currentAgendaMode === 'chairs') renderChairSchedule();
 
         return;
       }
@@ -2080,17 +2137,12 @@
           monthNames[agendaDate.getMonth()]
         )} ${agendaDate.getFullYear()}`;
 
-        periodSubtitle.textContent = 'Vista mensual · 38 citas';
+        periodSubtitle.textContent = currentAgendaMode === 'chairs' ?
+          `Vista mensual · Silla ${selectedChair}` :
+          'Vista mensual · 38 citas';
 
-        renderMonthGrid();
-
-        return;
-      }
-
-      if (currentAgendaView === 'chairs') {
-        periodTitle.textContent = formatAgendaDate(agendaDate);
-        periodSubtitle.textContent = `Disponibilidad · Silla ${selectedChair}`;
-        renderChairTimeline();
+        if (currentAgendaMode === 'chairs') renderChairSchedule();
+        else renderMonthGrid();
 
         return;
       }
@@ -2115,13 +2167,16 @@
           `${saturday.getFullYear()}`;
       }
 
-      periodSubtitle.textContent = 'Semana clínica · 38 citas';
+      periodSubtitle.textContent = currentAgendaMode === 'chairs' ?
+        `Vista semanal · Silla ${selectedChair}` :
+        'Semana clínica · 38 citas';
 
       updateWeeklyHeader();
+      if (currentAgendaMode === 'chairs') renderChairSchedule();
     }
 
     const setAgendaView = (view) => {
-      currentAgendaView = ['week', 'day', 'month', 'chairs'].includes(view) ?
+      currentAgendaView = ['week', 'day', 'month'].includes(view) ?
         view :
         'week';
 
@@ -2167,8 +2222,6 @@
       } else if (currentAgendaView === 'month') {
         agendaDate.setDate(1);
         agendaDate.setMonth(agendaDate.getMonth() + direction);
-      } else if (currentAgendaView === 'chairs') {
-        agendaDate.setDate(agendaDate.getDate() + direction);
       }
 
       updateAgendaPeriod();
@@ -2206,13 +2259,20 @@
       'agendaFollowupMode'
     );
 
+    const agendaChairMode = document.getElementById(
+      'agendaChairMode'
+    );
+
     const agendaToolbar = document.querySelector(
       '.dc-agenda-toolbar'
     );
 
     function setAgendaMode(mode) {
-      const selectedMode =
-        mode === 'followups' ? 'followups' : 'calendar';
+      const selectedMode = ['calendar', 'followups', 'chairs'].includes(mode) ?
+        mode :
+        'calendar';
+
+      currentAgendaMode = selectedMode;
 
       document
         .querySelectorAll('[data-agenda-mode-view]')
@@ -2231,6 +2291,11 @@
         selectedMode === 'followups'
       );
 
+      agendaChairMode?.classList.toggle(
+        'active',
+        selectedMode === 'chairs'
+      );
+
       /*
        * En Seguimientos dejamos visibles los botones de modo,
        * pero ocultamos navegación, buscador y selector S/D.
@@ -2244,6 +2309,8 @@
         'ssl-agenda-mode',
         selectedMode
       );
+
+      updateAgendaPeriod();
     }
 
     agendaCalendarMode?.addEventListener('click', () => {
@@ -2254,7 +2321,11 @@
       setAgendaMode('followups');
     });
 
-    if (agendaCalendarMode && agendaFollowupMode) {
+    agendaChairMode?.addEventListener('click', () => {
+      setAgendaMode('chairs');
+    });
+
+    if (agendaCalendarMode && agendaFollowupMode && agendaChairMode) {
       setAgendaMode(
         localStorage.getItem('ssl-agenda-mode') || 'calendar'
       );
