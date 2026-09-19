@@ -7,6 +7,7 @@ const endpoints = [
     ['GET', '/api/health', 'Estado de API y conexión a MySQL'],
     ['GET', '/api/pacientes', 'Directorio de pacientes'],
     ['POST', '/api/pacientes', 'Crear paciente'],
+    ['GET', '/api/pacientes/:id/foto', 'Descargar foto desde MySQL'],
     ['GET', '/api/pacientes/:id', 'Consultar paciente'],
     ['PATCH', '/api/pacientes/:id', 'Editar paciente'],
     ['PATCH', '/api/pacientes/:id/estado', 'Cambiar estado de paciente']

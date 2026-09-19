@@ -5,7 +5,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const pool = require('./config/database');
-const path = require('path');
+const errorHandler = require('./middleware/error-handler');
 
 const app = express();
 const allowedOrigins = (process.env.FRONTEND_ORIGINS || '')
@@ -13,7 +13,11 @@ const allowedOrigins = (process.env.FRONTEND_ORIGINS || '')
     .map((origin) => origin.trim())
     .filter(Boolean);
 
-app.use(helmet());
+app.use(helmet({
+    // El frontend y la API usan puertos/dominios distintos; permite mostrar
+    // las fotos servidas por el endpoint de pacientes.
+    crossOriginResourcePolicy: { policy: 'cross-origin' }
+}));
 app.use(cors({
     origin(origin, callback) {
         if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
@@ -21,7 +25,6 @@ app.use(cors({
     }
 }));
 app.use(express.json({ limit: '1mb' }));
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 // Muestra cada solicitud atendida y su resultado en la consola.
 app.use((req, res, next) => {
     const inicio = Date.now();
@@ -58,5 +61,7 @@ app.use('/api/pacientes', pacientesRoutes);
 app.use('/api/odontogramas', odontogramasRoutes);
 app.use('/api/periodontogramas', periodontogramasRoutes);
 app.use('/api/archivos', archivosRoutes);
+
+app.use(errorHandler);
 
 module.exports = app;
