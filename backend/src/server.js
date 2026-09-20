@@ -11,7 +11,14 @@ const endpoints = [
     ['GET', '/api/pacientes/:id/foto', 'Descargar foto desde MySQL'],
     ['GET', '/api/pacientes/:id', 'Consultar paciente'],
     ['PATCH', '/api/pacientes/:id', 'Editar paciente'],
-    ['PATCH', '/api/pacientes/:id/estado', 'Cambiar estado de paciente']
+    ['PATCH', '/api/pacientes/:id/estado', 'Cambiar estado de paciente'],
+    ['GET', '/api/pacientes/:id/resumen', 'Cabecera del expediente clínico'],
+    ['GET/PUT', '/api/pacientes/:id/historia-clinica', 'Historia clínica versionada'],
+    ['GET/POST', '/api/pacientes/:id/odontogramas', 'Odontogramas del paciente'],
+    ['GET/POST', '/api/odontogramas/:id/hallazgos', 'Hallazgos por pieza dental'],
+    ['GET/POST', '/api/pacientes/:id/periodontogramas', 'Periodontogramas del paciente'],
+    ['GET', '/api/periodontogramas/:id', 'Detalle y mediciones periodontales'],
+    ['PUT', '/api/periodontogramas/:id/mediciones', 'Guardar mediciones completas']
 ];
 
 async function iniciarServidor() {
@@ -21,7 +28,7 @@ async function iniciarServidor() {
         await asegurarEsquema(pool);
 
         console.log('\n✅ Base de datos MySQL conectada correctamente');
-        console.log('✅ Tabla paciente_fotos disponible');
+        console.log('✅ Esquema de pacientes y expediente clínico disponible');
         console.log(`✅ Entorno: ${process.env.NODE_ENV || 'development'}`);
 
         app.listen(port, '0.0.0.0', () => {
