@@ -78,12 +78,31 @@ async function asegurarEsquema(pool) {
         // anterior. CREATE TABLE IF NOT EXISTS no agrega columnas a esas tablas.
         // Se mantiene nullable para no inventar un diagnóstico en registros legados.
         ['odontograma_hallazgos', 'id_catalogo_hallazgo', 'INT UNSIGNED NULL'],
+        ['odontograma_hallazgos', 'pieza', 'VARCHAR(4) NULL'],
         ['odontograma_hallazgos', 'superficie', 'VARCHAR(30) NULL'],
         ['odontograma_hallazgos', 'estado_visual', "VARCHAR(20) NOT NULL DEFAULT 'MALO'"],
         ['odontograma_hallazgos', 'variante', 'VARCHAR(40) NULL'],
         ['odontograma_hallazgos', 'datos_json', 'JSON NULL'],
         ['odontograma_hallazgos', 'observaciones', 'TEXT NULL'],
-        ['odontograma_hallazgos', 'created_at', 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP']
+        ['odontograma_hallazgos', 'created_at', 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP'],
+        ['pacientes', 'adicional', 'VARCHAR(255) NULL'],
+        ['pacientes', 'grupo', 'VARCHAR(100) NULL'],
+        ['pacientes', 'linea_negocio', 'VARCHAR(100) NULL'],
+        ['citas', 'doctor', 'VARCHAR(160) NULL'],
+        ['citas', 'motivo', "VARCHAR(255) NOT NULL DEFAULT 'Consulta'"],
+        ['citas', 'comentario', 'TEXT NULL'],
+        ['citas', 'fin_at', 'DATETIME NULL'],
+        ['citas', 'created_at', 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP'],
+        ['presupuestos', 'concepto', "VARCHAR(255) NOT NULL DEFAULT 'Tratamiento dental'"],
+        ['presupuestos', 'observaciones', 'TEXT NULL'],
+        ['presupuestos', 'created_at', 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP'],
+        ['tareas_paciente', 'nombre', "VARCHAR(180) NOT NULL DEFAULT 'Seguimiento'"],
+        ['tareas_paciente', 'descripcion', 'TEXT NULL'],
+        ['tareas_paciente', 'responsable', 'VARCHAR(160) NULL'],
+        ['tareas_paciente', 'tipo', "VARCHAR(20) NOT NULL DEFAULT 'MANUAL'"],
+        ['tareas_paciente', 'fecha_envio', 'DATETIME NULL'],
+        ['tareas_paciente', 'plantilla', 'VARCHAR(180) NULL'],
+        ['tareas_paciente', 'created_at', 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP']
     ];
     for (const [table, column, definition] of columns) {
         await asegurarColumna(pool, table, column, definition);

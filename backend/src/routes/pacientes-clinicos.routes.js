@@ -29,6 +29,20 @@ function patientPhotoUrl(req, patientId, updatedAt) {
     return `${req.protocol}://${req.get('host')}/api/pacientes/${patientId}/foto?v=${version}`;
 }
 
+function textValue(value, maxLength = 4000) {
+    const result = String(value ?? '').trim();
+    if (result.length > maxLength) return { error: true, value: null };
+    return { error: false, value: result || null };
+}
+
+async function writeAudit(connection, patientId, action, detail) {
+    await connection.query(
+        `INSERT INTO auditoria (entidad, id_entidad, accion, detalle)
+         VALUES ('pacientes', ?, ?, ?)`,
+        [patientId, action, JSON.stringify(detail)]
+    );
+}
+
 router.get('/etiquetas/catalogo', async (_req, res, next) => {
     try {
         const [items] = await pool.query(
@@ -241,14 +255,18 @@ router.get('/:id/filiacion', async (req, res, next) => {
         const patientId = parsePositiveId(req.params.id);
         if (!patientId) return invalidId(res);
         const [rows] = await pool.query(
-            `SELECT id_paciente AS idPaciente, nombres,
-                    apellido_paterno AS apellidoPaterno,
-                    apellido_materno AS apellidoMaterno,
-                    fecha_nacimiento AS fechaNacimiento, sexo, telefono, correo,
-                    como_nos_conocio AS comoNosConocio,
-                    antecedentes_medicos AS antecedentesMedicos,
-                    notas_alerta AS notasAlerta
-             FROM pacientes WHERE id_paciente = ? LIMIT 1`,
+            `SELECT p.id_paciente AS idPaciente, p.nombres,
+                    p.apellido_paterno AS apellidoPaterno,
+                    p.apellido_materno AS apellidoMaterno,
+                    p.fecha_nacimiento AS fechaNacimiento, p.sexo, p.telefono, p.correo,
+                    p.como_nos_conocio AS comoNosConocio, p.adicional, p.grupo,
+                    p.linea_negocio AS lineaNegocio,
+                    p.antecedentes_medicos AS antecedentesMedicos,
+                    p.notas_alerta AS notasAlerta,
+                    ep.numero_expediente AS numeroExpediente
+             FROM pacientes p
+             LEFT JOIN expedientes_paciente ep ON ep.id_paciente = p.id_paciente
+             WHERE p.id_paciente = ? LIMIT 1`,
             [patientId]
         );
         if (!rows.length) return res.status(404).json({ ok: false, mensaje: 'Paciente no encontrado.' });
@@ -279,13 +297,17 @@ router.patch('/:id/filiacion', async (req, res, next) => {
         const [result] = await connection.query(
             `UPDATE pacientes SET nombres = ?, apellido_paterno = ?, apellido_materno = ?,
                     fecha_nacimiento = ?, sexo = ?, telefono = ?, correo = ?,
-                    como_nos_conocio = ?, antecedentes_medicos = ?, notas_alerta = ?
+                    como_nos_conocio = ?, adicional = ?, grupo = ?, linea_negocio = ?,
+                    antecedentes_medicos = ?, notas_alerta = ?
              WHERE id_paciente = ?`,
             [names, String(req.body.apellidoPaterno || '').trim() || null,
                 String(req.body.apellidoMaterno || '').trim() || null, birthDate, sex,
                 String(req.body.telefono || '').trim() || null,
                 String(req.body.correo || '').trim() || null,
                 String(req.body.comoNosConocio || '').trim() || null,
+                String(req.body.adicional || '').trim() || null,
+                String(req.body.grupo || '').trim() || null,
+                String(req.body.lineaNegocio || '').trim() || null,
                 String(req.body.antecedentesMedicos || '').trim() || null,
                 String(req.body.notasAlerta || '').trim() || null, patientId]
         );
@@ -300,6 +322,210 @@ router.patch('/:id/filiacion', async (req, res, next) => {
         );
         await connection.commit();
         return res.json({ ok: true, mensaje: 'Filiación actualizada.' });
+    } catch (error) {
+        await connection.rollback();
+        next(error);
+    } finally {
+        connection.release();
+    }
+});
+
+router.get('/:id/citas', async (req, res, next) => {
+    try {
+        const patientId = parsePositiveId(req.params.id);
+        if (!patientId) return invalidId(res);
+        if (!(await patientExists(pool, patientId))) {
+            return res.status(404).json({ ok: false, mensaje: 'Paciente no encontrado.' });
+        }
+        const [items] = await pool.query(
+            `SELECT id_cita AS idCita, inicio_at AS inicioAt, fin_at AS finAt,
+                    doctor, motivo, estado, comentario, created_at AS creadoAt
+             FROM citas WHERE id_paciente = ? ORDER BY inicio_at DESC, id_cita DESC`,
+            [patientId]
+        );
+        return res.json({ items });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/citas', async (req, res, next) => {
+    const connection = await pool.getConnection();
+    try {
+        const patientId = parsePositiveId(req.params.id);
+        if (!patientId) return invalidId(res);
+        const startAt = String(req.body.inicioAt || '').trim().replace('T', ' ');
+        const endAt = String(req.body.finAt || '').trim().replace('T', ' ') || null;
+        const doctor = textValue(req.body.doctor, 160);
+        const reason = textValue(req.body.motivo, 255);
+        const comment = textValue(req.body.comentario);
+        const status = String(req.body.estado || 'PROGRAMADA').trim().toUpperCase();
+        if (!startAt || Number.isNaN(Date.parse(startAt))) {
+            return res.status(400).json({ ok: false, mensaje: 'Selecciona una fecha y hora válidas.' });
+        }
+        if (!reason.value || doctor.error || reason.error || comment.error) {
+            return res.status(400).json({ ok: false, mensaje: 'Revisa la longitud de los datos de la cita.' });
+        }
+        const allowedStatuses = ['PROGRAMADA', 'POR_CONFIRMAR', 'CONFIRMADA', 'EN_SALA', 'FINALIZADA', 'CANCELADA', 'NO_ASISTIO'];
+        if (!allowedStatuses.includes(status)) {
+            return res.status(400).json({ ok: false, mensaje: 'El estado de la cita no es válido.' });
+        }
+        await connection.beginTransaction();
+        if (!(await patientExists(connection, patientId))) {
+            await connection.rollback();
+            return res.status(404).json({ ok: false, mensaje: 'Paciente no encontrado.' });
+        }
+        const [result] = await connection.query(
+            `INSERT INTO citas (id_paciente, inicio_at, fin_at, doctor, motivo, estado, comentario)
+             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [patientId, startAt, endAt, doctor.value, reason.value, status, comment.value]
+        );
+        await writeAudit(connection, patientId, 'CREAR_CITA', { idCita: result.insertId });
+        await connection.commit();
+        return res.status(201).json({ ok: true, idCita: result.insertId, mensaje: 'Cita registrada correctamente.' });
+    } catch (error) {
+        await connection.rollback();
+        next(error);
+    } finally {
+        connection.release();
+    }
+});
+
+router.get('/:id/presupuestos', async (req, res, next) => {
+    try {
+        const patientId = parsePositiveId(req.params.id);
+        if (!patientId) return invalidId(res);
+        if (!(await patientExists(pool, patientId))) {
+            return res.status(404).json({ ok: false, mensaje: 'Paciente no encontrado.' });
+        }
+        const [items] = await pool.query(
+            `SELECT id_presupuesto AS idPresupuesto, concepto, total, estado,
+                    observaciones, created_at AS creadoAt
+             FROM presupuestos WHERE id_paciente = ?
+             ORDER BY created_at DESC, id_presupuesto DESC`,
+            [patientId]
+        );
+        return res.json({
+            items: items.map((item) => ({ ...item, total: Number(item.total) }))
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/presupuestos', async (req, res, next) => {
+    const connection = await pool.getConnection();
+    try {
+        const patientId = parsePositiveId(req.params.id);
+        if (!patientId) return invalidId(res);
+        const concept = textValue(req.body.concepto, 255);
+        const observations = textValue(req.body.observaciones);
+        const total = Number(req.body.total);
+        const status = String(req.body.estado || 'BORRADOR').trim().toUpperCase();
+        if (!concept.value || concept.error || observations.error || !Number.isFinite(total) || total < 0) {
+            return res.status(400).json({ ok: false, mensaje: 'Captura un concepto y un total válidos.' });
+        }
+        if (!['BORRADOR', 'ENVIADO', 'APROBADO', 'RECHAZADO', 'PAGADO', 'CANCELADO'].includes(status)) {
+            return res.status(400).json({ ok: false, mensaje: 'El estado del presupuesto no es válido.' });
+        }
+        await connection.beginTransaction();
+        if (!(await patientExists(connection, patientId))) {
+            await connection.rollback();
+            return res.status(404).json({ ok: false, mensaje: 'Paciente no encontrado.' });
+        }
+        const [result] = await connection.query(
+            `INSERT INTO presupuestos (id_paciente, concepto, total, estado, observaciones)
+             VALUES (?, ?, ?, ?, ?)`,
+            [patientId, concept.value, total, status, observations.value]
+        );
+        await writeAudit(connection, patientId, 'CREAR_PRESUPUESTO', { idPresupuesto: result.insertId, total });
+        await connection.commit();
+        return res.status(201).json({ ok: true, idPresupuesto: result.insertId, mensaje: 'Presupuesto creado correctamente.' });
+    } catch (error) {
+        await connection.rollback();
+        next(error);
+    } finally {
+        connection.release();
+    }
+});
+
+router.get('/:id/tareas', async (req, res, next) => {
+    try {
+        const patientId = parsePositiveId(req.params.id);
+        if (!patientId) return invalidId(res);
+        if (!(await patientExists(pool, patientId))) {
+            return res.status(404).json({ ok: false, mensaje: 'Paciente no encontrado.' });
+        }
+        const [items] = await pool.query(
+            `SELECT id_tarea AS idTarea, nombre, descripcion, responsable, tipo,
+                    estado, fecha_envio AS fechaEnvio, plantilla, created_at AS creadoAt
+             FROM tareas_paciente WHERE id_paciente = ?
+             ORDER BY created_at DESC, id_tarea DESC`,
+            [patientId]
+        );
+        return res.json({ items });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/tareas', async (req, res, next) => {
+    const connection = await pool.getConnection();
+    try {
+        const patientId = parsePositiveId(req.params.id);
+        if (!patientId) return invalidId(res);
+        const name = textValue(req.body.nombre, 180);
+        const description = textValue(req.body.descripcion);
+        const responsible = textValue(req.body.responsable, 160);
+        if (!name.value || name.error || description.error || responsible.error) {
+            return res.status(400).json({ ok: false, mensaje: 'El nombre de la tarea es obligatorio.' });
+        }
+        await connection.beginTransaction();
+        if (!(await patientExists(connection, patientId))) {
+            await connection.rollback();
+            return res.status(404).json({ ok: false, mensaje: 'Paciente no encontrado.' });
+        }
+        const [result] = await connection.query(
+            `INSERT INTO tareas_paciente
+                (id_paciente, nombre, descripcion, responsable, tipo, estado)
+             VALUES (?, ?, ?, ?, 'MANUAL', 'PENDIENTE')`,
+            [patientId, name.value, description.value, responsible.value]
+        );
+        await writeAudit(connection, patientId, 'CREAR_TAREA', { idTarea: result.insertId });
+        await connection.commit();
+        return res.status(201).json({ ok: true, idTarea: result.insertId, mensaje: 'Tarea creada correctamente.' });
+    } catch (error) {
+        await connection.rollback();
+        next(error);
+    } finally {
+        connection.release();
+    }
+});
+
+router.patch('/:id/tareas/:tareaId', async (req, res, next) => {
+    const connection = await pool.getConnection();
+    try {
+        const patientId = parsePositiveId(req.params.id);
+        const taskId = parsePositiveId(req.params.tareaId);
+        if (!patientId) return invalidId(res);
+        if (!taskId) return invalidId(res, 'tarea');
+        const status = String(req.body.estado || '').trim().toUpperCase();
+        if (!['PENDIENTE', 'EN_PROCESO', 'COMPLETADA', 'CANCELADA'].includes(status)) {
+            return res.status(400).json({ ok: false, mensaje: 'El estado de la tarea no es válido.' });
+        }
+        await connection.beginTransaction();
+        const [result] = await connection.query(
+            `UPDATE tareas_paciente SET estado = ?
+             WHERE id_tarea = ? AND id_paciente = ?`,
+            [status, taskId, patientId]
+        );
+        if (!result.affectedRows) {
+            await connection.rollback();
+            return res.status(404).json({ ok: false, mensaje: 'Tarea no encontrada.' });
+        }
+        await writeAudit(connection, patientId, 'ACTUALIZAR_TAREA', { idTarea: taskId, estado: status });
+        await connection.commit();
+        return res.json({ ok: true, mensaje: 'Estado de tarea actualizado.' });
     } catch (error) {
         await connection.rollback();
         next(error);

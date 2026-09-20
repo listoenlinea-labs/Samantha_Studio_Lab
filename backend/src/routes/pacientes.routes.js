@@ -68,6 +68,7 @@ router.get('/', async (req, res, next) => {
           TIMESTAMPDIFF(YEAR, p.fecha_nacimiento, CURDATE()) AS edad,
           p.telefono,
           p.correo,
+          p.como_nos_conocio AS comoNosConocio,
           pf.updated_at AS fotoActualizadaAt,
           ep.numero_expediente AS numeroExpediente,
           ep.nota_general AS notaGeneral,
@@ -538,16 +539,6 @@ router.patch('/:id/estado', async (req, res, next) => {
     }
 });
 
-
-router.get('/:id/citas', routePendiente('GET /api/pacientes/:id/citas'));
-router.get('/:id/filiacion', routePendiente('GET /api/pacientes/:id/filiacion'));
-router.patch('/:id/filiacion', routePendiente('PATCH /api/pacientes/:id/filiacion'));
-
-router.get('/:id/presupuestos', routePendiente('GET /api/pacientes/:id/presupuestos'));
-router.post('/:id/presupuestos', routePendiente('POST /api/pacientes/:id/presupuestos'));
-
-router.get('/:id/tareas', routePendiente('GET /api/pacientes/:id/tareas'));
-router.post('/:id/tareas', routePendiente('POST /api/pacientes/:id/tareas'));
 
 router.post('/:id/responsables', routePendiente('POST /api/pacientes/:id/responsables'));
 router.post('/:id/etiquetas', routePendiente('POST /api/pacientes/:id/etiquetas'));
