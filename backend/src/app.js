@@ -57,12 +57,14 @@ const pacientesRoutes = require('./routes/pacientes.routes');
 const odontogramasRoutes = require('./routes/odontogramas.routes');
 const periodontogramasRoutes = require('./routes/periodontogramas.routes');
 const archivosRoutes = require('./routes/archivos.routes');
+const tratamientosRoutes = require('./routes/tratamientos.routes');
 app.use('/api/auth', authRoutes);
 app.use('/api/pacientes', pacientesClinicosRoutes);
 app.use('/api/pacientes', pacientesRoutes);
 app.use('/api/odontogramas', odontogramasRoutes);
 app.use('/api/periodontogramas', periodontogramasRoutes);
 app.use('/api/archivos', archivosRoutes);
+app.use('/api/tratamientos', tratamientosRoutes);
 
 app.use(errorHandler);
 
