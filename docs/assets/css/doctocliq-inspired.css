@@ -60,7 +60,7 @@ body {
   align-self: stretch;
   flex: 1;
   min-width: 0;
-  overflow-x: auto;
+  overflow: visible;
   scrollbar-width: none;
 }
 
@@ -119,6 +119,126 @@ body {
   padding: 2px 5px;
   color: var(--brand-charcoal);
   background: var(--brand-peach);
+}
+
+.nav-group {
+  position: relative;
+  display: flex;
+  align-self: stretch;
+}
+
+.nav-group-trigger {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: max-content;
+  padding: 0 11px;
+  color: rgba(33, 33, 32, .66);
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  transition: .2s ease;
+}
+
+.nav-group-trigger::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  bottom: 0;
+  left: 10px;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: transparent;
+  transform: scaleX(.3);
+  transition: .2s;
+}
+
+.nav-group:hover .nav-group-trigger,
+.nav-group.open .nav-group-trigger,
+.nav-group.active .nav-group-trigger {
+  color: var(--brand-charcoal);
+  background: rgba(255, 255, 255, .38);
+}
+
+.nav-group.active .nav-group-trigger::after {
+  background: var(--brand-gold);
+  transform: scaleX(1);
+}
+
+.nav-chevron {
+  margin-left: 1px;
+  font-size: 12px;
+  transition: transform .2s ease;
+}
+
+.nav-group.open .nav-chevron {
+  transform: rotate(180deg);
+}
+
+.nav-group-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 80;
+  display: none;
+  width: 245px;
+  padding: 8px;
+  border: 1px solid rgba(119, 101, 133, .16);
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 18px 42px rgba(58, 45, 68, .2);
+}
+
+.nav-group.open .nav-group-menu {
+  display: grid;
+  gap: 3px;
+  animation: fade-up .16s ease both;
+}
+
+.app-nav .nav-group-menu a {
+  min-height: 42px;
+  padding: 0 12px;
+  border-radius: 9px;
+  color: var(--brand-charcoal);
+  font-size: 12px;
+}
+
+.app-nav .nav-group-menu a::after {
+  display: none;
+}
+
+.app-nav .nav-group-menu a:hover,
+.app-nav .nav-group-menu a.active {
+  background: var(--dc-teal-soft);
+}
+
+.treatment-connection {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.treatment-connection.success {
+  border-color: rgba(88, 187, 139, .35);
+  background: rgba(88, 187, 139, .09);
+}
+
+.treatment-connection.error {
+  border-color: rgba(218, 100, 91, .35);
+  background: rgba(218, 100, 91, .09);
+}
+
+.treatment-empty {
+  padding: 36px 18px !important;
+  color: rgba(33, 33, 32, .64);
+  text-align: center;
+}
+
+.treatment-form .wide {
+  grid-column: 1 / -1;
 }
 
 .dc-header-tools {
@@ -716,6 +836,10 @@ tbody tr:hover {
     display: none
   }
 
+  .nav-group-trigger>span:not(.nav-icon):not(.nav-chevron) {
+    display: none
+  }
+
   .app-nav a .nav-icon {
     font-size: 15px
   }
@@ -776,6 +900,71 @@ tbody tr:hover {
     transform: translateX(-104%);
     transition: .25s ease;
     box-shadow: 18px 0 40px rgba(15, 35, 44, .26)
+  }
+
+  .nav-group {
+    display: block;
+  }
+
+  .nav-group-trigger {
+    width: 100%;
+    min-height: 45px;
+    border-radius: 8px;
+    padding: 0 13px;
+    color: rgba(255, 255, 255, .78);
+    font-size: 13px;
+  }
+
+  .nav-group-trigger>span:not(.nav-icon):not(.nav-chevron) {
+    display: inline;
+  }
+
+  .nav-group-trigger .nav-chevron {
+    margin-left: auto;
+  }
+
+  .nav-group-trigger::after {
+    top: 8px;
+    right: auto;
+    bottom: 8px;
+    left: 0;
+    width: 3px;
+    height: auto;
+    transform: scaleY(.3);
+  }
+
+  .nav-group.active .nav-group-trigger::after {
+    transform: scaleY(1);
+  }
+
+  .nav-group:hover .nav-group-trigger,
+  .nav-group.open .nav-group-trigger,
+  .nav-group.active .nav-group-trigger {
+    color: #fff;
+    background: rgba(255, 255, 255, .1);
+  }
+
+  .nav-group-menu {
+    position: static;
+    width: auto;
+    margin: 3px 0 8px 12px;
+    padding: 4px;
+    border: 0;
+    border-left: 1px solid rgba(255, 255, 255, .18);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .app-nav .nav-group-menu a {
+    min-height: 40px;
+    color: rgba(255, 255, 255, .78);
+  }
+
+  .app-nav .nav-group-menu a:hover,
+  .app-nav .nav-group-menu a.active {
+    color: #fff;
+    background: rgba(255, 255, 255, .1);
   }
 
   .app-nav a {

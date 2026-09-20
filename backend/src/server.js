@@ -7,6 +7,9 @@ const port = Number(process.env.PORT || 3000);
 const endpoints = [
     ['GET', '/api/health', 'Estado de API y conexión a MySQL'],
     ['GET', '/api/pacientes', 'Directorio de pacientes'],
+    ['GET', '/api/tratamientos', 'Catálogo real de tratamientos'],
+    ['POST', '/api/tratamientos', 'Crear tratamiento'],
+    ['PATCH', '/api/tratamientos/:id', 'Editar tratamiento'],
     ['POST', '/api/pacientes', 'Crear paciente'],
     ['GET', '/api/pacientes/:id/foto', 'Descargar foto desde MySQL'],
     ['GET', '/api/pacientes/:id', 'Consultar paciente'],

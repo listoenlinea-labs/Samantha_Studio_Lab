@@ -221,9 +221,46 @@
   }
 
   function navigation(role) {
-    return nav.filter((item) => item.id && item.permissions.includes(role)).map((item) =>
-      `<a href="${item.href}" class="${page === item.id ? 'active' : ''}" data-module="${item.id}"><span class="nav-icon">${item.icon}</span><span>${item.label}</span>${item.badge ? `<span class="nav-badge">${item.badge}</span>` : ''}</a>`
-    ).join('');
+    const allowedItems = nav.filter((item) => item.id && item.permissions.includes(role));
+    const directIds = ['dashboard', 'agenda', 'pacientes'];
+    const groups = [{
+      id: 'clinica',
+      label: 'Clínica',
+      icon: '✦',
+      items: ['operacion', 'tratamientos', 'seguimientos', 'radiografias']
+    }, {
+      id: 'administracion',
+      label: 'Administración',
+      icon: '▦',
+      items: ['finanzas', 'reportes', 'configuracion']
+    }];
+    const link = (item, child = false) =>
+      `<a href="${item.href}" class="${page === item.id ? 'active' : ''}${child ? ' nav-child' : ''}" data-module="${item.id}"><span class="nav-icon">${item.icon}</span><span>${item.label}</span>${item.badge ? `<span class="nav-badge">${item.badge}</span>` : ''}</a>`;
+    const directLinks = directIds
+      .map((id) => allowedItems.find((item) => item.id === id))
+      .filter(Boolean)
+      .map((item) => link(item))
+      .join('');
+    const groupedLinks = groups.map((group) => {
+      const items = group.items
+        .map((id) => allowedItems.find((item) => item.id === id))
+        .filter(Boolean);
+
+      if (!items.length) return '';
+
+      const isActive = items.some((item) => item.id === page);
+      return `<div class="nav-group${isActive ? ' active' : ''}">
+        <button class="nav-group-trigger" type="button" aria-expanded="false">
+          <span class="nav-icon">${group.icon}</span><span>${group.label}</span><span class="nav-chevron">⌄</span>
+        </button>
+        <div class="nav-group-menu" role="menu" aria-label="${group.label}">
+          ${items.map((item) => link(item, true)).join('')}
+        </div>
+      </div>`;
+    }).join('');
+
+    const inventory = allowedItems.find((item) => item.id === 'inventario');
+    return `${directLinks}${groupedLinks}${inventory ? link(inventory) : ''}`;
   }
 
   function shell(content) {
@@ -1073,22 +1110,19 @@
   }
 
   function renderTreatments() {
-    const treatmentRows = (seed.treatments || []).map((t) => {
-      const price = matchPrice(t.name);
-      return `<tr data-search-row><td><span class="table-title">${esc(t.name)}</span><span class="table-sub">${esc(t.category)}</span></td><td>${t.hours || 'Por definir'} h</td><td>${money.format(t.materialCost || 0)}</td><td>${price ? money.format(price) : 'Pendiente'}</td><td>${price ? status('Precio importado', 'success') : status('Costear', 'warning')}</td><td><button class="button soft" data-toast="Tratamiento seleccionado para editar materiales y tiempo.">Editar</button></td></tr>`;
-    }).join('');
     shell(
-      hero('52 tratamientos homologados', 'Catálogo clínico y precio en el mismo lugar.', 'El costo combina tiempo de consultorio, materiales por uso y margen deseado; el precio sugerido se recalcula sin perder el precio vigente.', `${button('＋ Nuevo tratamiento', 'primary', 'data-toast="Formulario de tratamiento listo para conectarse al backend."')}${button('Ver materiales', 'secondary', 'data-scroll="calculator"')}`) +
-      `<section class="grid layout" id="calculator"><article class="card"><div class="card-head"><div><h2>Calculador de precio</h2><p>Misma lógica de SSL_Calculadora_Precios_2026.</p></div>${status('Fórmula activa', 'success')}</div><div class="form-grid">
-        <div class="field"><label>Tratamiento</label><select class="select" id="calcTreatment">${(seed.treatments || []).map((t) => `<option>${esc(t.name)}</option>`).join('')}</select></div>
+      hero('<span id="treatmentHeroCount">Catálogo conectado</span>', 'Catálogo clínico y precio en el mismo lugar.', 'Los tratamientos se consultan directamente desde catalogo_tratamientos; tiempo, costos, precio y estado reflejan la base de datos.', `${button('＋ Nuevo tratamiento', 'primary', 'id="newTreatmentButton"')}${button('Ver calculador', 'secondary', 'data-scroll="calculator"')}`) +
+      `<div class="callout treatment-connection" id="treatmentConnection" role="status"><strong>Conectando con MySQL…</strong><span> Consultando el catálogo de tratamientos.</span></div>
+      <section class="grid layout" id="calculator"><article class="card"><div class="card-head"><div><h2>Calculador de precio</h2><p>Usa los valores reales guardados para cada tratamiento.</p></div>${status('Fórmula activa', 'success')}</div><div class="form-grid">
+        <div class="field"><label>Tratamiento</label><select class="select" id="calcTreatment"><option value="">Cargando catálogo…</option></select></div>
         <div class="field"><label>Tiempo de sillón (horas)</label><input class="input" id="calcHours" type="number" min="0" step="0.25" value="1"></div>
         <div class="field"><label>Costo por hora de consultorio</label><input class="input" id="calcHourly" type="number" min="0" step="10" value="450"></div>
         <div class="field"><label>Margen deseado</label><input class="input" id="calcMargin" type="number" min="1" max="90" value="30"></div>
-        <div class="field"><label>Otros materiales</label><input class="input" id="calcMaterials" type="number" min="0" step=".01" value="80"></div>
-        <div class="field"><label>Usos de consumible demo</label><input class="input" id="calcPlaque" type="number" min="0" step="1" value="1"></div>
-      </div><div class="grid three" style="margin-top:16px"><div class="callout"><strong id="calcCost">$531.75</strong><br>Costo total</div><div class="callout"><strong id="calcSuggested">$759.64</strong><br>Precio mínimo sugerido</div><div class="callout"><strong>$1.75</strong><br>Costo ficticio del consumible demo</div></div></article>
+        <div class="field"><label>Costo de materiales</label><input class="input" id="calcMaterials" type="number" min="0" step=".01" value="0"></div>
+        <div class="field"><label>Otros consumibles</label><input class="input" id="calcPlaque" type="number" min="0" step=".01" value="0"></div>
+      </div><div class="grid three" style="margin-top:16px"><div class="callout"><strong id="calcCost">$0</strong><br>Costo total</div><div class="callout"><strong id="calcSuggested">$0</strong><br>Precio mínimo sugerido</div><div class="callout"><strong id="currentTreatmentPrice">$0</strong><br>Precio de venta actual</div></div></article>
       <aside class="card"><div class="card-head"><div><h2>Regla de cálculo</h2><p>Evita precios por debajo del costo.</p></div></div><div class="list"><div class="list-item"><span class="list-icon">1</span><span class="list-copy"><strong>Costo de consultorio</strong><span>Horas × costo por hora</span></span></div><div class="list-item"><span class="list-icon">2</span><span class="list-copy"><strong>Costo de materiales</strong><span>Costo unitario × cantidad usada</span></span></div><div class="list-item"><span class="list-icon">3</span><span class="list-copy"><strong>Precio sugerido</strong><span>Costo total ÷ (1 − margen)</span></span></div></div><div class="callout warning" style="margin-top:14px"><strong>Dato pendiente:</strong> los tiempos y consumos faltantes del Excel permanecen como “Por definir”; no se inventan valores clínicos.</div></aside></section>
-      <article class="card" style="margin-top:16px"><div class="card-head"><div><h2>Catálogo completo</h2><p>Odontología, ortopedia, ortodoncia, cirugía, estética, diagnóstico y general.</p></div><span>${seed.treatments?.length || 0} registros</span></div><div class="toolbar"><input class="input search" id="treatmentSearch" placeholder="Buscar tratamiento o categoría"></div><div class="table-wrap" style="max-height:620px"><table><thead><tr><th>Tratamiento</th><th>Tiempo</th><th>Materiales</th><th>Precio base</th><th>Estado</th><th></th></tr></thead><tbody id="treatmentTable">${treatmentRows}</tbody></table></div></article>`
+      <article class="card" style="margin-top:16px"><div class="card-head"><div><h2>Catálogo completo</h2><p>Información vigente de la tabla catalogo_tratamientos.</p></div><span id="treatmentCount">0 registros</span></div><div class="toolbar"><input class="input search" id="treatmentSearch" placeholder="Buscar tratamiento o categoría"><select class="select" id="treatmentStatusFilter" style="width:auto"><option value="">Todos</option><option value="active">Activos</option><option value="inactive">Inactivos</option></select></div><div class="table-wrap" style="max-height:620px"><table><thead><tr><th>Tratamiento</th><th>Tiempo</th><th>Sesiones</th><th>Costo calculado</th><th>Precio de venta</th><th>Estado</th><th></th></tr></thead><tbody id="treatmentTable"><tr><td colspan="7" class="treatment-empty">Cargando tratamientos reales…</td></tr></tbody></table></div></article>`
     );
   }
 
@@ -1677,6 +1711,26 @@
     const closeMenu = () => body.classList.remove('nav-open');
     menu?.addEventListener('click', () => body.classList.toggle('nav-open'));
     document.getElementById('sidebarScrim')?.addEventListener('click', closeMenu);
+    document.querySelectorAll('.nav-group-trigger').forEach((trigger) => {
+      trigger.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const group = trigger.closest('.nav-group');
+        const willOpen = !group.classList.contains('open');
+        document.querySelectorAll('.nav-group.open').forEach((item) => {
+          item.classList.remove('open');
+          item.querySelector('.nav-group-trigger')?.setAttribute('aria-expanded', 'false');
+        });
+        group.classList.toggle('open', willOpen);
+        trigger.setAttribute('aria-expanded', String(willOpen));
+      });
+    });
+    document.addEventListener('click', (event) => {
+      if (event.target.closest('.nav-group')) return;
+      document.querySelectorAll('.nav-group.open').forEach((group) => {
+        group.classList.remove('open');
+        group.querySelector('.nav-group-trigger')?.setAttribute('aria-expanded', 'false');
+      });
+    });
     document.getElementById('activeRole')?.addEventListener('change', (event) => {
       localStorage.setItem('ssl-active-role', event.target.value);
       window.location.href = 'index.html';
@@ -1870,7 +1924,7 @@
       const hourly = Number(document.getElementById('calcHourly')?.value || 0);
       const margin = Math.min(90, Number(document.getElementById('calcMargin')?.value || 0)) / 100;
       const materials = Number(document.getElementById('calcMaterials')?.value || 0);
-      const consumable = Number(document.getElementById('calcPlaque')?.value || 0) * 1.75;
+      const consumable = Number(document.getElementById('calcPlaque')?.value || 0);
       const cost = hours * hourly + materials + consumable;
       const suggested = margin < 1 ? cost / (1 - margin) : cost;
       if (document.getElementById('calcCost')) document.getElementById('calcCost').textContent = money.format(cost);
