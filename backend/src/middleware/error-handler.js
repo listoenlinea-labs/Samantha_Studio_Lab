@@ -18,7 +18,7 @@ function errorHandler(error, _req, res, _next) {
     if (error.code === 'ER_NO_SUCH_TABLE') {
         return res.status(503).json({
             ok: false,
-            mensaje: 'Falta preparar la tabla de fotos. Reinicia la API y revisa los permisos de MySQL.'
+            mensaje: 'Falta preparar una tabla de la API. Ejecuta las migraciones pendientes, reinicia la API y revisa los permisos de MySQL.'
         });
     }
 
