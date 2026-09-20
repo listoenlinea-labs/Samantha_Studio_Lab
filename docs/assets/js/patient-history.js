@@ -22,6 +22,7 @@
     odontograms: [],
     odontogram: null,
     findings: [],
+    findingCatalog: [],
     stage: 'initial',
     dentition: 'ADULTO',
     nomenclature: 'FDI',
@@ -56,6 +57,24 @@
   function avatar(patient) {
     if (patient.fotoUrl) return `<img src="${escapeHtml(patient.fotoUrl)}" alt="Foto de ${escapeHtml(patient.nombreCompleto)}">`;
     return `<span class="ph-profile-initials" aria-hidden="true">${initials(patient.nombreCompleto)}</span>`;
+  }
+
+  const symbolText = {
+    sano: 'S', ausente: '×', superficie: 'Click', extraccion: '×', endodoncia: '⌟',
+    corona: '○', fractura: '╱', 'lesion-cervical': '⌒', 'defecto-esmalte': '●',
+    impactacion: 'Click', implante: '▥', linea: '━', gingivitis: 'G⌒', erupcion: 'ϟ',
+    fisura: '╱', remanente: 'RR', periodontitis: 'P⌒', 'perno-fibra': '▴',
+    frenillo: '∪∪', ffp: 'FFP', 'aparato-fijo': '⊞—⊞', fusion: '⚭',
+    'aparato-removible': '⌃', geminacion: '○', bolsa: 'B⌒', gingivectomia: 'Gingiv',
+    carilla: '▪', carillas: '▪▪', giroversion: '↷', furca: '∿', diastema: ')(',
+    'perno-metalico': '▥', 'flecha-arriba': '⬆', ectopica: 'Click', clavija: '△',
+    'flecha-abajo': '⬇', puente: 'Π', pulpectomia: '⌟', pulpotomia: '▣',
+    sellante: '✚', conducto: '│', caries: '●', restauracion: '◆'
+  };
+
+  function findingGlyph(icon, visualState, compact = false) {
+    const stateClass = String(visualState || 'NEUTRO').toLowerCase();
+    return `<span class="ph-symbol ${stateClass} icon-${escapeHtml(icon || 'punto')} ${compact ? 'compact' : ''}" aria-hidden="true">${escapeHtml(symbolText[icon] || '●')}</span>`;
   }
 
   function notify(message, error = false) {
@@ -102,10 +121,11 @@
   }
 
   function toothButton(id, arch) {
-    const finding = state.findings.find((item) => String(item.pieza) === String(id));
-    const condition = finding ? (finding.clasificacion === 'BUENO' ? 'good' : 'bad') : '';
+    const toothFindings = state.findings.filter((item) => String(item.pieza) === String(id));
+    const finding = toothFindings[toothFindings.length - 1];
+    const condition = finding ? (finding.estadoVisual === 'BUENO' ? 'good' : finding.estadoVisual === 'MALO' ? 'bad' : 'neutral') : '';
     return `<button class="ph-tooth ${toothType(id)} ${condition}" data-tooth="${id}" aria-label="Diente ${id}">
-      <span>${id}</span>${toothArtwork(id, arch)}</button>`;
+      <span>${id}</span>${toothArtwork(id, arch)}${finding ? `<i class="ph-tooth-marker">${findingGlyph(finding.icono, finding.estadoVisual, true)}${toothFindings.length > 1 ? `<em>${toothFindings.length}</em>` : ''}</i>` : ''}</button>`;
   }
 
   function toothRow(ids, arch, primary = false) {
@@ -133,18 +153,68 @@
       <main class="ph-layout">
         <aside class="ph-sidebar"><section class="ph-profile"><div class="ph-profile-cover"></div>${avatar(patient)}<h1>${escapeHtml(patient.nombreCompleto)}</h1><p>${patient.edad ?? 'Edad no registrada'}${patient.edad !== null ? ' años' : ''}</p><small>Creado el ${formatDate(patient.creadoAt)}</small><div class="ph-contact"><a href="${patient.telefono ? `tel:${escapeHtml(patient.telefono)}` : '#'}">☎</a><a href="${patient.correo ? `mailto:${escapeHtml(patient.correo)}` : '#'}">✉</a><button id="phMoreButton">⋮</button></div><div class="ph-more-menu" id="phMoreMenu" hidden><a href="pacientes.html">Editar datos y foto</a><button data-notify="La descarga del expediente se habilitará en Archivos">Descargar expediente</button></div></section>
           <nav class="ph-record-nav">${navigation.map(([id,label]) => `<button class="${id === 'odontogram' ? 'active' : ''}" data-record-view="${id}"><i>${icons[id]}</i>${label}</button>`).join('')}</nav></aside>
-        <section class="ph-workspace"><div class="ph-info-strip"><article><b>▮ Etiquetas</b><span>${escapeHtml(tags)}</span></article><article><b>▰ Nota general</b><span>${escapeHtml(patient.notaGeneral || 'Sin notas')}</span></article><article><b>● Alergias</b><span>${escapeHtml(patient.alergias || 'Sin alergias registradas')}</span></article></div><div id="phView"></div></section>
+        <section class="ph-workspace"><div class="ph-info-strip"><article><b>▮ Etiquetas</b><button data-summary-edit="tags">＋ Editar</button><span>${escapeHtml(tags)}</span></article><article><b>▰ Nota general</b><button data-summary-edit="note">Editar</button><span>${escapeHtml(patient.notaGeneral || 'Sin notas')}</span></article><article><b>● Alergias</b><button data-summary-edit="allergies">Editar</button><span>${escapeHtml(patient.alergias || 'Sin alergias registradas')}</span></article></div><div id="phView"></div></section>
         <aside class="ph-clinical-rail"><section><h3>Expediente</h3><div class="ph-illustration">◔</div><strong>${escapeHtml(patient.numeroExpediente || '—')}</strong></section><section><div class="ph-rail-title"><h3>Notas de evolución</h3></div><div class="ph-illustration note">▤</div><button data-record-view-shortcut="history">＋ Registrar evolución</button></section></aside>
-      </main><div class="ph-toast" id="phToast" role="status"></div>`;
+      </main><div class="ph-modal-backdrop" id="phModal" hidden></div><div class="ph-toast" id="phToast" role="status"></div>`;
     document.querySelector('.ph-record-nav').addEventListener('click', onNavigation);
     document.getElementById('phMoreButton').addEventListener('click', () => {
       const menu = document.getElementById('phMoreMenu'); menu.hidden = !menu.hidden;
     });
     document.querySelector('[data-record-view-shortcut="history"]').addEventListener('click', () => activateView('history'));
+    document.querySelectorAll('[data-summary-edit]').forEach((button) => button.addEventListener('click', () => openSummaryEditor(button.dataset.summaryEdit)));
     document.addEventListener('click', (event) => {
       const trigger = event.target.closest('[data-notify]');
       if (trigger) notify(trigger.dataset.notify);
     });
+  }
+
+  async function refreshPatientSummary() {
+    state.patient = await api(`/pacientes/${patientId}/resumen`);
+    const active = document.querySelector('[data-record-view].active')?.dataset.recordView || 'odontogram';
+    shell();
+    await activateView(active);
+  }
+
+  function closeModal() {
+    const modal = document.getElementById('phModal');
+    modal.hidden = true;
+    modal.innerHTML = '';
+  }
+
+  async function openSummaryEditor(type) {
+    const modal = document.getElementById('phModal');
+    modal.hidden = false;
+    if (type === 'tags') {
+      try {
+        const data = await api('/pacientes/etiquetas/catalogo');
+        const assigned = new Set((state.patient.etiquetas || []).map((tag) => Number(tag.idEtiqueta)));
+        modal.innerHTML = `<section class="ph-modal-card"><header><h2>Etiquetas del paciente</h2><button data-close-modal>×</button></header><div class="ph-tag-editor">${data.items.map((tag) => `<label style="--tag-bg:${escapeHtml(tag.colorFondo || '#e5f6f2')};--tag-color:${escapeHtml(tag.colorTexto || '#187862')}"><input type="checkbox" value="${tag.idEtiqueta}" ${assigned.has(Number(tag.idEtiqueta)) ? 'checked' : ''}>${escapeHtml(tag.nombre)}</label>`).join('') || '<p>No hay etiquetas activas en el catálogo.</p>'}</div><footer><button data-close-modal>Cancelar</button><button class="ph-primary" id="saveTags">Guardar etiquetas</button></footer></section>`;
+        modal.querySelector('#saveTags').onclick = async () => {
+          try {
+            const selected = new Set([...modal.querySelectorAll('input:checked')].map((input) => Number(input.value)));
+            await Promise.all([
+              ...[...selected].filter((id) => !assigned.has(id)).map((id) => api(`/pacientes/${patientId}/etiquetas`, { method: 'POST', body: JSON.stringify({ idEtiqueta: id }) })),
+              ...[...assigned].filter((id) => !selected.has(id)).map((id) => api(`/pacientes/${patientId}/etiquetas/${id}`, { method: 'DELETE' }))
+            ]);
+            closeModal(); notify('Etiquetas guardadas.'); await refreshPatientSummary();
+          } catch (error) { notify(error.message, true); }
+        };
+      } catch (error) { modal.innerHTML = `<section class="ph-modal-card"><p>${escapeHtml(error.message)}</p><button data-close-modal>Cerrar</button></section>`; }
+    } else {
+      const isNote = type === 'note';
+      const value = isNote ? state.patient.notaGeneral : state.patient.alergias;
+      modal.innerHTML = `<form class="ph-modal-card" id="summaryForm"><header><h2>${isNote ? 'Nota general' : 'Alergias'}</h2><button type="button" data-close-modal>×</button></header><label>${isNote ? 'Información visible en el expediente' : 'Alergias y reacciones importantes'}<textarea name="value" rows="6" maxlength="4000">${escapeHtml(value || '')}</textarea></label><footer><button type="button" data-close-modal>Cancelar</button><button class="ph-primary">Guardar</button></footer></form>`;
+      modal.querySelector('form').onsubmit = async (event) => {
+        event.preventDefault();
+        try {
+          const payload = { [isNote ? 'notaGeneral' : 'alergias']: new FormData(event.currentTarget).get('value') };
+          await api(`/pacientes/${patientId}/resumen`, { method: 'PATCH', body: JSON.stringify(payload) });
+          closeModal(); notify('Información clínica guardada.'); await refreshPatientSummary();
+        } catch (error) { notify(error.message, true); }
+      };
+    }
+    modal.querySelectorAll('[data-close-modal]').forEach((button) => button.onclick = closeModal);
+    modal.onclick = (event) => { if (event.target === modal) closeModal(); };
   }
 
   function onNavigation(event) {
@@ -154,10 +224,30 @@
 
   function activateView(id) {
     document.querySelectorAll('[data-record-view]').forEach((button) => button.classList.toggle('active', button.dataset.recordView === id));
+    if (id === 'filiation') return renderFiliation();
     if (id === 'history') return renderHistory();
     if (id === 'odontogram') return loadOdontograms();
     if (id === 'perio') return loadPeriodontogram();
     renderGeneric(id);
+  }
+
+  async function renderFiliation() {
+    const view = document.getElementById('phView');
+    view.innerHTML = '<section class="ph-card ph-loading">Cargando filiación…</section>';
+    try {
+      const data = await api(`/pacientes/${patientId}/filiacion`);
+      const input = (name, label, type = 'text') => `<label>${label}<input type="${type}" name="${name}" value="${escapeHtml(data[name] || '')}"></label>`;
+      view.innerHTML = `<section class="ph-card ph-history"><header><div><h2>Filiación</h2><p>Datos personales y de contacto del paciente.</p></div><button class="ph-primary" id="saveFiliation">Guardar cambios</button></header><form id="filiationForm" class="ph-history-form">${input('nombres','Nombre(s)')}${input('apellidoPaterno','Apellido paterno')}${input('apellidoMaterno','Apellido materno')}${input('fechaNacimiento','Fecha de nacimiento','date')}<label>Sexo<select name="sexo"><option value="">No especificado</option>${['F','M','X','NO_ESPECIFICA'].map((value) => `<option ${data.sexo === value ? 'selected' : ''}>${value}</option>`).join('')}</select></label>${input('telefono','Teléfono','tel')}${input('correo','Correo','email')}${input('comoNosConocio','¿Cómo nos conoció?')}<label>Antecedentes médicos<textarea name="antecedentesMedicos" rows="4">${escapeHtml(data.antecedentesMedicos || '')}</textarea></label><label>Notas de alerta<textarea name="notasAlerta" rows="4">${escapeHtml(data.notasAlerta || '')}</textarea></label></form></section>`;
+      document.getElementById('saveFiliation').onclick = async () => {
+        try {
+          const payload = Object.fromEntries(new FormData(document.getElementById('filiationForm')));
+          await api(`/pacientes/${patientId}/filiacion`, { method: 'PATCH', body: JSON.stringify(payload) });
+          notify('Filiación guardada.'); await refreshPatientSummary();
+        } catch (error) { notify(error.message, true); }
+      };
+    } catch (error) {
+      view.innerHTML = `<section class="ph-card ph-error"><h2>No se pudo cargar la filiación</h2><p>${escapeHtml(error.message)}</p></section>`;
+    }
   }
 
   async function renderHistory() {
@@ -199,7 +289,7 @@
   }
 
   function odontogramControls() {
-    return `<div class="ph-odo-controls"><label>Tipo<select id="dentitionType"><option value="ADULTO" ${state.dentition === 'ADULTO' ? 'selected' : ''}>Adulto</option><option value="MIXTO" ${state.dentition === 'MIXTO' ? 'selected' : ''}>Mixto</option><option value="NINO" ${state.dentition === 'NINO' ? 'selected' : ''}>Niño</option></select></label><label>Nomenclatura<select id="nomenclature"><option value="FDI">Internacional (FDI)</option><option value="ADA">ADA</option></select></label><label class="ph-multi"><input id="multiSelect" type="checkbox"> Marcado múltiple</label></div>`;
+    return `<div class="ph-odo-controls"><label>Tipo<select id="dentitionType" ${state.odontogram?.estado === 'FINALIZADO' ? 'disabled' : ''}><option value="ADULTO" ${state.dentition === 'ADULTO' ? 'selected' : ''}>Adulto</option><option value="MIXTO" ${state.dentition === 'MIXTO' ? 'selected' : ''}>Mixto</option><option value="NINO" ${state.dentition === 'NINO' ? 'selected' : ''}>Niño</option></select></label><label>Nomenclatura<select id="nomenclature" ${state.odontogram?.estado === 'FINALIZADO' ? 'disabled' : ''}><option value="FDI" ${state.nomenclature === 'FDI' ? 'selected' : ''}>Internacional (FDI)</option><option value="ADA" ${state.nomenclature === 'ADA' ? 'selected' : ''}>ADA</option></select></label><label class="ph-multi"><input id="multiSelect" type="checkbox" ${state.odontogram?.estado === 'FINALIZADO' ? 'disabled' : ''}> Marcado múltiple</label></div>`;
   }
 
   async function loadOdontograms() {
@@ -223,24 +313,54 @@
 
   function renderOdontogram() {
     const view = document.getElementById('phView');
-    view.innerHTML = `<section class="ph-card ph-odontogram"><header class="ph-card-tabs"><div>${Object.entries(stages).map(([id, value]) => `<button class="${state.stage === id ? 'active' : ''}" data-odo-stage="${id}">${value === 'EVOLUCION' ? 'Odo. evolución' : value === 'ALTA' ? 'Odo. alta' : 'Odo. inicial'}</button>`).join('')}</div><div class="ph-state-key"><span class="bad">● Mal estado</span><span class="good">● Buen estado</span><button id="newOdontogram">${state.odontogram ? 'Nueva versión' : 'Crear odontograma'}</button></div></header>${odontogramControls()}${state.odontogram ? `<p class="ph-record-status">${escapeHtml(state.odontogram.estado)} · ${formatDate(state.odontogram.creadoAt)}</p>` : '<p class="ph-empty-notice">Aún no existe un odontograma para esta fase. Selecciona el tipo y créalo.</p>'}<div class="ph-teeth-chart">${dentitionChart()}</div><section class="ph-treatment-plan"><h2>Hallazgos</h2><div class="ph-plan-table"><b>N.º diente</b><b>Hallazgo</b><b>Superficie</b><b>Nota</b>${state.findings.length ? state.findings.map((item) => `<div class="ph-plan-row"><span>${escapeHtml(item.pieza)}</span><span>${escapeHtml(item.nombre)}</span><span>${escapeHtml(item.superficie || '—')}</span><span>${escapeHtml(item.observaciones || '—')}</span></div>`).join('') : '<div id="phPlanEmpty">Selecciona un diente para registrar un hallazgo.</div>'}</div></section></section><div class="ph-finding-popover" id="phFindingPopover" hidden></div>`;
+    view.innerHTML = `<section class="ph-card ph-odontogram"><header class="ph-card-tabs"><div>${Object.entries(stages).map(([id, value]) => `<button class="${state.stage === id ? 'active' : ''}" data-odo-stage="${id}">${value === 'EVOLUCION' ? 'Odo. evolución' : value === 'ALTA' ? 'Odo. alta' : 'Odo. inicial'}</button>`).join('')}</div><div class="ph-state-key"><span class="bad">● Mal estado</span><span class="good">● Buen estado</span><button id="newOdontogram">${state.odontogram ? 'Nueva versión' : 'Crear odontograma'}</button>${state.odontogram && state.odontogram.estado !== 'FINALIZADO' ? '<button id="finalizeOdontogram" class="ph-finalize">Finalizar</button>' : ''}</div></header>${odontogramControls()}${state.odontogram ? `<div class="ph-record-status"><span>${escapeHtml(state.odontogram.estado)} · ${formatDate(state.odontogram.creadoAt)}</span><input id="odontogramNotes" maxlength="4000" placeholder="Observaciones del odontograma" value="${escapeHtml(state.odontogram.observaciones || '')}" ${state.odontogram.estado === 'FINALIZADO' ? 'disabled' : ''}></div>` : '<p class="ph-empty-notice">Aún no existe un odontograma para esta fase. Selecciona el tipo y créalo.</p>'}<div class="ph-teeth-chart">${dentitionChart()}</div><section class="ph-treatment-plan"><h2>Hallazgos</h2><div class="ph-plan-table"><b>N.º diente</b><b>Hallazgo</b><b>Superficie</b><b>Estado</b><b></b>${state.findings.length ? state.findings.map((item) => `<div class="ph-plan-row"><span>${escapeHtml(item.pieza)}</span><span class="ph-plan-finding">${findingGlyph(item.icono, item.estadoVisual, true)}${escapeHtml(item.nombre)}</span><span>${escapeHtml(item.superficie || 'Diente completo')}</span><span class="${String(item.estadoVisual).toLowerCase()}">${escapeHtml(item.estadoVisual)}</span><span>${state.odontogram.estado !== 'FINALIZADO' ? `<button class="ph-remove-finding" data-remove-finding="${item.idHallazgo}" aria-label="Eliminar ${escapeHtml(item.nombre)}">×</button>` : ''}</span></div>`).join('') : '<div id="phPlanEmpty">Selecciona un diente para registrar un hallazgo.</div>'}</div></section></section><div class="ph-finding-popover" id="phFindingPopover" hidden></div>`;
     bindOdontogram();
   }
 
   function bindOdontogram() {
     const selected = new Set();
     document.querySelectorAll('[data-odo-stage]').forEach((button) => button.onclick = async () => { state.stage = button.dataset.odoStage; await loadOdontograms(); });
-    document.getElementById('dentitionType').onchange = (event) => { state.dentition = event.target.value; renderOdontogram(); };
-    document.getElementById('nomenclature').onchange = (event) => { state.nomenclature = event.target.value; };
+    document.getElementById('dentitionType').onchange = async (event) => { state.dentition = event.target.value; if (state.odontogram) await saveOdontogramSettings(); else renderOdontogram(); };
+    document.getElementById('nomenclature').onchange = async (event) => { state.nomenclature = event.target.value; if (state.odontogram) await saveOdontogramSettings(); };
     document.getElementById('newOdontogram').onclick = createOdontogram;
+    document.getElementById('finalizeOdontogram')?.addEventListener('click', finalizeOdontogram);
+    document.getElementById('odontogramNotes')?.addEventListener('change', saveOdontogramSettings);
+    document.querySelectorAll('[data-remove-finding]').forEach((button) => button.onclick = () => removeFinding(button.dataset.removeFinding));
     document.querySelectorAll('.ph-tooth').forEach((button) => button.onclick = () => {
       if (!state.odontogram) return notify('Primero crea el odontograma.', true);
+      if (state.odontogram.estado === 'FINALIZADO') return notify('Este odontograma está finalizado. Crea una nueva versión para editar.', true);
       const multiple = document.getElementById('multiSelect').checked;
       if (!multiple) { selected.clear(); document.querySelectorAll('.ph-tooth').forEach((tooth) => tooth.classList.remove('selected')); }
       button.classList.toggle('selected');
       button.classList.contains('selected') ? selected.add(button.dataset.tooth) : selected.delete(button.dataset.tooth);
       showFindingPopover(button, selected);
     });
+  }
+
+  async function saveOdontogramSettings() {
+    try {
+      await api(`/odontogramas/${state.odontogram.idOdontograma}`, { method: 'PATCH', body: JSON.stringify({ tipoDenticion: state.dentition, nomenclatura: state.nomenclature, observaciones: document.getElementById('odontogramNotes')?.value || state.odontogram.observaciones || '' }) });
+      state.odontogram.tipoDenticion = state.dentition;
+      state.odontogram.nomenclatura = state.nomenclature;
+      state.odontogram.observaciones = document.getElementById('odontogramNotes')?.value || '';
+      notify('Configuración del odontograma guardada.');
+      renderOdontogram();
+    } catch (error) { notify(error.message, true); }
+  }
+
+  async function finalizeOdontogram() {
+    if (!confirm('¿Finalizar este odontograma? Después necesitarás crear una nueva versión para modificarlo.')) return;
+    try {
+      await api(`/odontogramas/${state.odontogram.idOdontograma}/finalizar`, { method: 'PATCH', body: '{}' });
+      notify('Odontograma finalizado.'); await loadOdontograms();
+    } catch (error) { notify(error.message, true); }
+  }
+
+  async function removeFinding(findingId) {
+    try {
+      await api(`/odontogramas/${state.odontogram.idOdontograma}/hallazgos/${findingId}`, { method: 'DELETE' });
+      notify('Hallazgo eliminado.'); await loadOdontograms();
+    } catch (error) { notify(error.message, true); }
   }
 
   async function createOdontogram() {
@@ -255,14 +375,21 @@
     const popover = document.getElementById('phFindingPopover');
     if (!selected.size) { popover.hidden = true; return; }
     const rectangle = button.getBoundingClientRect();
-    popover.style.left = `${Math.min(innerWidth - 390, Math.max(20, rectangle.left - 80))}px`;
-    popover.style.top = `${Math.min(innerHeight - 360, rectangle.bottom + 8)}px`;
-    popover.innerHTML = `<header><b>Diente${selected.size > 1 ? 's' : ''} ${[...selected].join(', ')}</b><button aria-label="Cerrar">×</button></header><label>Superficie<select id="findingSurface"><option>OCLUSAL</option><option>VESTIBULAR</option><option>PALATINA</option><option>LINGUAL</option><option>MESIAL</option><option>DISTAL</option></select></label><div class="ph-findings"><button data-code="CARIES">Caries <i>●</i></button><button data-code="RESTAURACION_DEFICIENTE">Restauración deficiente <i>●</i></button><button data-code="RESTAURACION">Restauración <i>◆</i></button><button data-code="BOLSA_PERIODONTAL">Bolsa periodontal <i>⌒</i></button></div>`;
+    popover.style.left = `${Math.min(innerWidth - 470, Math.max(16, rectangle.left - 100))}px`;
+    popover.style.top = `${Math.max(10, Math.min(innerHeight - 480, Math.max(78, rectangle.bottom - 110)))}px`;
+    const findingRows = state.findingCatalog.map((item) => `<article class="ph-finding-option" data-finding-name="${escapeHtml(item.nombre.toLowerCase())}"><span>${escapeHtml(item.nombre)}</span><div>${item.variantes.map((variant) => `<button type="button" data-code="${item.codigo}" data-visual-state="${variant}" data-requires-surface="${item.requiereSuperficie ? '1' : '0'}" title="${escapeHtml(item.nombre)} · ${variant}">${findingGlyph(item.icono, variant)}</button>`).join('')}</div></article>`).join('');
+    popover.innerHTML = `<header><b>Diente${selected.size > 1 ? 's' : ''} ${[...selected].join(', ')}</b><button aria-label="Cerrar">×</button></header><div class="ph-finding-tags"><button data-quick-code="CARIES" class="bad">Caries</button><button data-quick-code="RESTAURACION_DEFICIENTE" class="bad">Restau.</button><button data-quick-code="RESTAURACION" class="good">Restau.</button></div><label class="ph-finding-search"><input id="findingSearch" type="search" placeholder="Buscar hallazgo"><span>⌕</span></label><label class="ph-surface-control">Superficie<select id="findingSurface"><option value="DIENTE">Diente completo</option><option>OCLUSAL</option><option>VESTIBULAR</option><option>PALATINA</option><option>LINGUAL</option><option>MESIAL</option><option>DISTAL</option></select></label><label class="ph-finding-note">Nota opcional<input id="findingNote" maxlength="500" placeholder="Observaciones"></label><div class="ph-findings">${findingRows}</div>`;
     popover.hidden = false;
     popover.querySelector('header button').onclick = () => { popover.hidden = true; };
+    popover.querySelector('#findingSearch').oninput = (event) => {
+      const query = event.target.value.trim().toLowerCase();
+      popover.querySelectorAll('.ph-finding-option').forEach((row) => { row.hidden = !row.dataset.findingName.includes(query); });
+    };
+    popover.querySelectorAll('[data-quick-code]').forEach((quick) => quick.onclick = () => popover.querySelector(`[data-code="${quick.dataset.quickCode}"]`)?.click());
     popover.querySelectorAll('[data-code]').forEach((item) => item.onclick = async () => {
       try {
-        await api(`/odontogramas/${state.odontogram.idOdontograma}/hallazgos`, { method: 'POST', body: JSON.stringify({ piezas: [...selected], codigoHallazgo: item.dataset.code, superficie: document.getElementById('findingSurface').value, observaciones: '' }) });
+        const selectedSurface = document.getElementById('findingSurface').value;
+        await api(`/odontogramas/${state.odontogram.idOdontograma}/hallazgos`, { method: 'POST', body: JSON.stringify({ piezas: [...selected], codigoHallazgo: item.dataset.code, estadoVisual: item.dataset.visualState, superficie: item.dataset.requiresSurface === '1' || selectedSurface !== 'DIENTE' ? selectedSurface : null, observaciones: document.getElementById('findingNote').value }) });
         popover.hidden = true; notify('Hallazgo guardado.'); await loadOdontograms();
       } catch (error) { notify(error.message, true); }
     });
@@ -295,11 +422,13 @@
 
   function renderPeriodontogram() {
     const view = document.getElementById('phView');
-    view.innerHTML = `<section class="ph-card ph-perio"><header class="ph-simple-tabs"><button class="active">Periodontograma</button><label>Cara <select id="perioFace"><option>VESTIBULAR</option><option>PALATINA</option><option>LINGUAL</option></select></label><button class="ph-save" id="savePerio">Guardar</button></header><div class="ph-perio-status">${state.periodontogram ? `${escapeHtml(state.periodontogram.estado)} · ${formatDate(state.periodontogram.creadoAt)}` : 'Se creará al guardar'} · Placa <b id="plaquePct">0%</b> · Sangrado <b id="bleedPct">0%</b> · Profundidad media <b id="depthAvg">0.0 mm</b></div><div class="ph-perio-scroll">${perioTable(adultUpper.slice(0,8),0)}${perioTable(adultUpper.slice(8),8)}<div class="ph-perio-chart"><svg viewBox="0 0 1000 220" preserveAspectRatio="none"><g class="grid">${[30,60,90,120,150,180].map((y) => `<line x1="0" y1="${y}" x2="1000" y2="${y}"/>`).join('')}</g><path id="upperMarginLine" class="margin-line"/><path id="upperDepthLine" class="depth-line"/></svg><div class="ph-perio-teeth">${adultUpper.map((id) => toothButton(id,'upper')).join('')}</div></div>${perioTable(adultLower.slice(0,8),16)}${perioTable(adultLower.slice(8),24)}<div class="ph-perio-chart lower"><svg viewBox="0 0 1000 220" preserveAspectRatio="none"><g class="grid">${[30,60,90,120,150,180].map((y) => `<line x1="0" y1="${y}" x2="1000" y2="${y}"/>`).join('')}</g><path id="lowerMarginLine" class="margin-line"/><path id="lowerDepthLine" class="depth-line"/></svg><div class="ph-perio-teeth">${adultLower.map((id) => toothButton(id,'lower')).join('')}</div></div></div></section>`;
+    const locked = state.periodontogram?.estado === 'FINALIZADO';
+    view.innerHTML = `<section class="ph-card ph-perio"><header class="ph-simple-tabs"><button class="active">Periodontograma</button><label>Cara <select id="perioFace"><option>VESTIBULAR</option><option>PALATINA</option><option>LINGUAL</option></select></label><button class="ph-save" id="savePerio" ${locked ? 'disabled' : ''}>Guardar</button>${state.periodontogram && !locked ? '<button class="ph-finalize" id="finalizePerio">Finalizar</button>' : ''}</header><div class="ph-perio-status">${state.periodontogram ? `${escapeHtml(state.periodontogram.estado)} · ${formatDate(state.periodontogram.creadoAt)}` : 'Se creará al guardar'} · Placa <b id="plaquePct">0%</b> · Sangrado <b id="bleedPct">0%</b> · Profundidad media <b id="depthAvg">0.0 mm</b></div><label class="ph-perio-notes">Observaciones <textarea id="perioNotes" rows="2" maxlength="4000" ${locked ? 'disabled' : ''}>${escapeHtml(state.periodontogram?.observaciones || '')}</textarea></label><fieldset ${locked ? 'disabled' : ''}><div class="ph-perio-scroll">${perioTable(adultUpper.slice(0,8),0)}${perioTable(adultUpper.slice(8),8)}<div class="ph-perio-chart"><svg viewBox="0 0 1000 220" preserveAspectRatio="none"><g class="grid">${[30,60,90,120,150,180].map((y) => `<line x1="0" y1="${y}" x2="1000" y2="${y}"/>`).join('')}</g><path id="upperMarginLine" class="margin-line"/><path id="upperDepthLine" class="depth-line"/></svg><div class="ph-perio-teeth">${adultUpper.map((id) => toothButton(id,'upper')).join('')}</div></div>${perioTable(adultLower.slice(0,8),16)}${perioTable(adultLower.slice(8),24)}<div class="ph-perio-chart lower"><svg viewBox="0 0 1000 220" preserveAspectRatio="none"><g class="grid">${[30,60,90,120,150,180].map((y) => `<line x1="0" y1="${y}" x2="1000" y2="${y}"/>`).join('')}</g><path id="lowerMarginLine" class="margin-line"/><path id="lowerDepthLine" class="depth-line"/></svg><div class="ph-perio-teeth">${adultLower.map((id) => toothButton(id,'lower')).join('')}</div></div></div></fieldset></section>`;
     document.getElementById('perioFace').value = state.perioFace;
     document.getElementById('perioFace').onchange = (event) => { collectPerioInputs(); state.perioFace = event.target.value; renderPeriodontogram(); };
     document.querySelectorAll('[data-perio]').forEach((input) => input.addEventListener('input', updatePerioSummary));
     document.getElementById('savePerio').onclick = savePeriodontogram;
+    document.getElementById('finalizePerio')?.addEventListener('click', finalizePeriodontogram);
     updatePerioSummary();
   }
 
@@ -341,7 +470,19 @@
         state.periodontogram = { idPeriodontograma: created.idPeriodontograma, estado: 'BORRADOR', creadoAt: new Date().toISOString() };
       }
       await api(`/periodontogramas/${state.periodontogram.idPeriodontograma}/mediciones`, { method: 'PUT', body: JSON.stringify({ mediciones: [...state.measurements.values()] }) });
+      await api(`/periodontogramas/${state.periodontogram.idPeriodontograma}`, { method: 'PATCH', body: JSON.stringify({ observaciones: document.getElementById('perioNotes').value }) });
+      state.periodontogram.observaciones = document.getElementById('perioNotes').value;
       notify('Periodontograma guardado.');
+      return true;
+    } catch (error) { notify(error.message, true); return false; }
+  }
+
+  async function finalizePeriodontogram() {
+    if (!confirm('¿Finalizar este periodontograma? Ya no se podrá editar.')) return;
+    try {
+      if (!(await savePeriodontogram())) return;
+      await api(`/periodontogramas/${state.periodontogram.idPeriodontograma}/finalizar`, { method: 'PATCH', body: '{}' });
+      notify('Periodontograma finalizado.'); await loadPeriodontogram();
     } catch (error) { notify(error.message, true); }
   }
 
@@ -357,7 +498,12 @@
     }
     app.innerHTML = '<main class="ph-fatal"><p>Cargando expediente clínico…</p></main>';
     try {
-      state.patient = await api(`/pacientes/${patientId}/resumen`);
+      const [patient, catalog] = await Promise.all([
+        api(`/pacientes/${patientId}/resumen`),
+        api('/odontogramas/catalogo/hallazgos')
+      ]);
+      state.patient = patient;
+      state.findingCatalog = catalog.items || [];
       shell();
       await loadOdontograms();
     } catch (error) {
