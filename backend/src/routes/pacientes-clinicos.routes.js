@@ -471,7 +471,7 @@ router.get('/:id/odontogramas', async (req, res, next) => {
                     o.tipo_denticion AS tipoDenticion, o.nomenclatura,
                     o.observaciones, o.estado, o.created_at AS creadoAt,
                     o.finalizado_at AS finalizadoAt,
-                    COUNT(h.id_hallazgo) AS totalHallazgos
+                    COUNT(h.id_odontograma) AS totalHallazgos
              FROM odontogramas o
              LEFT JOIN odontograma_hallazgos h ON h.id_odontograma = o.id_odontograma
              WHERE o.id_paciente = ?${phaseFilter}

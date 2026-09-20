@@ -30,6 +30,7 @@
     measurements: new Map(),
     perioFace: 'VESTIBULAR'
   };
+  let odontogramCreationPromise = null;
 
   const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -41,7 +42,8 @@
       headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }
     });
     const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.mensaje || data.detalle || 'No fue posible completar la solicitud.');
+    // En desarrollo la API incluye detalle; en producción se conserva el mensaje amigable.
+    if (!response.ok) throw new Error(data.detalle || data.mensaje || 'No fue posible completar la solicitud.');
     return data;
   }
 
@@ -313,7 +315,7 @@
 
   function renderOdontogram() {
     const view = document.getElementById('phView');
-    view.innerHTML = `<section class="ph-card ph-odontogram"><header class="ph-card-tabs"><div>${Object.entries(stages).map(([id, value]) => `<button class="${state.stage === id ? 'active' : ''}" data-odo-stage="${id}">${value === 'EVOLUCION' ? 'Odo. evolución' : value === 'ALTA' ? 'Odo. alta' : 'Odo. inicial'}</button>`).join('')}</div><div class="ph-state-key"><span class="bad">● Mal estado</span><span class="good">● Buen estado</span><button id="newOdontogram">${state.odontogram ? 'Nueva versión' : 'Crear odontograma'}</button>${state.odontogram && state.odontogram.estado !== 'FINALIZADO' ? '<button id="finalizeOdontogram" class="ph-finalize">Finalizar</button>' : ''}</div></header>${odontogramControls()}${state.odontogram ? `<div class="ph-record-status"><span>${escapeHtml(state.odontogram.estado)} · ${formatDate(state.odontogram.creadoAt)}</span><input id="odontogramNotes" maxlength="4000" placeholder="Observaciones del odontograma" value="${escapeHtml(state.odontogram.observaciones || '')}" ${state.odontogram.estado === 'FINALIZADO' ? 'disabled' : ''}></div>` : '<p class="ph-empty-notice">Aún no existe un odontograma para esta fase. Selecciona el tipo y créalo.</p>'}<div class="ph-teeth-chart">${dentitionChart()}</div><section class="ph-treatment-plan"><h2>Hallazgos</h2><div class="ph-plan-table"><b>N.º diente</b><b>Hallazgo</b><b>Superficie</b><b>Estado</b><b></b>${state.findings.length ? state.findings.map((item) => `<div class="ph-plan-row"><span>${escapeHtml(item.pieza)}</span><span class="ph-plan-finding">${findingGlyph(item.icono, item.estadoVisual, true)}${escapeHtml(item.nombre)}</span><span>${escapeHtml(item.superficie || 'Diente completo')}</span><span class="${String(item.estadoVisual).toLowerCase()}">${escapeHtml(item.estadoVisual)}</span><span>${state.odontogram.estado !== 'FINALIZADO' ? `<button class="ph-remove-finding" data-remove-finding="${item.idHallazgo}" aria-label="Eliminar ${escapeHtml(item.nombre)}">×</button>` : ''}</span></div>`).join('') : '<div id="phPlanEmpty">Selecciona un diente para registrar un hallazgo.</div>'}</div></section></section><div class="ph-finding-popover" id="phFindingPopover" hidden></div>`;
+    view.innerHTML = `<section class="ph-card ph-odontogram"><header class="ph-card-tabs"><div>${Object.entries(stages).map(([id, value]) => `<button class="${state.stage === id ? 'active' : ''}" data-odo-stage="${id}">${value === 'EVOLUCION' ? 'Odo. evolución' : value === 'ALTA' ? 'Odo. alta' : 'Odo. inicial'}</button>`).join('')}</div><div class="ph-state-key"><span class="bad">● Mal estado</span><span class="good">● Buen estado</span><button id="newOdontogram">${state.odontogram ? 'Nueva versión' : 'Crear odontograma'}</button>${state.odontogram && state.odontogram.estado !== 'FINALIZADO' ? '<button id="finalizeOdontogram" class="ph-finalize">Finalizar</button>' : ''}</div></header>${odontogramControls()}${state.odontogram ? `<div class="ph-record-status"><span>${escapeHtml(state.odontogram.estado)} · ${formatDate(state.odontogram.creadoAt)}</span><input id="odontogramNotes" maxlength="4000" placeholder="Observaciones del odontograma" value="${escapeHtml(state.odontogram.observaciones || '')}" ${state.odontogram.estado === 'FINALIZADO' ? 'disabled' : ''}></div>` : '<p class="ph-empty-notice">Selecciona un diente. El odontograma se guardará automáticamente al registrar el primer hallazgo.</p>'}<div class="ph-teeth-chart">${dentitionChart()}</div><section class="ph-treatment-plan"><h2>Hallazgos</h2><div class="ph-plan-table"><b>N.º diente</b><b>Hallazgo</b><b>Superficie</b><b>Estado</b><b></b>${state.findings.length ? state.findings.map((item) => `<div class="ph-plan-row"><span>${escapeHtml(item.pieza)}</span><span class="ph-plan-finding">${findingGlyph(item.icono, item.estadoVisual, true)}${escapeHtml(item.nombre)}</span><span>${escapeHtml(item.superficie || 'Diente completo')}</span><span class="${String(item.estadoVisual).toLowerCase()}">${escapeHtml(item.estadoVisual)}</span><span>${state.odontogram.estado !== 'FINALIZADO' ? `<button class="ph-remove-finding" data-remove-finding="${item.idHallazgo}" aria-label="Eliminar ${escapeHtml(item.nombre)}">×</button>` : ''}</span></div>`).join('') : '<div id="phPlanEmpty">Selecciona un diente para registrar un hallazgo.</div>'}</div></section></section><div class="ph-finding-popover" id="phFindingPopover" hidden></div>`;
     bindOdontogram();
   }
 
@@ -327,8 +329,6 @@
     document.getElementById('odontogramNotes')?.addEventListener('change', saveOdontogramSettings);
     document.querySelectorAll('[data-remove-finding]').forEach((button) => button.onclick = () => removeFinding(button.dataset.removeFinding));
     document.querySelectorAll('.ph-tooth').forEach((button) => button.onclick = () => {
-      if (!state.odontogram) return notify('Primero crea el odontograma.', true);
-      if (state.odontogram.estado === 'FINALIZADO') return notify('Este odontograma está finalizado. Crea una nueva versión para editar.', true);
       const multiple = document.getElementById('multiSelect').checked;
       if (!multiple) { selected.clear(); document.querySelectorAll('.ph-tooth').forEach((tooth) => tooth.classList.remove('selected')); }
       button.classList.toggle('selected');
@@ -365,10 +365,41 @@
 
   async function createOdontogram() {
     try {
-      await api(`/pacientes/${patientId}/odontogramas`, { method: 'POST', body: JSON.stringify({ fase: stages[state.stage], tipoDenticion: state.dentition, nomenclatura: state.nomenclature, observaciones: '' }) });
+      await requestNewOdontogram();
       notify('Odontograma creado.');
       await loadOdontograms();
     } catch (error) { notify(error.message, true); }
+  }
+
+  async function requestNewOdontogram() {
+    const created = await api(`/pacientes/${patientId}/odontogramas`, {
+      method: 'POST',
+      body: JSON.stringify({ fase: stages[state.stage], tipoDenticion: state.dentition, nomenclatura: state.nomenclature, observaciones: '' })
+    });
+    return {
+      idOdontograma: created.idOdontograma,
+      fase: stages[state.stage],
+      tipoDenticion: state.dentition,
+      nomenclatura: state.nomenclature,
+      observaciones: '',
+      estado: 'BORRADOR',
+      creadoAt: new Date().toISOString()
+    };
+  }
+
+  async function ensureEditableOdontogram() {
+    if (state.odontogram && state.odontogram.estado !== 'FINALIZADO') return state.odontogram;
+    if (!odontogramCreationPromise) {
+      odontogramCreationPromise = requestNewOdontogram()
+        .then((odontogram) => {
+          state.odontogram = odontogram;
+          state.odontograms.unshift(odontogram);
+          notify('Odontograma borrador creado automáticamente.');
+          return odontogram;
+        })
+        .finally(() => { odontogramCreationPromise = null; });
+    }
+    return odontogramCreationPromise;
   }
 
   function showFindingPopover(button, selected) {
@@ -389,7 +420,8 @@
     popover.querySelectorAll('[data-code]').forEach((item) => item.onclick = async () => {
       try {
         const selectedSurface = document.getElementById('findingSurface').value;
-        await api(`/odontogramas/${state.odontogram.idOdontograma}/hallazgos`, { method: 'POST', body: JSON.stringify({ piezas: [...selected], codigoHallazgo: item.dataset.code, estadoVisual: item.dataset.visualState, superficie: item.dataset.requiresSurface === '1' || selectedSurface !== 'DIENTE' ? selectedSurface : null, observaciones: document.getElementById('findingNote').value }) });
+        const odontogram = await ensureEditableOdontogram();
+        await api(`/odontogramas/${odontogram.idOdontograma}/hallazgos`, { method: 'POST', body: JSON.stringify({ piezas: [...selected], codigoHallazgo: item.dataset.code, estadoVisual: item.dataset.visualState, superficie: item.dataset.requiresSurface === '1' || selectedSurface !== 'DIENTE' ? selectedSurface : null, observaciones: document.getElementById('findingNote').value }) });
         popover.hidden = true; notify('Hallazgo guardado.'); await loadOdontograms();
       } catch (error) { notify(error.message, true); }
     });

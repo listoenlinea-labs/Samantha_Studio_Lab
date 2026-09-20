@@ -61,17 +61,29 @@ async function asegurarEsquema(pool) {
     }
 
     const columns = [
+        ['catalogo_hallazgos', 'clasificacion', "VARCHAR(20) NOT NULL DEFAULT 'MALO'"],
+        ['catalogo_hallazgos', 'activo', 'TINYINT(1) NOT NULL DEFAULT 1'],
         ['catalogo_hallazgos', 'icono', "VARCHAR(40) NOT NULL DEFAULT 'punto'"],
         ['catalogo_hallazgos', 'variantes', "VARCHAR(80) NOT NULL DEFAULT 'MALO'"],
         ['catalogo_hallazgos', 'orden', 'SMALLINT UNSIGNED NOT NULL DEFAULT 0'],
         ['catalogo_hallazgos', 'requiere_superficie', 'TINYINT(1) NOT NULL DEFAULT 0'],
+        ['odontogramas', 'fase', "VARCHAR(20) NOT NULL DEFAULT 'INICIAL'"],
+        ['odontogramas', 'tipo_denticion', "VARCHAR(20) NOT NULL DEFAULT 'ADULTO'"],
+        ['odontogramas', 'nomenclatura', "VARCHAR(20) NOT NULL DEFAULT 'FDI'"],
+        ['odontogramas', 'observaciones', 'TEXT NULL'],
+        ['odontogramas', 'estado', "VARCHAR(20) NOT NULL DEFAULT 'BORRADOR'"],
+        ['odontogramas', 'created_at', 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP'],
+        ['odontogramas', 'finalizado_at', 'DATETIME NULL'],
         // Algunas instalaciones ya tenían odontograma_hallazgos con el esquema
         // anterior. CREATE TABLE IF NOT EXISTS no agrega columnas a esas tablas.
         // Se mantiene nullable para no inventar un diagnóstico en registros legados.
         ['odontograma_hallazgos', 'id_catalogo_hallazgo', 'INT UNSIGNED NULL'],
+        ['odontograma_hallazgos', 'superficie', 'VARCHAR(30) NULL'],
         ['odontograma_hallazgos', 'estado_visual', "VARCHAR(20) NOT NULL DEFAULT 'MALO'"],
         ['odontograma_hallazgos', 'variante', 'VARCHAR(40) NULL'],
-        ['odontograma_hallazgos', 'datos_json', 'JSON NULL']
+        ['odontograma_hallazgos', 'datos_json', 'JSON NULL'],
+        ['odontograma_hallazgos', 'observaciones', 'TEXT NULL'],
+        ['odontograma_hallazgos', 'created_at', 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP']
     ];
     for (const [table, column, definition] of columns) {
         await asegurarColumna(pool, table, column, definition);
