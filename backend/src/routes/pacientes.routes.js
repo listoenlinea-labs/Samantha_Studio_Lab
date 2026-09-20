@@ -539,7 +539,6 @@ router.patch('/:id/estado', async (req, res, next) => {
 });
 
 
-router.get('/:id/resumen', routePendiente('GET /api/pacientes/:id/resumen'));
 router.get('/:id/citas', routePendiente('GET /api/pacientes/:id/citas'));
 router.get('/:id/filiacion', routePendiente('GET /api/pacientes/:id/filiacion'));
 router.patch('/:id/filiacion', routePendiente('PATCH /api/pacientes/:id/filiacion'));
@@ -553,19 +552,6 @@ router.post('/:id/tareas', routePendiente('POST /api/pacientes/:id/tareas'));
 router.post('/:id/responsables', routePendiente('POST /api/pacientes/:id/responsables'));
 router.post('/:id/etiquetas', routePendiente('POST /api/pacientes/:id/etiquetas'));
 router.post('/:id/notas', routePendiente('POST /api/pacientes/:id/notas'));
-
-router.get('/:id/historia-clinica', routePendiente('GET /api/pacientes/:id/historia-clinica'));
-router.put('/:id/historia-clinica', routePendiente('PUT /api/pacientes/:id/historia-clinica'));
-
-router.get('/:id/tratamientos', routePendiente('GET /api/pacientes/:id/tratamientos'));
-router.get('/:id/sesiones', routePendiente('GET /api/pacientes/:id/sesiones'));
-router.post('/:id/sesiones', routePendiente('POST /api/pacientes/:id/sesiones'));
-
-router.get('/:id/odontogramas', routePendiente('GET /api/pacientes/:id/odontogramas'));
-router.post('/:id/odontogramas', routePendiente('POST /api/pacientes/:id/odontogramas'));
-
-router.get('/:id/periodontogramas', routePendiente('GET /api/pacientes/:id/periodontogramas'));
-router.post('/:id/periodontogramas', routePendiente('POST /api/pacientes/:id/periodontogramas'));
 
 router.get('/:id/archivos', routePendiente('GET /api/pacientes/:id/archivos'));
 router.post('/:id/archivos', routePendiente('POST /api/pacientes/:id/archivos'));
