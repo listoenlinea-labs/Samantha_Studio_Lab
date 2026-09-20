@@ -44,6 +44,11 @@ Si la base ya existe, ejecuta únicamente las migraciones pendientes en orden.
 Para habilitar las fotos de perfil almacenadas en MySQL, ejecuta
 `migrations/003_paciente_fotos.sql` antes de iniciar esta versión de la API.
 
+Para conectar historia clínica, odontograma y periodontograma, ejecuta después
+`migrations/004_expediente_clinico.sql`. La migración es aditiva: crea únicamente
+las tablas que falten y no elimina expedientes existentes. El backend también
+verifica estas tablas al arrancar.
+
 Como protección adicional, el backend verifica la tabla al arrancar y, solo si
 falta, ejecuta la misma creación con `CREATE TABLE IF NOT EXISTS`. El usuario
 configurado en `DB_USER` necesita permiso `CREATE` esa primera vez.
