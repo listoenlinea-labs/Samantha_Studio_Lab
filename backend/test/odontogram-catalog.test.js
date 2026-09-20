@@ -5,6 +5,10 @@ const path = require('node:path');
 const catalog = require('../src/config/odontogram-catalog');
 const odontogramRoutes = require('../src/routes/odontogramas.routes');
 const periodontogramRoutes = require('../src/routes/periodontogramas.routes');
+const ensureSchemaSource = fs.readFileSync(
+    path.join(__dirname, '../src/config/ensure-schema.js'),
+    'utf8'
+);
 
 test('el catálogo visual contiene todos los hallazgos de referencia', () => {
     const expected = [
@@ -64,4 +68,11 @@ test('el primer hallazgo crea el borrador automáticamente', () => {
     assert.doesNotMatch(frontend, /Primero crea el odontograma/);
     assert.match(frontend, /const odontogram = await ensureEditableOdontogram\(\)/);
     assert.match(frontend, /Odontograma borrador creado automáticamente/);
+});
+
+test('la compatibilidad agrega la pieza a tablas de hallazgos anteriores', () => {
+    assert.match(
+        ensureSchemaSource,
+        /\['odontograma_hallazgos', 'pieza', 'VARCHAR\(4\) NULL'\]/
+    );
 });
