@@ -163,9 +163,11 @@
     gap: 14px
 }
 
-.px-patient-cell>span {
+.px-patient-cell>span:not(.px-avatar) {
     display: grid;
-    grid-template-columns: auto 1fr;
+    flex: 1 1 auto;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr) 64px;
     align-items: center;
     gap: 4px 8px
 }
@@ -192,7 +194,9 @@
     color: #fff;
     background: linear-gradient(135deg, #86cbd0, #766083);
     font-size: 13px;
-    font-weight: 900
+    font-weight: 900;
+    line-height: 1;
+    text-align: center
 }
 
 .px-avatar.large {
@@ -267,7 +271,8 @@
     border-radius: 999px;
     font-size: 9px;
     font-style: normal;
-    font-weight: 800
+    font-weight: 800;
+    justify-self: end
 }
 
 .px-tag.active,

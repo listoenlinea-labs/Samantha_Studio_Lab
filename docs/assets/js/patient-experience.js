@@ -120,11 +120,13 @@
         `${API_URL}/pacientes?buscar=${encodeURIComponent(buscar)}&pagina=1&limite=20`
       );
 
+      const data = await response.json().catch(() => ({}));
+
       if (!response.ok) {
-        throw new Error('No fue posible cargar el directorio.');
+        const detalle = data.detalle ? ` ${data.detalle}` : '';
+        throw new Error(`${data.mensaje || 'No fue posible cargar el directorio.'}${detalle}`);
       }
 
-      const data = await response.json();
       patients = data.items || [];
       total = Number(data.total || 0);
       renderRows();

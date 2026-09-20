@@ -1,5 +1,6 @@
 const app = require('./app');
 const pool = require('./config/database');
+const asegurarEsquema = require('./config/ensure-schema');
 
 const port = Number(process.env.PORT || 3000);
 
@@ -17,8 +18,10 @@ async function iniciarServidor() {
     try {
         // Esta consulta confirma una conexión REAL con Hostinger/MySQL.
         await pool.query('SELECT 1 AS conexion_ok');
+        await asegurarEsquema(pool);
 
         console.log('\n✅ Base de datos MySQL conectada correctamente');
+        console.log('✅ Tabla paciente_fotos disponible');
         console.log(`✅ Entorno: ${process.env.NODE_ENV || 'development'}`);
 
         app.listen(port, '0.0.0.0', () => {
@@ -33,7 +36,7 @@ async function iniciarServidor() {
             );
         });
     } catch (error) {
-        console.error('\n❌ No fue posible conectar con MySQL.');
+        console.error('\n❌ No fue posible iniciar la API con MySQL.');
         console.error(`Motivo: ${error.message}`);
         process.exit(1);
     }
