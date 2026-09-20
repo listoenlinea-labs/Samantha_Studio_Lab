@@ -65,6 +65,10 @@ async function asegurarEsquema(pool) {
         ['catalogo_hallazgos', 'variantes', "VARCHAR(80) NOT NULL DEFAULT 'MALO'"],
         ['catalogo_hallazgos', 'orden', 'SMALLINT UNSIGNED NOT NULL DEFAULT 0'],
         ['catalogo_hallazgos', 'requiere_superficie', 'TINYINT(1) NOT NULL DEFAULT 0'],
+        // Algunas instalaciones ya tenían odontograma_hallazgos con el esquema
+        // anterior. CREATE TABLE IF NOT EXISTS no agrega columnas a esas tablas.
+        // Se mantiene nullable para no inventar un diagnóstico en registros legados.
+        ['odontograma_hallazgos', 'id_catalogo_hallazgo', 'INT UNSIGNED NULL'],
         ['odontograma_hallazgos', 'estado_visual', "VARCHAR(20) NOT NULL DEFAULT 'MALO'"],
         ['odontograma_hallazgos', 'variante', 'VARCHAR(40) NULL'],
         ['odontograma_hallazgos', 'datos_json', 'JSON NULL']
