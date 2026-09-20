@@ -1,5 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 const catalog = require('../src/config/odontogram-catalog');
 const odontogramRoutes = require('../src/routes/odontogramas.routes');
 const periodontogramRoutes = require('../src/routes/periodontogramas.routes');
@@ -52,4 +54,14 @@ test('las rutas de persistencia y corrección están registradas', () => {
     ].forEach((route) => assert.ok(odontogram.has(route), `Falta ${route}`));
     ['PUT /:id/mediciones', 'PATCH /:id', 'PATCH /:id/finalizar']
         .forEach((route) => assert.ok(periodontogram.has(route), `Falta ${route}`));
+});
+
+test('el primer hallazgo crea el borrador automáticamente', () => {
+    const frontend = fs.readFileSync(
+        path.join(__dirname, '../../docs/assets/js/patient-history.js'),
+        'utf8'
+    );
+    assert.doesNotMatch(frontend, /Primero crea el odontograma/);
+    assert.match(frontend, /const odontogram = await ensureEditableOdontogram\(\)/);
+    assert.match(frontend, /Odontograma borrador creado automáticamente/);
 });
