@@ -11,6 +11,56 @@ const catalogValues = odontogramCatalog.map((item) => [
 ]);
 
 const clinicalSchemaStatements = [
+    `CREATE TABLE IF NOT EXISTS citas (
+        id_cita BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        id_paciente INT UNSIGNED NOT NULL,
+        inicio_at DATETIME NOT NULL,
+        fin_at DATETIME NULL,
+        doctor VARCHAR(160) NULL,
+        motivo VARCHAR(255) NOT NULL,
+        estado VARCHAR(30) NOT NULL DEFAULT 'PROGRAMADA',
+        comentario TEXT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id_cita),
+        INDEX idx_citas_paciente_fecha (id_paciente, inicio_at),
+        CONSTRAINT fk_citas_paciente FOREIGN KEY (id_paciente)
+            REFERENCES pacientes (id_paciente) ON UPDATE CASCADE ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`,
+
+    `CREATE TABLE IF NOT EXISTS presupuestos (
+        id_presupuesto BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        id_paciente INT UNSIGNED NOT NULL,
+        concepto VARCHAR(255) NOT NULL,
+        total DECIMAL(12,2) NOT NULL DEFAULT 0,
+        estado VARCHAR(30) NOT NULL DEFAULT 'BORRADOR',
+        observaciones TEXT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id_presupuesto),
+        INDEX idx_presupuestos_paciente_estado (id_paciente, estado),
+        CONSTRAINT fk_presupuestos_paciente FOREIGN KEY (id_paciente)
+            REFERENCES pacientes (id_paciente) ON UPDATE CASCADE ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`,
+
+    `CREATE TABLE IF NOT EXISTS tareas_paciente (
+        id_tarea BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        id_paciente INT UNSIGNED NOT NULL,
+        nombre VARCHAR(180) NOT NULL,
+        descripcion TEXT NULL,
+        responsable VARCHAR(160) NULL,
+        tipo VARCHAR(20) NOT NULL DEFAULT 'MANUAL',
+        estado VARCHAR(30) NOT NULL DEFAULT 'PENDIENTE',
+        fecha_envio DATETIME NULL,
+        plantilla VARCHAR(180) NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id_tarea),
+        INDEX idx_tareas_paciente_estado (id_paciente, estado),
+        CONSTRAINT fk_tareas_paciente_paciente FOREIGN KEY (id_paciente)
+            REFERENCES pacientes (id_paciente) ON UPDATE CASCADE ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`,
+
     `CREATE TABLE IF NOT EXISTS historias_clinicas (
         id_historia BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         id_paciente INT UNSIGNED NOT NULL,
