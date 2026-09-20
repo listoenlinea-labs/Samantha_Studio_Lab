@@ -131,6 +131,42 @@ router.put('/:id/mediciones', async (req, res, next) => {
     }
 });
 
+router.patch('/:id', async (req, res, next) => {
+    const connection = await pool.getConnection();
+    try {
+        const periodontogramId = parseId(req.params.id);
+        if (!periodontogramId) {
+            return res.status(400).json({ ok: false, mensaje: 'El id del periodontograma no es válido.' });
+        }
+        const observations = String(req.body.observaciones || '').trim() || null;
+        if (observations && observations.length > 4000) {
+            return res.status(400).json({ ok: false, mensaje: 'Las observaciones no pueden superar 4000 caracteres.' });
+        }
+        await connection.beginTransaction();
+        const [result] = await connection.query(
+            `UPDATE periodontogramas SET observaciones = ?
+             WHERE id_periodontograma = ? AND estado <> 'FINALIZADO'`,
+            [observations, periodontogramId]
+        );
+        if (!result.affectedRows) {
+            await connection.rollback();
+            return res.status(409).json({ ok: false, mensaje: 'Periodontograma no encontrado o finalizado.' });
+        }
+        await connection.query(
+            `INSERT INTO auditoria (entidad, id_entidad, accion, detalle)
+             VALUES ('periodontogramas', ?, 'ACTUALIZAR_OBSERVACIONES', ?)`,
+            [periodontogramId, JSON.stringify({ observaciones: Boolean(observations) })]
+        );
+        await connection.commit();
+        return res.json({ ok: true, mensaje: 'Observaciones guardadas.' });
+    } catch (error) {
+        await connection.rollback();
+        next(error);
+    } finally {
+        connection.release();
+    }
+});
+
 router.patch('/:id/finalizar', async (req, res, next) => {
     const connection = await pool.getConnection();
     try {
