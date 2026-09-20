@@ -1,0 +1,23 @@
+.ph-profile>img,.ph-profile-initials{width:82px;height:82px;margin-top:-41px;border:4px solid #fff;border-radius:50%;object-fit:cover}
+.ph-profile-initials{display:inline-grid;place-items:center;color:#fff;background:linear-gradient(145deg,#77c9cf,#737397);font-size:19px;font-weight:900}
+.ph-contact a{display:grid;width:36px;height:31px;place-items:center;border:1px solid #bcd3da;border-radius:6px;color:#536c77;background:#fff;text-decoration:none}
+.ph-more-menu a{display:block;padding:8px;color:#52636b;text-decoration:none}
+.ph-clinical-rail section{text-align:center}.ph-clinical-rail h3{text-align:left}.ph-clinical-rail strong{font-size:12px}
+.ph-info-strip article{align-content:start;gap:12px}.ph-info-strip article span{grid-column:1/-1}
+.ph-primary,.ph-history button,.ph-clinical-columns button{min-height:36px;padding:0 15px;border:0;border-radius:7px;color:#fff;background:var(--ph-teal-dark);font-weight:800;cursor:pointer}
+.ph-loading,.ph-error{display:grid;place-items:center;text-align:center}.ph-error{color:#9d3842}
+.ph-empty-notice,.ph-record-status{margin:0;padding:8px;text-align:center;color:var(--ph-muted);font-size:10px}
+.ph-teeth-chart{overflow:hidden}.ph-dentition-block{position:relative}.ph-dentition-block:after{position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--ph-line);content:"";pointer-events:none}
+.ph-tooth-row{grid-template-columns:repeat(var(--tooth-count),minmax(38px,1fr));min-height:172px;padding:8px 4px}
+.ph-tooth-row.primary{width:64%;margin-inline:auto}.ph-dentition-block.child{max-width:760px;margin:auto}.ph-dentition-block.child .ph-tooth-row.primary{width:84%}
+.ph-dentition-block.mixed .ph-primary-pair{margin:12px 0;border-top:1px solid var(--ph-line);border-bottom:1px solid var(--ph-line)}
+.ph-tooth svg{width:auto;max-width:50px;height:116px;margin-top:8px}.ph-tooth svg.lower{order:initial;margin-top:8px;margin-bottom:0;transform:rotate(180deg)}
+.ph-tooth:hover svg,.ph-tooth.selected svg{transform:translateY(-3px)}.ph-tooth svg.lower:hover,.ph-tooth.selected svg.lower{transform:rotate(180deg) translateY(3px)}
+.ph-tooth svg g{fill:#eee2c8;stroke:#ded4bf;stroke-width:1.1}.ph-tooth svg .root-groove{fill:#d9d0bc;stroke:none}.ph-tooth svg .crown{fill:#fff;stroke:#e4e6e5;stroke-width:1.5}.ph-tooth>span{height:40px;font-size:13px}
+.ph-plan-table>.ph-plan-row{display:contents}.ph-finding-popover>label{display:flex;align-items:center;justify-content:space-between;margin:12px 0;color:#5c727c;font-size:11px}.ph-finding-popover select{min-width:150px;height:34px;border:1px solid #b9d7df;border-radius:6px;background:#fff}
+.ph-perio-labels,.ph-perio-col{grid-template-rows:25px repeat(7,29px)}
+.ph-history{padding:25px}.ph-history>header{display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid var(--ph-line)}.ph-history h2{margin:0}.ph-history header p{color:var(--ph-muted);font-size:11px}
+.ph-history-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:22px}.ph-history-form label{display:grid;gap:6px;color:#58707a;font-size:11px}.ph-history-form textarea,.ph-clinical-columns textarea{padding:10px;border:1px solid #bad4dc;border-radius:7px;resize:vertical;font:12px inherit}
+.ph-clinical-columns{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:25px}.ph-clinical-columns>section{padding:18px;border:1px solid var(--ph-line);border-radius:8px}.ph-clinical-columns h3{margin-top:0}.ph-clinical-columns article{display:grid;grid-template-columns:1fr auto;padding:10px 0;border-bottom:1px solid #edf3f5}.ph-clinical-columns article p{grid-column:1/-1;color:var(--ph-muted)}.ph-clinical-columns article span{font-size:10px}.ph-clinical-columns form{display:grid;gap:8px;margin-top:14px}
+.ph-toast.error{background:#ad3d47}.ph-fatal{display:grid;min-height:100vh;place-content:center;gap:10px;text-align:center}.ph-fatal a{color:var(--ph-teal-dark)}
+@media(max-width:760px){.ph-profile>img,.ph-profile-initials{grid-row:1/4;width:58px;height:58px;margin:0}.ph-tooth-row.primary{width:64%}.ph-history-form,.ph-clinical-columns{grid-template-columns:1fr}}
