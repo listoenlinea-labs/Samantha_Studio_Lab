@@ -1,3 +1,15 @@
+const odontogramCatalog = require('./odontogram-catalog');
+
+const catalogValues = odontogramCatalog.map((item) => [
+    item.codigo,
+    item.nombre,
+    item.clasificacion,
+    item.icono,
+    item.variantes,
+    item.orden,
+    item.requiereSuperficie
+]);
+
 const clinicalSchemaStatements = [
     `CREATE TABLE IF NOT EXISTS historias_clinicas (
         id_historia BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -71,6 +83,10 @@ const clinicalSchemaStatements = [
         codigo VARCHAR(50) NOT NULL,
         nombre VARCHAR(120) NOT NULL,
         clasificacion VARCHAR(20) NOT NULL DEFAULT 'MALO',
+        icono VARCHAR(40) NOT NULL DEFAULT 'punto',
+        variantes VARCHAR(80) NOT NULL DEFAULT 'MALO',
+        orden SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+        requiere_superficie TINYINT(1) NOT NULL DEFAULT 0,
         activo TINYINT(1) NOT NULL DEFAULT 1,
         PRIMARY KEY (id_catalogo_hallazgo),
         UNIQUE KEY uq_catalogo_hallazgos_codigo (codigo)
@@ -82,6 +98,9 @@ const clinicalSchemaStatements = [
         id_catalogo_hallazgo INT UNSIGNED NOT NULL,
         pieza VARCHAR(4) NOT NULL,
         superficie VARCHAR(30) NULL,
+        estado_visual VARCHAR(20) NOT NULL DEFAULT 'MALO',
+        variante VARCHAR(40) NULL,
+        datos_json JSON NULL,
         observaciones TEXT NULL,
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id_hallazgo),
@@ -125,13 +144,16 @@ const clinicalSchemaStatements = [
             REFERENCES periodontogramas (id_periodontograma) ON UPDATE CASCADE ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`,
 
-    `INSERT IGNORE INTO catalogo_hallazgos (codigo, nombre, clasificacion) VALUES
-        ('CARIES', 'Caries', 'MALO'),
-        ('RESTAURACION_DEFICIENTE', 'Restauración deficiente', 'MALO'),
-        ('RESTAURACION', 'Restauración', 'BUENO'),
-        ('APARATO_FIJO', 'Aparato ortodóntico fijo', 'BUENO'),
-        ('APARATO_REMOVIBLE', 'Aparato ortodóntico removible', 'BUENO'),
-        ('BOLSA_PERIODONTAL', 'Bolsa periodontal', 'MALO')`
+    {
+        sql: `INSERT INTO catalogo_hallazgos
+                (codigo, nombre, clasificacion, icono, variantes, orden, requiere_superficie)
+              VALUES ?
+              ON DUPLICATE KEY UPDATE
+                nombre = VALUES(nombre), clasificacion = VALUES(clasificacion),
+                icono = VALUES(icono), variantes = VALUES(variantes),
+                orden = VALUES(orden), requiere_superficie = VALUES(requiere_superficie), activo = 1`,
+        values: [catalogValues]
+    }
 ];
 
 module.exports = clinicalSchemaStatements;

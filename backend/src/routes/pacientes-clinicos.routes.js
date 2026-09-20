@@ -29,6 +29,19 @@ function patientPhotoUrl(req, patientId, updatedAt) {
     return `${req.protocol}://${req.get('host')}/api/pacientes/${patientId}/foto?v=${version}`;
 }
 
+router.get('/etiquetas/catalogo', async (_req, res, next) => {
+    try {
+        const [items] = await pool.query(
+            `SELECT id_etiqueta AS idEtiqueta, nombre,
+                    color_fondo AS colorFondo, color_texto AS colorTexto
+             FROM etiquetas WHERE activo = 1 ORDER BY nombre`
+        );
+        return res.json({ items });
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.get('/:id/resumen', async (req, res, next) => {
     try {
         const patientId = parsePositiveId(req.params.id);
@@ -87,6 +100,211 @@ router.get('/:id/resumen', async (req, res, next) => {
         });
     } catch (error) {
         next(error);
+    }
+});
+
+router.patch('/:id/resumen', async (req, res, next) => {
+    const connection = await pool.getConnection();
+    try {
+        const patientId = parsePositiveId(req.params.id);
+        if (!patientId) return invalidId(res);
+        const hasAllergies = Object.prototype.hasOwnProperty.call(req.body, 'alergias');
+        const hasNote = Object.prototype.hasOwnProperty.call(req.body, 'notaGeneral');
+        if (!hasAllergies && !hasNote) {
+            return res.status(400).json({ ok: false, mensaje: 'Envía alergias o notaGeneral para actualizar.' });
+        }
+        const allergies = String(req.body.alergias || '').trim() || null;
+        const note = String(req.body.notaGeneral || '').trim() || null;
+        if ((allergies && allergies.length > 4000) || (note && note.length > 4000)) {
+            return res.status(400).json({ ok: false, mensaje: 'El texto no puede superar 4000 caracteres.' });
+        }
+        await connection.beginTransaction();
+        if (!(await patientExists(connection, patientId))) {
+            await connection.rollback();
+            return res.status(404).json({ ok: false, mensaje: 'Paciente no encontrado.' });
+        }
+        if (hasAllergies) {
+            await connection.query('UPDATE pacientes SET alergias = ? WHERE id_paciente = ?', [allergies, patientId]);
+            const [historyRows] = await connection.query(
+                `SELECT motivo_consulta, antecedentes_medicos, antecedentes_odontologicos,
+                        medicamentos_actuales, diagnostico_general, observaciones
+                 FROM historias_clinicas
+                 WHERE id_paciente = ? AND vigente = 1
+                 ORDER BY id_historia DESC LIMIT 1 FOR UPDATE`,
+                [patientId]
+            );
+            await connection.query(
+                'UPDATE historias_clinicas SET vigente = 0 WHERE id_paciente = ? AND vigente = 1',
+                [patientId]
+            );
+            const history = historyRows[0] || {};
+            await connection.query(
+                `INSERT INTO historias_clinicas
+                    (id_paciente, motivo_consulta, alergias, antecedentes_medicos,
+                     antecedentes_odontologicos, medicamentos_actuales,
+                     diagnostico_general, observaciones, vigente)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+                [patientId, history.motivo_consulta || null, allergies,
+                    history.antecedentes_medicos || null, history.antecedentes_odontologicos || null,
+                    history.medicamentos_actuales || null, history.diagnostico_general || null,
+                    history.observaciones || null]
+            );
+        }
+        if (hasNote) {
+            await connection.query('UPDATE expedientes_paciente SET nota_general = ? WHERE id_paciente = ?', [note, patientId]);
+        }
+        await connection.query(
+            `INSERT INTO auditoria (entidad, id_entidad, accion, detalle)
+             VALUES ('pacientes', ?, 'ACTUALIZAR_RESUMEN_CLINICO', ?)`,
+            [patientId, JSON.stringify({ alergias: hasAllergies, notaGeneral: hasNote })]
+        );
+        await connection.commit();
+        return res.json({ ok: true, alergias: allergies, notaGeneral: note });
+    } catch (error) {
+        await connection.rollback();
+        next(error);
+    } finally {
+        connection.release();
+    }
+});
+
+router.post('/:id/etiquetas', async (req, res, next) => {
+    const connection = await pool.getConnection();
+    try {
+        const patientId = parsePositiveId(req.params.id);
+        const tagId = parsePositiveId(req.body.idEtiqueta);
+        if (!patientId) return invalidId(res);
+        if (!tagId) return invalidId(res, 'etiqueta');
+        await connection.beginTransaction();
+        const [rows] = await connection.query(
+            `SELECT p.id_paciente, e.id_etiqueta
+             FROM pacientes p CROSS JOIN etiquetas e
+             WHERE p.id_paciente = ? AND e.id_etiqueta = ? AND e.activo = 1`,
+            [patientId, tagId]
+        );
+        if (!rows.length) {
+            await connection.rollback();
+            return res.status(404).json({ ok: false, mensaje: 'Paciente o etiqueta no encontrada.' });
+        }
+        await connection.query(
+            'INSERT IGNORE INTO paciente_etiquetas (id_paciente, id_etiqueta) VALUES (?, ?)',
+            [patientId, tagId]
+        );
+        await connection.query(
+            `INSERT INTO auditoria (entidad, id_entidad, accion, detalle)
+             VALUES ('pacientes', ?, 'AGREGAR_ETIQUETA', ?)`,
+            [patientId, JSON.stringify({ idEtiqueta: tagId })]
+        );
+        await connection.commit();
+        return res.status(201).json({ ok: true, mensaje: 'Etiqueta agregada.' });
+    } catch (error) {
+        await connection.rollback();
+        next(error);
+    } finally {
+        connection.release();
+    }
+});
+
+router.delete('/:id/etiquetas/:etiquetaId', async (req, res, next) => {
+    const connection = await pool.getConnection();
+    try {
+        const patientId = parsePositiveId(req.params.id);
+        const tagId = parsePositiveId(req.params.etiquetaId);
+        if (!patientId) return invalidId(res);
+        if (!tagId) return invalidId(res, 'etiqueta');
+        await connection.beginTransaction();
+        const [result] = await connection.query(
+            'DELETE FROM paciente_etiquetas WHERE id_paciente = ? AND id_etiqueta = ?',
+            [patientId, tagId]
+        );
+        if (!result.affectedRows) {
+            await connection.rollback();
+            return res.status(404).json({ ok: false, mensaje: 'La etiqueta no estaba asignada al paciente.' });
+        }
+        await connection.query(
+            `INSERT INTO auditoria (entidad, id_entidad, accion, detalle)
+             VALUES ('pacientes', ?, 'QUITAR_ETIQUETA', ?)`,
+            [patientId, JSON.stringify({ idEtiqueta: tagId })]
+        );
+        await connection.commit();
+        return res.json({ ok: true, mensaje: 'Etiqueta eliminada.' });
+    } catch (error) {
+        await connection.rollback();
+        next(error);
+    } finally {
+        connection.release();
+    }
+});
+
+router.get('/:id/filiacion', async (req, res, next) => {
+    try {
+        const patientId = parsePositiveId(req.params.id);
+        if (!patientId) return invalidId(res);
+        const [rows] = await pool.query(
+            `SELECT id_paciente AS idPaciente, nombres,
+                    apellido_paterno AS apellidoPaterno,
+                    apellido_materno AS apellidoMaterno,
+                    fecha_nacimiento AS fechaNacimiento, sexo, telefono, correo,
+                    como_nos_conocio AS comoNosConocio,
+                    antecedentes_medicos AS antecedentesMedicos,
+                    notas_alerta AS notasAlerta
+             FROM pacientes WHERE id_paciente = ? LIMIT 1`,
+            [patientId]
+        );
+        if (!rows.length) return res.status(404).json({ ok: false, mensaje: 'Paciente no encontrado.' });
+        return res.json(rows[0]);
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.patch('/:id/filiacion', async (req, res, next) => {
+    const connection = await pool.getConnection();
+    try {
+        const patientId = parsePositiveId(req.params.id);
+        if (!patientId) return invalidId(res);
+        const names = String(req.body.nombres || '').trim();
+        if (!names || names.length > 100) {
+            return res.status(400).json({ ok: false, mensaje: 'El nombre es obligatorio y admite hasta 100 caracteres.' });
+        }
+        const sex = String(req.body.sexo || '').trim() || null;
+        if (sex && !['F', 'M', 'X', 'NO_ESPECIFICA'].includes(sex)) {
+            return res.status(400).json({ ok: false, mensaje: 'El sexo recibido no es válido.' });
+        }
+        const birthDate = String(req.body.fechaNacimiento || '').trim() || null;
+        if (birthDate && !/^\d{4}-\d{2}-\d{2}$/.test(birthDate)) {
+            return res.status(400).json({ ok: false, mensaje: 'La fecha debe tener formato AAAA-MM-DD.' });
+        }
+        await connection.beginTransaction();
+        const [result] = await connection.query(
+            `UPDATE pacientes SET nombres = ?, apellido_paterno = ?, apellido_materno = ?,
+                    fecha_nacimiento = ?, sexo = ?, telefono = ?, correo = ?,
+                    como_nos_conocio = ?, antecedentes_medicos = ?, notas_alerta = ?
+             WHERE id_paciente = ?`,
+            [names, String(req.body.apellidoPaterno || '').trim() || null,
+                String(req.body.apellidoMaterno || '').trim() || null, birthDate, sex,
+                String(req.body.telefono || '').trim() || null,
+                String(req.body.correo || '').trim() || null,
+                String(req.body.comoNosConocio || '').trim() || null,
+                String(req.body.antecedentesMedicos || '').trim() || null,
+                String(req.body.notasAlerta || '').trim() || null, patientId]
+        );
+        if (!result.affectedRows) {
+            await connection.rollback();
+            return res.status(404).json({ ok: false, mensaje: 'Paciente no encontrado.' });
+        }
+        await connection.query(
+            `INSERT INTO auditoria (entidad, id_entidad, accion, detalle)
+             VALUES ('pacientes', ?, 'ACTUALIZAR_FILIACION', ?)`,
+            [patientId, JSON.stringify({ campos: Object.keys(req.body) })]
+        );
+        await connection.commit();
+        return res.json({ ok: true, mensaje: 'Filiación actualizada.' });
+    } catch (error) {
+        await connection.rollback();
+        next(error);
+    } finally {
+        connection.release();
     }
 });
 

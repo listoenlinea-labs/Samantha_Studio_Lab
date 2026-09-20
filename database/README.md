@@ -49,6 +49,10 @@ Para conectar historia clínica, odontograma y periodontograma, ejecuta después
 las tablas que falten y no elimina expedientes existentes. El backend también
 verifica estas tablas al arrancar.
 
+Para habilitar el selector visual completo (variantes roja, azul y neutra,
+superficies y símbolos), ejecuta `migrations/005_odontograma_catalogo_visual.sql`.
+Esta migración amplía el catálogo y conserva todos los hallazgos ya registrados.
+
 Como protección adicional, el backend verifica la tabla al arrancar y, solo si
 falta, ejecuta la misma creación con `CREATE TABLE IF NOT EXISTS`. El usuario
 configurado en `DB_USER` necesita permiso `CREATE` esa primera vez.
