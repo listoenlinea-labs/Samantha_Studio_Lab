@@ -251,7 +251,7 @@
       const isActive = items.some((item) => item.id === page);
       return `<div class="nav-group${isActive ? ' active' : ''}">
         <button class="nav-group-trigger" type="button" aria-expanded="false">
-          <span class="nav-icon">${group.icon}</span><span>${group.label}</span><span class="nav-chevron">⌄</span>
+          <span class="nav-icon">${group.icon}</span><span>${group.label}</span><span class="nav-chevron" aria-hidden="true"><svg viewBox="0 0 12 8" focusable="false"><path d="M1 1.5 6 6.5 11 1.5" /></svg></span>
         </button>
         <div class="nav-group-menu" role="menu" aria-label="${group.label}">
           ${items.map((item) => link(item, true)).join('')}

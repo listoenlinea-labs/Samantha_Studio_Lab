@@ -168,9 +168,26 @@ body {
 }
 
 .nav-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   margin-left: 1px;
-  font-size: 12px;
+  width: 12px;
+  height: 8px;
+  color: #279eae;
   transition: transform .2s ease;
+}
+
+.nav-chevron svg {
+  display: block;
+  width: 12px;
+  height: 8px;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .nav-group.open .nav-chevron {
