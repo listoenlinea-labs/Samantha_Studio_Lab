@@ -35,6 +35,18 @@ async function existeTablaPacienteFotos(pool) {
     return Number(tablas[0]?.existe) === 1;
 }
 
+async function asegurarColumna(pool, tabla, columna, definicion) {
+    const [rows] = await pool.query(
+        `SELECT COUNT(*) AS existe
+         FROM information_schema.columns
+         WHERE table_schema = DATABASE() AND table_name = ? AND column_name = ?`,
+        [tabla, columna]
+    );
+    if (Number(rows[0]?.existe) === 0) {
+        await pool.query(`ALTER TABLE \`${tabla}\` ADD COLUMN \`${columna}\` ${definicion}`);
+    }
+}
+
 async function asegurarEsquema(pool) {
     if (!(await existeTablaPacienteFotos(pool))) {
         await pool.query(crearTablaPacienteFotos);
@@ -44,9 +56,34 @@ async function asegurarEsquema(pool) {
         }
     }
 
-    for (const statement of clinicalSchemaStatements) {
+    for (const statement of clinicalSchemaStatements.filter((item) => typeof item === 'string')) {
         await pool.query(statement);
     }
+
+    const columns = [
+        ['catalogo_hallazgos', 'icono', "VARCHAR(40) NOT NULL DEFAULT 'punto'"],
+        ['catalogo_hallazgos', 'variantes', "VARCHAR(80) NOT NULL DEFAULT 'MALO'"],
+        ['catalogo_hallazgos', 'orden', 'SMALLINT UNSIGNED NOT NULL DEFAULT 0'],
+        ['catalogo_hallazgos', 'requiere_superficie', 'TINYINT(1) NOT NULL DEFAULT 0'],
+        ['odontograma_hallazgos', 'estado_visual', "VARCHAR(20) NOT NULL DEFAULT 'MALO'"],
+        ['odontograma_hallazgos', 'variante', 'VARCHAR(40) NULL'],
+        ['odontograma_hallazgos', 'datos_json', 'JSON NULL']
+    ];
+    for (const [table, column, definition] of columns) {
+        await asegurarColumna(pool, table, column, definition);
+    }
+
+    for (const statement of clinicalSchemaStatements.filter((item) => typeof item !== 'string')) {
+        await pool.query(statement.sql, statement.values);
+    }
+
+    await pool.query(
+        `UPDATE odontograma_hallazgos h
+         INNER JOIN catalogo_hallazgos c
+            ON c.id_catalogo_hallazgo = h.id_catalogo_hallazgo
+         SET h.estado_visual = c.clasificacion
+         WHERE h.variante IS NULL`
+    );
 }
 
 module.exports = asegurarEsquema;
