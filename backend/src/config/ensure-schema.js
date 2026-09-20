@@ -1,3 +1,5 @@
+const clinicalSchemaStatements = require('./clinical-schema');
+
 const crearTablaPacienteFotos = `
     CREATE TABLE IF NOT EXISTS paciente_fotos (
         id_foto BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -34,12 +36,16 @@ async function existeTablaPacienteFotos(pool) {
 }
 
 async function asegurarEsquema(pool) {
-    if (await existeTablaPacienteFotos(pool)) return;
-
-    await pool.query(crearTablaPacienteFotos);
-
     if (!(await existeTablaPacienteFotos(pool))) {
-        throw new Error('No se pudo verificar la tabla paciente_fotos.');
+        await pool.query(crearTablaPacienteFotos);
+
+        if (!(await existeTablaPacienteFotos(pool))) {
+            throw new Error('No se pudo verificar la tabla paciente_fotos.');
+        }
+    }
+
+    for (const statement of clinicalSchemaStatements) {
+        await pool.query(statement);
     }
 }
 
