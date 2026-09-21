@@ -910,13 +910,37 @@ tbody tr:hover {
     left: 0;
     z-index: 60;
     display: block;
-    width: min(82vw, 310px);
-    padding: 12px;
+    width: min(88vw, 330px);
+    padding: 16px 13px 28px;
     overflow-y: auto;
-    background: linear-gradient(180deg, var(--dc-navy), var(--dc-navy-2));
+    border-top: 1px solid rgba(119, 101, 133, .1);
+    border-right: 1px solid rgba(119, 101, 133, .16);
+    border-radius: 0 0 18px 0;
+    background: linear-gradient(180deg, #fbf8ff 0%, #fffdfb 52%, #f3f8f7 100%);
     transform: translateX(-104%);
-    transition: .25s ease;
-    box-shadow: 18px 0 40px rgba(15, 35, 44, .26)
+    transition: transform .25s ease;
+    box-shadow: 18px 0 44px rgba(72, 58, 82, .2)
+  }
+
+  .app-nav>a {
+    margin-bottom: 4px;
+    color: #514b55;
+    background: transparent;
+  }
+
+  .app-nav>a:hover {
+    color: var(--brand-charcoal);
+    background: rgba(215, 202, 231, .36);
+  }
+
+  .app-nav>a.active {
+    color: var(--brand-charcoal);
+    background: linear-gradient(90deg, rgba(215, 202, 231, .62), rgba(255, 255, 255, .88));
+    box-shadow: 0 7px 18px rgba(91, 72, 106, .11);
+  }
+
+  .app-nav>a.active::after {
+    background: var(--brand-gold);
   }
 
   .nav-group {
@@ -926,9 +950,11 @@ tbody tr:hover {
   .nav-group-trigger {
     width: 100%;
     min-height: 45px;
-    border-radius: 8px;
+    margin-top: 3px;
+    border-radius: 10px;
     padding: 0 13px;
-    color: rgba(255, 255, 255, .78);
+    color: #514b55;
+    background: transparent;
     font-size: 13px;
   }
 
@@ -957,17 +983,21 @@ tbody tr:hover {
   .nav-group:hover .nav-group-trigger,
   .nav-group.open .nav-group-trigger,
   .nav-group.active .nav-group-trigger {
-    color: #fff;
-    background: rgba(255, 255, 255, .1);
+    color: var(--brand-charcoal);
+    background: rgba(215, 202, 231, .34);
+  }
+
+  .nav-group.active .nav-group-trigger::after {
+    background: var(--brand-gold);
   }
 
   .nav-group-menu {
     position: static;
     width: auto;
-    margin: 3px 0 8px 12px;
-    padding: 4px;
+    margin: 4px 0 10px 15px;
+    padding: 4px 0 4px 9px;
     border: 0;
-    border-left: 1px solid rgba(255, 255, 255, .18);
+    border-left: 2px solid rgba(39, 158, 174, .28);
     border-radius: 0;
     background: transparent;
     box-shadow: none;
@@ -975,13 +1005,19 @@ tbody tr:hover {
 
   .app-nav .nav-group-menu a {
     min-height: 40px;
-    color: rgba(255, 255, 255, .78);
+    margin: 2px 0;
+    color: #5f5862;
+    border-radius: 9px;
   }
 
   .app-nav .nav-group-menu a:hover,
   .app-nav .nav-group-menu a.active {
-    color: #fff;
-    background: rgba(255, 255, 255, .1);
+    color: var(--brand-charcoal);
+    background: rgba(154, 178, 179, .18);
+  }
+
+  .app-nav .nav-group-menu a.active {
+    box-shadow: inset 3px 0 0 #279eae;
   }
 
   .app-nav a {
@@ -1013,7 +1049,9 @@ tbody tr:hover {
   }
 
   .sidebar-scrim {
-    top: 56px
+    top: 56px;
+    background: rgba(50, 43, 55, .28);
+    backdrop-filter: blur(4px)
   }
 
   .nav-open .sidebar-scrim {
