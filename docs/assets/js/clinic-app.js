@@ -423,8 +423,17 @@
             autocomplete="off"
           >
 
-          <!-- Selector Semana / Día / otras vistas -->
+          <!-- Selector Mes / Semana / Día / otras vistas -->
           <div class="dc-view-selector" aria-label="Seleccionar vista">
+            <button
+              class="dc-view-button"
+              type="button"
+              data-agenda-set="month"
+              title="Vista mensual"
+            >
+              M
+            </button>
+
             <button
               class="dc-view-button active"
               type="button"
@@ -459,15 +468,7 @@
               </button>
 
               <div class="dc-dropdown-menu dc-view-menu" id="agendaViewMenu" hidden>
-                <span class="dc-menu-title">Selecciona una vista</span>
-
-                <button type="button" data-agenda-set="month">
-                  Por mes
-                </button>
-
-                <button type="button" data-agenda-set="day">
-                  Por día
-                </button>
+                <span class="dc-menu-title">Otras vistas</span>
 
                 <button
                   type="button"
