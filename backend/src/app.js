@@ -1,6 +1,8 @@
 require('dotenv').config();
 
 const express = require('express');
+const path = require('path');
+const crypto = require('crypto');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -8,6 +10,30 @@ const pool = require('./config/database');
 const errorHandler = require('./middleware/error-handler');
 
 const app = express();
+// Protección temporal de todo el sitio hasta conectar el login a usuarios y roles.
+if (process.env.NODE_ENV === 'production') {
+    const username = process.env.SITE_USER;
+    const password = process.env.SITE_PASSWORD;
+    if (!username || !password) {
+        throw new Error('Configura SITE_USER y SITE_PASSWORD para publicar datos clínicos.');
+    }
+    app.use((req, res, next) => {
+        const header = req.get('authorization') || '';
+        const encoded = header.startsWith('Basic ') ? header.slice(6) : '';
+        const credentials = Buffer.from(encoded, 'base64').toString('utf8');
+        const separator = credentials.indexOf(':');
+        const suppliedUser = separator < 0 ? '' : credentials.slice(0, separator);
+        const suppliedPassword = separator < 0 ? '' : credentials.slice(separator + 1);
+        const matches = (actual, expected) => {
+            const a = crypto.createHash('sha256').update(actual).digest();
+            const b = crypto.createHash('sha256').update(expected).digest();
+            return crypto.timingSafeEqual(a, b);
+        };
+        if (matches(suppliedUser, username) && matches(suppliedPassword, password)) return next();
+        res.set('WWW-Authenticate', 'Basic realm="Samantha Studio Lab"');
+        res.status(401).send('Acceso restringido');
+    });
+}
 const allowedOrigins = (process.env.FRONTEND_ORIGINS || '')
     .split(',')
     .map((origin) => origin.trim())
@@ -65,6 +91,15 @@ app.use('/api/odontogramas', odontogramasRoutes);
 app.use('/api/periodontogramas', periodontogramasRoutes);
 app.use('/api/archivos', archivosRoutes);
 app.use('/api/tratamientos', tratamientosRoutes);
+
+// En producción la interfaz y la API comparten origen; no necesita CORS ni
+// direcciones localhost configuradas en el navegador del visitante.
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.resolve(__dirname, '../../docs')));
+    app.get('/', (req, res) => {
+        res.redirect('/login.html');
+    });
+}
 
 app.use(errorHandler);
 
