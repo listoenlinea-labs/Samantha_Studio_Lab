@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "start": "node backend/src/server.js",
+    "start": "node index.js",
     "test": "node --test backend/test/*.test.js"
   },
   "dependencies": {
