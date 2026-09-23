@@ -47,6 +47,28 @@ async function asegurarColumna(pool, tabla, columna, definicion) {
     }
 }
 
+async function asegurarCompatibilidadCatalogoAnterior(pool) {
+    const [columns] = await pool.query(
+        `SELECT COLUMN_TYPE AS columnType, IS_NULLABLE AS isNullable, COLUMN_DEFAULT AS columnDefault
+         FROM information_schema.columns
+         WHERE table_schema = DATABASE()
+           AND table_name = 'odontograma_hallazgos'
+           AND column_name = 'id_hallazgo_catalogo'`
+    );
+    const legacyColumn = columns[0];
+    if (!legacyColumn || (legacyColumn.isNullable === 'YES' && legacyColumn.columnDefault === null)) return;
+
+    // La columna antigua sigue apuntando a su catálogo original. Los nuevos
+    // hallazgos usan id_catalogo_hallazgo y dejan esta referencia en NULL.
+    // La FK anterior y todos los valores históricos se conservan.
+    if (!/^(?:tinyint|smallint|mediumint|int|bigint)(?:\(\d+\))?(?: unsigned)?$/i.test(legacyColumn.columnType)) {
+        throw new Error('El tipo de id_hallazgo_catalogo no permite una migración automática segura.');
+    }
+    await pool.query(
+        `ALTER TABLE odontograma_hallazgos MODIFY COLUMN id_hallazgo_catalogo ${legacyColumn.columnType} NULL DEFAULT NULL`
+    );
+}
+
 async function asegurarEsquema(pool) {
     if (!(await existeTablaPacienteFotos(pool))) {
         await pool.query(crearTablaPacienteFotos);
@@ -107,6 +129,8 @@ async function asegurarEsquema(pool) {
     for (const [table, column, definition] of columns) {
         await asegurarColumna(pool, table, column, definition);
     }
+
+    await asegurarCompatibilidadCatalogoAnterior(pool);
 
     for (const statement of clinicalSchemaStatements.filter((item) => typeof item !== 'string')) {
         await pool.query(statement.sql, statement.values);
