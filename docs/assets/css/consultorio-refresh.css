@@ -41,6 +41,9 @@ body:not(.login-page) {
 .agenda-appointment-details dt { color: var(--ssl-muted); font-weight: 700; }
 .agenda-appointment-details dd { margin: 0; overflow-wrap: anywhere; }
 .agenda-appointment-footer { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+.agenda-appointment-footer .agenda-delete { color: #a33838; border-color: #e9c5c5; }
+.agenda-appointment-footer .agenda-delete:hover { background: #fff1f1; }
+.dc-header .dc-search { min-width: 168px; text-align: left; }
 .dc-month-chip:focus-visible, .dc-event:focus-visible { outline: 2px solid var(--dc-teal); outline-offset: 2px; }
 
 .dc-header {
@@ -209,9 +212,11 @@ body:not(.login-page) {
 .live-date-label input { min-height: 40px; border: 1px solid var(--ssl-outline); border-radius: 9px; padding: 0 10px; background: #fff; }
 
 @media (max-width: 1180px) {
+  .dc-header .dc-search { min-width: 0; text-align: center; }
   .grid.kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 760px) {
+  .dc-header .dc-search { min-width: 0; text-align: center; }
   .dc-month-chip { gap: 4px; }
   .dc-month-chip-time { min-width: 0; padding-right: 4px; }
   .dc-header { min-height: 64px; }
