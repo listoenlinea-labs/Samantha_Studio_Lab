@@ -1,4 +1,5 @@
 const express = require('express');
+const crypto = require('crypto');
 const pool = require('../config/database');
 
 const router = express.Router();
@@ -19,6 +20,15 @@ async function patientExists(connection, patientId) {
     const [rows] = await connection.query(
         'SELECT id_paciente FROM pacientes WHERE id_paciente = ? LIMIT 1',
         [patientId]
+    );
+    return rows.length > 0;
+}
+
+async function hasLegacyColumn(connection, table, column) {
+    const [rows] = await connection.query(
+        `SELECT 1 FROM information_schema.columns
+         WHERE table_schema = DATABASE() AND table_name = ? AND column_name = ? LIMIT 1`,
+        [table, column]
     );
     return rows.length > 0;
 }
@@ -433,10 +443,13 @@ router.post('/:id/presupuestos', async (req, res, next) => {
             await connection.rollback();
             return res.status(404).json({ ok: false, mensaje: 'Paciente no encontrado.' });
         }
+        const legacyFolio = await hasLegacyColumn(connection, 'presupuestos', 'folio');
+        const legacyDate = await hasLegacyColumn(connection, 'presupuestos', 'fecha_emision');
         const [result] = await connection.query(
-            `INSERT INTO presupuestos (id_paciente, concepto, total, estado, observaciones)
-             VALUES (?, ?, ?, ?, ?)`,
-            [patientId, concept.value, total, status, observations.value]
+            `INSERT INTO presupuestos (id_paciente, concepto, total, estado, observaciones${legacyFolio ? ', folio' : ''}${legacyDate ? ', fecha_emision' : ''})
+             VALUES (?, ?, ?, ?, ?${legacyFolio ? ', ?' : ''}${legacyDate ? ', CURDATE()' : ''})`,
+            [patientId, concept.value, total, status, observations.value,
+                ...(legacyFolio ? [`SSL-${crypto.randomBytes(7).toString('hex')}`] : [])]
         );
         await writeAudit(connection, patientId, 'CREAR_PRESUPUESTO', { idPresupuesto: result.insertId, total });
         await connection.commit();
@@ -485,11 +498,13 @@ router.post('/:id/tareas', async (req, res, next) => {
             await connection.rollback();
             return res.status(404).json({ ok: false, mensaje: 'Paciente no encontrado.' });
         }
+        const legacyTitle = await hasLegacyColumn(connection, 'tareas_paciente', 'titulo');
         const [result] = await connection.query(
             `INSERT INTO tareas_paciente
-                (id_paciente, nombre, descripcion, responsable, tipo, estado)
-             VALUES (?, ?, ?, ?, 'MANUAL', 'PENDIENTE')`,
-            [patientId, name.value, description.value, responsible.value]
+                (id_paciente, nombre, descripcion, responsable, tipo, estado${legacyTitle ? ', titulo' : ''})
+             VALUES (?, ?, ?, ?, 'MANUAL', 'PENDIENTE'${legacyTitle ? ', ?' : ''})`,
+            [patientId, name.value, description.value, responsible.value,
+                ...(legacyTitle ? [name.value] : [])]
         );
         await writeAudit(connection, patientId, 'CREAR_TAREA', { idTarea: result.insertId });
         await connection.commit();
