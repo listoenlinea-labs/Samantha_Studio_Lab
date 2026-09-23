@@ -6,8 +6,10 @@ No crea usuarios ni contraseñas. Usa correos `.invalid`, que no reciben mensaje
 
 1. En Hostinger, abre phpMyAdmin y selecciona `u327351184_sam_studio`.
 2. Abre la pestaña **SQL** y pega el contenido de `006_pacientes_ficticios.sql`.
-3. Ejecuta una sola vez. El script comprueba correos y registros para que
-   ejecutarlo nuevamente el mismo día no duplique los datos.
+3. Puedes ejecutar el archivo corregido aunque una ejecución anterior se haya
+   detenido en el segundo presupuesto: completa los campos obligatorios de
+   las tareas y presupuestos ficticios ya creados y agrega los que falten.
+   El script comprueba correos y registros para no duplicarlos el mismo día.
 4. Abre Inicio, Agenda, Pacientes, Jornada clínica, Seguimientos y Finanzas.
    En Inicio aparece la cantidad de pacientes de prueba; cada cita, tarea y
    presupuesto de prueba está marcado como ficticio.

@@ -138,82 +138,154 @@ FROM pacientes p WHERE p.correo = 'paciente08@ejemplo.invalid'
 AND NOT EXISTS (SELECT 1 FROM citas c WHERE c.id_paciente = p.id_paciente
 AND DATE(c.inicio_at) = DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND c.motivo = 'Revisión preventiva');
 
-INSERT INTO tareas_paciente (id_paciente, nombre, descripcion, estado, tipo)
-SELECT p.id_paciente, 'Recordatorio preventivo ficticio 01', 'Seguimiento de prueba sin envío automático', 'PENDIENTE', 'MANUAL'
+UPDATE tareas_paciente t INNER JOIN pacientes p ON p.id_paciente = t.id_paciente
+SET t.titulo = t.nombre
+WHERE p.correo = 'paciente01@ejemplo.invalid' AND t.nombre = 'Recordatorio preventivo ficticio 01' AND (t.titulo IS NULL OR t.titulo = '');
+
+INSERT INTO tareas_paciente (id_paciente, nombre, titulo, descripcion, estado, tipo)
+SELECT p.id_paciente, 'Recordatorio preventivo ficticio 01', 'Recordatorio preventivo ficticio 01', 'Seguimiento de prueba sin envío automático', 'PENDIENTE', 'MANUAL'
 FROM pacientes p WHERE p.correo = 'paciente01@ejemplo.invalid'
 AND NOT EXISTS (SELECT 1 FROM tareas_paciente t WHERE t.id_paciente = p.id_paciente AND t.nombre = 'Recordatorio preventivo ficticio 01');
 
-INSERT INTO presupuestos (id_paciente, concepto, total, estado, observaciones)
-SELECT p.id_paciente, 'Plan preventivo ficticio 01', 1025, 'BORRADOR', 'Importe ficticio para pruebas; no es un cobro real.'
+UPDATE presupuestos pr INNER JOIN pacientes p ON p.id_paciente = pr.id_paciente
+SET pr.folio = CONCAT('TST-', p.id_paciente), pr.fecha_emision = CURDATE()
+WHERE p.correo = 'paciente01@ejemplo.invalid' AND pr.concepto = 'Plan preventivo ficticio 01'
+AND (pr.folio IS NULL OR pr.folio = '');
+
+INSERT INTO presupuestos (id_paciente, concepto, total, estado, observaciones, folio, fecha_emision)
+SELECT p.id_paciente, 'Plan preventivo ficticio 01', 1025, 'BORRADOR', 'Importe ficticio para pruebas; no es un cobro real.', CONCAT('TST-', p.id_paciente), CURDATE()
 FROM pacientes p WHERE p.correo = 'paciente01@ejemplo.invalid'
 AND NOT EXISTS (SELECT 1 FROM presupuestos pr WHERE pr.id_paciente = p.id_paciente AND pr.concepto = 'Plan preventivo ficticio 01');
 
-INSERT INTO tareas_paciente (id_paciente, nombre, descripcion, estado, tipo)
-SELECT p.id_paciente, 'Recordatorio preventivo ficticio 02', 'Seguimiento de prueba sin envío automático', 'PENDIENTE', 'MANUAL'
+UPDATE tareas_paciente t INNER JOIN pacientes p ON p.id_paciente = t.id_paciente
+SET t.titulo = t.nombre
+WHERE p.correo = 'paciente02@ejemplo.invalid' AND t.nombre = 'Recordatorio preventivo ficticio 02' AND (t.titulo IS NULL OR t.titulo = '');
+
+INSERT INTO tareas_paciente (id_paciente, nombre, titulo, descripcion, estado, tipo)
+SELECT p.id_paciente, 'Recordatorio preventivo ficticio 02', 'Recordatorio preventivo ficticio 02', 'Seguimiento de prueba sin envío automático', 'PENDIENTE', 'MANUAL'
 FROM pacientes p WHERE p.correo = 'paciente02@ejemplo.invalid'
 AND NOT EXISTS (SELECT 1 FROM tareas_paciente t WHERE t.id_paciente = p.id_paciente AND t.nombre = 'Recordatorio preventivo ficticio 02');
 
-INSERT INTO presupuestos (id_paciente, concepto, total, estado, observaciones)
-SELECT p.id_paciente, 'Plan preventivo ficticio 02', 1200, 'BORRADOR', 'Importe ficticio para pruebas; no es un cobro real.'
+UPDATE presupuestos pr INNER JOIN pacientes p ON p.id_paciente = pr.id_paciente
+SET pr.folio = CONCAT('TST-', p.id_paciente), pr.fecha_emision = CURDATE()
+WHERE p.correo = 'paciente02@ejemplo.invalid' AND pr.concepto = 'Plan preventivo ficticio 02'
+AND (pr.folio IS NULL OR pr.folio = '');
+
+INSERT INTO presupuestos (id_paciente, concepto, total, estado, observaciones, folio, fecha_emision)
+SELECT p.id_paciente, 'Plan preventivo ficticio 02', 1200, 'BORRADOR', 'Importe ficticio para pruebas; no es un cobro real.', CONCAT('TST-', p.id_paciente), CURDATE()
 FROM pacientes p WHERE p.correo = 'paciente02@ejemplo.invalid'
 AND NOT EXISTS (SELECT 1 FROM presupuestos pr WHERE pr.id_paciente = p.id_paciente AND pr.concepto = 'Plan preventivo ficticio 02');
 
-INSERT INTO tareas_paciente (id_paciente, nombre, descripcion, estado, tipo)
-SELECT p.id_paciente, 'Recordatorio preventivo ficticio 03', 'Seguimiento de prueba sin envío automático', 'PENDIENTE', 'MANUAL'
+UPDATE tareas_paciente t INNER JOIN pacientes p ON p.id_paciente = t.id_paciente
+SET t.titulo = t.nombre
+WHERE p.correo = 'paciente03@ejemplo.invalid' AND t.nombre = 'Recordatorio preventivo ficticio 03' AND (t.titulo IS NULL OR t.titulo = '');
+
+INSERT INTO tareas_paciente (id_paciente, nombre, titulo, descripcion, estado, tipo)
+SELECT p.id_paciente, 'Recordatorio preventivo ficticio 03', 'Recordatorio preventivo ficticio 03', 'Seguimiento de prueba sin envío automático', 'PENDIENTE', 'MANUAL'
 FROM pacientes p WHERE p.correo = 'paciente03@ejemplo.invalid'
 AND NOT EXISTS (SELECT 1 FROM tareas_paciente t WHERE t.id_paciente = p.id_paciente AND t.nombre = 'Recordatorio preventivo ficticio 03');
 
-INSERT INTO presupuestos (id_paciente, concepto, total, estado, observaciones)
-SELECT p.id_paciente, 'Plan preventivo ficticio 03', 1375, 'BORRADOR', 'Importe ficticio para pruebas; no es un cobro real.'
+UPDATE presupuestos pr INNER JOIN pacientes p ON p.id_paciente = pr.id_paciente
+SET pr.folio = CONCAT('TST-', p.id_paciente), pr.fecha_emision = CURDATE()
+WHERE p.correo = 'paciente03@ejemplo.invalid' AND pr.concepto = 'Plan preventivo ficticio 03'
+AND (pr.folio IS NULL OR pr.folio = '');
+
+INSERT INTO presupuestos (id_paciente, concepto, total, estado, observaciones, folio, fecha_emision)
+SELECT p.id_paciente, 'Plan preventivo ficticio 03', 1375, 'BORRADOR', 'Importe ficticio para pruebas; no es un cobro real.', CONCAT('TST-', p.id_paciente), CURDATE()
 FROM pacientes p WHERE p.correo = 'paciente03@ejemplo.invalid'
 AND NOT EXISTS (SELECT 1 FROM presupuestos pr WHERE pr.id_paciente = p.id_paciente AND pr.concepto = 'Plan preventivo ficticio 03');
 
-INSERT INTO tareas_paciente (id_paciente, nombre, descripcion, estado, tipo)
-SELECT p.id_paciente, 'Recordatorio preventivo ficticio 04', 'Seguimiento de prueba sin envío automático', 'PENDIENTE', 'MANUAL'
+UPDATE tareas_paciente t INNER JOIN pacientes p ON p.id_paciente = t.id_paciente
+SET t.titulo = t.nombre
+WHERE p.correo = 'paciente04@ejemplo.invalid' AND t.nombre = 'Recordatorio preventivo ficticio 04' AND (t.titulo IS NULL OR t.titulo = '');
+
+INSERT INTO tareas_paciente (id_paciente, nombre, titulo, descripcion, estado, tipo)
+SELECT p.id_paciente, 'Recordatorio preventivo ficticio 04', 'Recordatorio preventivo ficticio 04', 'Seguimiento de prueba sin envío automático', 'PENDIENTE', 'MANUAL'
 FROM pacientes p WHERE p.correo = 'paciente04@ejemplo.invalid'
 AND NOT EXISTS (SELECT 1 FROM tareas_paciente t WHERE t.id_paciente = p.id_paciente AND t.nombre = 'Recordatorio preventivo ficticio 04');
 
-INSERT INTO presupuestos (id_paciente, concepto, total, estado, observaciones)
-SELECT p.id_paciente, 'Plan preventivo ficticio 04', 1550, 'BORRADOR', 'Importe ficticio para pruebas; no es un cobro real.'
+UPDATE presupuestos pr INNER JOIN pacientes p ON p.id_paciente = pr.id_paciente
+SET pr.folio = CONCAT('TST-', p.id_paciente), pr.fecha_emision = CURDATE()
+WHERE p.correo = 'paciente04@ejemplo.invalid' AND pr.concepto = 'Plan preventivo ficticio 04'
+AND (pr.folio IS NULL OR pr.folio = '');
+
+INSERT INTO presupuestos (id_paciente, concepto, total, estado, observaciones, folio, fecha_emision)
+SELECT p.id_paciente, 'Plan preventivo ficticio 04', 1550, 'BORRADOR', 'Importe ficticio para pruebas; no es un cobro real.', CONCAT('TST-', p.id_paciente), CURDATE()
 FROM pacientes p WHERE p.correo = 'paciente04@ejemplo.invalid'
 AND NOT EXISTS (SELECT 1 FROM presupuestos pr WHERE pr.id_paciente = p.id_paciente AND pr.concepto = 'Plan preventivo ficticio 04');
 
-INSERT INTO tareas_paciente (id_paciente, nombre, descripcion, estado, tipo)
-SELECT p.id_paciente, 'Recordatorio preventivo ficticio 05', 'Seguimiento de prueba sin envío automático', 'PENDIENTE', 'MANUAL'
+UPDATE tareas_paciente t INNER JOIN pacientes p ON p.id_paciente = t.id_paciente
+SET t.titulo = t.nombre
+WHERE p.correo = 'paciente05@ejemplo.invalid' AND t.nombre = 'Recordatorio preventivo ficticio 05' AND (t.titulo IS NULL OR t.titulo = '');
+
+INSERT INTO tareas_paciente (id_paciente, nombre, titulo, descripcion, estado, tipo)
+SELECT p.id_paciente, 'Recordatorio preventivo ficticio 05', 'Recordatorio preventivo ficticio 05', 'Seguimiento de prueba sin envío automático', 'PENDIENTE', 'MANUAL'
 FROM pacientes p WHERE p.correo = 'paciente05@ejemplo.invalid'
 AND NOT EXISTS (SELECT 1 FROM tareas_paciente t WHERE t.id_paciente = p.id_paciente AND t.nombre = 'Recordatorio preventivo ficticio 05');
 
-INSERT INTO presupuestos (id_paciente, concepto, total, estado, observaciones)
-SELECT p.id_paciente, 'Plan preventivo ficticio 05', 1725, 'BORRADOR', 'Importe ficticio para pruebas; no es un cobro real.'
+UPDATE presupuestos pr INNER JOIN pacientes p ON p.id_paciente = pr.id_paciente
+SET pr.folio = CONCAT('TST-', p.id_paciente), pr.fecha_emision = CURDATE()
+WHERE p.correo = 'paciente05@ejemplo.invalid' AND pr.concepto = 'Plan preventivo ficticio 05'
+AND (pr.folio IS NULL OR pr.folio = '');
+
+INSERT INTO presupuestos (id_paciente, concepto, total, estado, observaciones, folio, fecha_emision)
+SELECT p.id_paciente, 'Plan preventivo ficticio 05', 1725, 'BORRADOR', 'Importe ficticio para pruebas; no es un cobro real.', CONCAT('TST-', p.id_paciente), CURDATE()
 FROM pacientes p WHERE p.correo = 'paciente05@ejemplo.invalid'
 AND NOT EXISTS (SELECT 1 FROM presupuestos pr WHERE pr.id_paciente = p.id_paciente AND pr.concepto = 'Plan preventivo ficticio 05');
 
-INSERT INTO tareas_paciente (id_paciente, nombre, descripcion, estado, tipo)
-SELECT p.id_paciente, 'Recordatorio preventivo ficticio 06', 'Seguimiento de prueba sin envío automático', 'PENDIENTE', 'MANUAL'
+UPDATE tareas_paciente t INNER JOIN pacientes p ON p.id_paciente = t.id_paciente
+SET t.titulo = t.nombre
+WHERE p.correo = 'paciente06@ejemplo.invalid' AND t.nombre = 'Recordatorio preventivo ficticio 06' AND (t.titulo IS NULL OR t.titulo = '');
+
+INSERT INTO tareas_paciente (id_paciente, nombre, titulo, descripcion, estado, tipo)
+SELECT p.id_paciente, 'Recordatorio preventivo ficticio 06', 'Recordatorio preventivo ficticio 06', 'Seguimiento de prueba sin envío automático', 'PENDIENTE', 'MANUAL'
 FROM pacientes p WHERE p.correo = 'paciente06@ejemplo.invalid'
 AND NOT EXISTS (SELECT 1 FROM tareas_paciente t WHERE t.id_paciente = p.id_paciente AND t.nombre = 'Recordatorio preventivo ficticio 06');
 
-INSERT INTO presupuestos (id_paciente, concepto, total, estado, observaciones)
-SELECT p.id_paciente, 'Plan preventivo ficticio 06', 1900, 'BORRADOR', 'Importe ficticio para pruebas; no es un cobro real.'
+UPDATE presupuestos pr INNER JOIN pacientes p ON p.id_paciente = pr.id_paciente
+SET pr.folio = CONCAT('TST-', p.id_paciente), pr.fecha_emision = CURDATE()
+WHERE p.correo = 'paciente06@ejemplo.invalid' AND pr.concepto = 'Plan preventivo ficticio 06'
+AND (pr.folio IS NULL OR pr.folio = '');
+
+INSERT INTO presupuestos (id_paciente, concepto, total, estado, observaciones, folio, fecha_emision)
+SELECT p.id_paciente, 'Plan preventivo ficticio 06', 1900, 'BORRADOR', 'Importe ficticio para pruebas; no es un cobro real.', CONCAT('TST-', p.id_paciente), CURDATE()
 FROM pacientes p WHERE p.correo = 'paciente06@ejemplo.invalid'
 AND NOT EXISTS (SELECT 1 FROM presupuestos pr WHERE pr.id_paciente = p.id_paciente AND pr.concepto = 'Plan preventivo ficticio 06');
 
-INSERT INTO tareas_paciente (id_paciente, nombre, descripcion, estado, tipo)
-SELECT p.id_paciente, 'Recordatorio preventivo ficticio 07', 'Seguimiento de prueba sin envío automático', 'PENDIENTE', 'MANUAL'
+UPDATE tareas_paciente t INNER JOIN pacientes p ON p.id_paciente = t.id_paciente
+SET t.titulo = t.nombre
+WHERE p.correo = 'paciente07@ejemplo.invalid' AND t.nombre = 'Recordatorio preventivo ficticio 07' AND (t.titulo IS NULL OR t.titulo = '');
+
+INSERT INTO tareas_paciente (id_paciente, nombre, titulo, descripcion, estado, tipo)
+SELECT p.id_paciente, 'Recordatorio preventivo ficticio 07', 'Recordatorio preventivo ficticio 07', 'Seguimiento de prueba sin envío automático', 'PENDIENTE', 'MANUAL'
 FROM pacientes p WHERE p.correo = 'paciente07@ejemplo.invalid'
 AND NOT EXISTS (SELECT 1 FROM tareas_paciente t WHERE t.id_paciente = p.id_paciente AND t.nombre = 'Recordatorio preventivo ficticio 07');
 
-INSERT INTO presupuestos (id_paciente, concepto, total, estado, observaciones)
-SELECT p.id_paciente, 'Plan preventivo ficticio 07', 2075, 'BORRADOR', 'Importe ficticio para pruebas; no es un cobro real.'
+UPDATE presupuestos pr INNER JOIN pacientes p ON p.id_paciente = pr.id_paciente
+SET pr.folio = CONCAT('TST-', p.id_paciente), pr.fecha_emision = CURDATE()
+WHERE p.correo = 'paciente07@ejemplo.invalid' AND pr.concepto = 'Plan preventivo ficticio 07'
+AND (pr.folio IS NULL OR pr.folio = '');
+
+INSERT INTO presupuestos (id_paciente, concepto, total, estado, observaciones, folio, fecha_emision)
+SELECT p.id_paciente, 'Plan preventivo ficticio 07', 2075, 'BORRADOR', 'Importe ficticio para pruebas; no es un cobro real.', CONCAT('TST-', p.id_paciente), CURDATE()
 FROM pacientes p WHERE p.correo = 'paciente07@ejemplo.invalid'
 AND NOT EXISTS (SELECT 1 FROM presupuestos pr WHERE pr.id_paciente = p.id_paciente AND pr.concepto = 'Plan preventivo ficticio 07');
 
-INSERT INTO tareas_paciente (id_paciente, nombre, descripcion, estado, tipo)
-SELECT p.id_paciente, 'Recordatorio preventivo ficticio 08', 'Seguimiento de prueba sin envío automático', 'PENDIENTE', 'MANUAL'
+UPDATE tareas_paciente t INNER JOIN pacientes p ON p.id_paciente = t.id_paciente
+SET t.titulo = t.nombre
+WHERE p.correo = 'paciente08@ejemplo.invalid' AND t.nombre = 'Recordatorio preventivo ficticio 08' AND (t.titulo IS NULL OR t.titulo = '');
+
+INSERT INTO tareas_paciente (id_paciente, nombre, titulo, descripcion, estado, tipo)
+SELECT p.id_paciente, 'Recordatorio preventivo ficticio 08', 'Recordatorio preventivo ficticio 08', 'Seguimiento de prueba sin envío automático', 'PENDIENTE', 'MANUAL'
 FROM pacientes p WHERE p.correo = 'paciente08@ejemplo.invalid'
 AND NOT EXISTS (SELECT 1 FROM tareas_paciente t WHERE t.id_paciente = p.id_paciente AND t.nombre = 'Recordatorio preventivo ficticio 08');
 
-INSERT INTO presupuestos (id_paciente, concepto, total, estado, observaciones)
-SELECT p.id_paciente, 'Plan preventivo ficticio 08', 2250, 'BORRADOR', 'Importe ficticio para pruebas; no es un cobro real.'
+UPDATE presupuestos pr INNER JOIN pacientes p ON p.id_paciente = pr.id_paciente
+SET pr.folio = CONCAT('TST-', p.id_paciente), pr.fecha_emision = CURDATE()
+WHERE p.correo = 'paciente08@ejemplo.invalid' AND pr.concepto = 'Plan preventivo ficticio 08'
+AND (pr.folio IS NULL OR pr.folio = '');
+
+INSERT INTO presupuestos (id_paciente, concepto, total, estado, observaciones, folio, fecha_emision)
+SELECT p.id_paciente, 'Plan preventivo ficticio 08', 2250, 'BORRADOR', 'Importe ficticio para pruebas; no es un cobro real.', CONCAT('TST-', p.id_paciente), CURDATE()
 FROM pacientes p WHERE p.correo = 'paciente08@ejemplo.invalid'
 AND NOT EXISTS (SELECT 1 FROM presupuestos pr WHERE pr.id_paciente = p.id_paciente AND pr.concepto = 'Plan preventivo ficticio 08');
