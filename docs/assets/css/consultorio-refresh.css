@@ -48,8 +48,22 @@ body:not(.login-page) {
 .dc-header .dc-notification { color: #fff; border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.09); }
 .dc-header .dc-profile-copy small { color: #c5d6dc; }
 .dc-header .nav-group-menu { color: var(--ssl-ink); }
-.dc-header .nav-group-menu a,
-.dc-header .nav-group-menu .nav-icon { color: var(--ssl-ink); }
+.dc-header .app-nav .nav-group-menu a,
+.dc-header .app-nav .nav-group-menu .nav-icon { color: var(--ssl-ink); }
+.dc-header .app-nav .nav-group-menu a.active,
+.dc-header .app-nav .nav-group-menu a:hover {
+  color: #174e5e;
+  background: #e8f6f7;
+  font-weight: 750;
+}
+.dc-header .app-nav .nav-group-menu a.active::before {
+  content: '';
+  position: absolute;
+  inset: 7px auto 7px 0;
+  width: 3px;
+  border-radius: 4px;
+  background: #258fa1;
+}
 
 .app-topbar { background: rgba(255,255,255,.94); border-bottom-color: var(--ssl-outline); }
 .content { width: min(1680px, 100%); padding: 30px clamp(18px, 2.7vw, 48px) 70px; }
@@ -65,6 +79,14 @@ body:not(.login-page) {
 .hero h1 { color: var(--ssl-ink); font-size: clamp(29px, 3.5vw, 51px); line-height: 1.08; }
 .hero p:not(.eyebrow) { color: var(--ssl-muted); font-size: clamp(13px, 1vw, 16px); }
 .hero .eyebrow, .eyebrow { color: #bb7535; font-size: 11px; }
+.content > .hero:has(.hero-actions) {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+}
+.content > .hero .hero-actions { align-self: flex-start; margin-top: 21px; }
+.content > .hero .hero-mark { position: absolute; right: 38px; bottom: 28px; opacity: .55; }
 
 .card, .ph-card, .ph-profile, .ph-info-strip article {
   border: 1px solid var(--ssl-outline);
@@ -136,6 +158,26 @@ body:not(.login-page) {
 }
 .ph-finding-popover .ph-findings { flex: 1 1 auto; min-height: 0; overflow-y: auto; align-content: start; }
 
+.live-appointments { display: grid; gap: 10px; }
+.live-appointment {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-height: 76px;
+  padding: 15px 18px;
+  border: 1px solid var(--ssl-outline);
+  border-left: 4px solid #91b9bd;
+  border-radius: 15px;
+  background: #fff;
+}
+.live-appointment:hover { background: #f6fbfc; }
+.live-appointment time { width: 155px; flex: 0 0 auto; color: #536e78; font-weight: 700; }
+.live-appointment span:not(.status) { display: grid; gap: 4px; min-width: 0; flex: 1; }
+.live-appointment small { color: var(--ssl-muted); font-size: 12px; }
+.live-empty { padding: 24px 0; color: var(--ssl-muted); }
+.live-date-label { display: grid; gap: 5px; font-size: 12px; color: var(--ssl-muted); }
+.live-date-label input { min-height: 40px; border: 1px solid var(--ssl-outline); border-radius: 9px; padding: 0 10px; background: #fff; }
+
 @media (max-width: 1180px) {
   .grid.kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
@@ -151,4 +193,6 @@ body:not(.login-page) {
   .grid.kpis .kpi-value { font-size: 21px; }
   .ph-workspace { padding: 12px; }
   .ph-info-strip { display: grid; gap: 6px; }
+  .live-appointment { flex-wrap: wrap; gap: 8px 14px; }
+  .live-appointment time { width: 100%; }
 }
