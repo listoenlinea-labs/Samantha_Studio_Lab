@@ -30,6 +30,18 @@ body:not(.login-page) {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.agenda-appointment-details { display: grid; gap: 0; margin: 0; }
+.agenda-appointment-details > div {
+  display: grid;
+  grid-template-columns: minmax(100px, 35%) 1fr;
+  gap: 14px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--ssl-outline);
+}
+.agenda-appointment-details dt { color: var(--ssl-muted); font-weight: 700; }
+.agenda-appointment-details dd { margin: 0; overflow-wrap: anywhere; }
+.agenda-appointment-footer { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+.dc-month-chip:focus-visible, .dc-event:focus-visible { outline: 2px solid var(--dc-teal); outline-offset: 2px; }
 
 .dc-header {
   min-height: 76px;
