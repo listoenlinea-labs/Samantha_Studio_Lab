@@ -1,0 +1,154 @@
+/* Lenguaje visual común para el consultorio: navegación oscura y paneles suaves. */
+:root {
+  --ssl-ink: #30394c;
+  --ssl-muted: #728096;
+  --ssl-outline: #e4ddef;
+  --ssl-shadow: 0 16px 38px rgba(49, 43, 72, .055);
+}
+
+body:not(.login-page) {
+  color: var(--ssl-ink);
+  background: radial-gradient(circle at 4% 8%, #fff8f2 0, transparent 27%),
+              radial-gradient(circle at 96% 10%, #f8f4ff 0, transparent 29%), #fdfcff;
+}
+
+/* Navegación compartida por los módulos principales. */
+.dc-header {
+  min-height: 76px;
+  height: auto;
+  color: #fff;
+  border: 0;
+  background: linear-gradient(110deg, #1e3440, #344e60);
+  box-shadow: 0 9px 26px rgba(25, 46, 57, .12);
+}
+.dc-header .brand strong,
+.dc-header .brand span,
+.dc-header .app-nav a,
+.dc-header .nav-group-trigger,
+.dc-header .app-nav .nav-icon,
+.dc-header .nav-chevron,
+.dc-header .dc-profile,
+.dc-header .dc-header-tools { color: #f7fcff; }
+.dc-header .brand span { opacity: .78; }
+.dc-header .brand img { background: rgba(255, 255, 255, .12); filter: brightness(0) invert(1); }
+.dc-header .app-nav a:hover,
+.dc-header .nav-group:hover .nav-group-trigger,
+.dc-header .nav-group.open .nav-group-trigger {
+  color: #fff;
+  background: rgba(255, 255, 255, .1);
+}
+.dc-header .app-nav a.active,
+.dc-header .nav-group.active .nav-group-trigger {
+  color: #fff;
+  background: transparent;
+}
+.dc-header .app-nav a.active::after,
+.dc-header .nav-group.active .nav-group-trigger::after { background: #69d1dc; }
+.dc-header .dc-search,
+.dc-header .dc-notification { color: #fff; border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.09); }
+.dc-header .dc-profile-copy small { color: #c5d6dc; }
+.dc-header .nav-group-menu { color: var(--ssl-ink); }
+.dc-header .nav-group-menu a,
+.dc-header .nav-group-menu .nav-icon { color: var(--ssl-ink); }
+
+.app-topbar { background: rgba(255,255,255,.94); border-bottom-color: var(--ssl-outline); }
+.content { width: min(1680px, 100%); padding: 30px clamp(18px, 2.7vw, 48px) 70px; }
+.hero {
+  min-height: 218px;
+  padding: clamp(26px, 3vw, 48px);
+  border: 1px solid #e7dcf2;
+  border-radius: 28px;
+  background: linear-gradient(110deg, #fff9f5 0%, #fff 40%, #f5f6ff 74%, #fff0e8 100%);
+  box-shadow: var(--ssl-shadow);
+}
+.hero::after { width: 210px; height: 210px; right: -72px; top: -85px; background: rgba(255, 208, 162, .36); }
+.hero h1 { color: var(--ssl-ink); font-size: clamp(29px, 3.5vw, 51px); line-height: 1.08; }
+.hero p:not(.eyebrow) { color: var(--ssl-muted); font-size: clamp(13px, 1vw, 16px); }
+.hero .eyebrow, .eyebrow { color: #bb7535; font-size: 11px; }
+
+.card, .ph-card, .ph-profile, .ph-info-strip article {
+  border: 1px solid var(--ssl-outline);
+  border-radius: 20px;
+  box-shadow: var(--ssl-shadow);
+}
+.card { padding: 24px; }
+.card-head h2, .card-head h3 { color: var(--ssl-ink); font-size: 18px; }
+.card-head p { font-size: 13px; }
+.grid { gap: 18px; }
+.grid.kpis { gap: 18px; margin: 20px 0 24px; }
+.grid.kpis .kpi {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  align-content: center;
+  column-gap: 17px;
+  min-height: 150px;
+  padding: 22px;
+  background: var(--kpi-surface, #f5faff);
+  border-color: var(--kpi-border, #d9e9f7);
+}
+.grid.kpis .kpi:nth-child(4n + 2) { --kpi-surface: #f3fcf7; --kpi-border: #d5eee0; }
+.grid.kpis .kpi:nth-child(4n + 3) { --kpi-surface: #fff9f1; --kpi-border: #f4dfc4; }
+.grid.kpis .kpi:nth-child(4n + 4) { --kpi-surface: #faf6ff; --kpi-border: #e7d9f5; }
+.grid.kpis .kpi::before {
+  content: attr(data-icon);
+  grid-column: 1;
+  grid-row: 1 / 4;
+  display: grid;
+  place-items: center;
+  align-self: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 17px;
+  color: #3b87ba;
+  background: #e2f1ff;
+  font-size: 24px;
+  font-weight: 700;
+}
+.grid.kpis .kpi:nth-child(4n + 2)::before { color: #329a72; background: #dff6e9; }
+.grid.kpis .kpi:nth-child(4n + 3)::before { color: #dc8a34; background: #ffead3; }
+.grid.kpis .kpi:nth-child(4n + 4)::before { color: #9270c0; background: #efe3fa; }
+.grid.kpis .kpi::after { display: none; }
+.grid.kpis .kpi-label,
+.grid.kpis .kpi-value,
+.grid.kpis .kpi-note { grid-column: 2; margin: 0; }
+.grid.kpis .kpi-label { font-size: 12px; color: var(--ssl-muted); }
+.grid.kpis .kpi-value { font-size: clamp(23px, 2vw, 32px); line-height: 1.25; color: var(--ssl-ink); }
+.grid.kpis .kpi-note { font-size: 11px; color: var(--ssl-muted); }
+
+/* Expediente: la barra propia conserva la misma navegación oscura. */
+.ph-body { min-width: 0; }
+.ph-header { background: linear-gradient(110deg, #1e3440, #344e60); box-shadow: 0 9px 26px rgba(25,46,57,.12); }
+.ph-header nav a.active { border-bottom-color: #69d1dc; }
+.ph-sidebar { background: transparent; }
+.ph-profile, .ph-info-strip article, .ph-card { background: #fff; }
+.ph-record-nav { border: 1px solid var(--ssl-outline); border-radius: 18px; box-shadow: var(--ssl-shadow); }
+.ph-record-nav button.active { background: #ddeff1; color: #1e5660; }
+.ph-info-strip { gap: 10px; overflow: visible; }
+.ph-workspace { padding: 24px; }
+
+/* Mantiene las opciones del odontograma dentro de la ventana. */
+.ph-finding-popover:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  max-height: min(470px, calc(100dvh - 20px));
+  overflow: hidden;
+}
+.ph-finding-popover .ph-findings { flex: 1 1 auto; min-height: 0; overflow-y: auto; align-content: start; }
+
+@media (max-width: 1180px) {
+  .grid.kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .dc-header { min-height: 64px; }
+  .dc-header .app-nav { background: #203844; }
+  .dc-header .app-nav a, .dc-header .nav-group-trigger { color: #f7fcff; }
+  .content { padding: 18px 12px 44px; }
+  .hero { min-height: 0; padding: 24px 20px; border-radius: 20px; }
+  .grid.kpis { gap: 10px; }
+  .grid.kpis .kpi { min-height: 125px; grid-template-columns: 42px 1fr; gap: 4px 9px; padding: 12px; }
+  .grid.kpis .kpi::before { width: 40px; height: 40px; border-radius: 12px; font-size: 18px; }
+  .grid.kpis .kpi-value { font-size: 21px; }
+  .ph-workspace { padding: 12px; }
+  .ph-info-strip { display: grid; gap: 6px; }
+}
