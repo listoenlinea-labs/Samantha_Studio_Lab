@@ -59,3 +59,44 @@ test('la agenda consulta citas de un periodo y rechaza rangos inválidos', async
         await new Promise((resolve) => server.close(resolve));
     }
 });
+
+test('editar y eliminar una cita persiste cambios y conserva auditoría', async () => {
+    const previousConnection = pool.getConnection;
+    const calls = [];
+    pool.getConnection = async () => ({
+        beginTransaction: async () => calls.push('begin'),
+        commit: async () => calls.push('commit'),
+        rollback: async () => calls.push('rollback'),
+        release: () => calls.push('release'),
+        query: async (sql, params) => {
+            calls.push({ sql, params });
+            if (sql.includes('FOR UPDATE')) return [[{ id_paciente: 7, estado: 'CONFIRMADA' }]];
+            return [{ affectedRows: 1 }];
+        }
+    });
+    const app = express();
+    app.use(express.json());
+    app.use('/api/clinica', routes);
+    const server = app.listen(0);
+    try {
+        const url = `http://127.0.0.1:${server.address().port}/api/clinica/citas/9`;
+        const edited = await fetch(url, { method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ inicioAt: '2026-10-01T10:00', finAt: '2026-10-01T10:45',
+                motivo: 'Control de higiene', estado: 'CONFIRMADA', doctor: 'Dra. Sofía', comentario: 'Prueba' }) });
+        assert.equal(edited.status, 200);
+        assert.ok(calls.some((call) => call.sql?.startsWith('UPDATE citas SET inicio_at')
+            && call.params[0] === '2026-10-01 10:00' && call.params.at(-1) === 9));
+        assert.ok(calls.some((call) => call.sql?.includes('EDITAR_CITA')));
+        const removed = await fetch(url, { method: 'DELETE' });
+        assert.equal(removed.status, 200);
+        assert.ok(calls.some((call) => call.sql?.includes("estado = 'CANCELADA'") && call.params[0] === 9));
+        assert.ok(calls.some((call) => call.sql?.includes('CANCELAR_CITA')));
+        assert.equal(calls.filter((call) => call === 'commit').length, 2);
+        assert.equal((await fetch(url, { method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ inicioAt: '2026-10-01T11:00', finAt: '2026-10-01T10:00',
+                motivo: 'Error', estado: 'PROGRAMADA' }) })).status, 400);
+    } finally {
+        pool.getConnection = previousConnection;
+        await new Promise((resolve) => server.close(resolve));
+    }
+});
