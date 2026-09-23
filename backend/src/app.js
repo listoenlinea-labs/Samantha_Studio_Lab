@@ -44,11 +44,26 @@ app.use(helmet({
     // las fotos servidas por el endpoint de pacientes.
     crossOriginResourcePolicy: { policy: 'cross-origin' }
 }));
-app.use(cors({
-    origin(origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-        return callback(new Error('Origen no permitido por CORS'));
+app.use(cors((req, callback) => {
+    const origin = req.get('origin');
+    let sameOrigin = false;
+    if (origin) {
+        try {
+            const parsed = new URL(origin);
+            sameOrigin = parsed.host === req.get('host')
+                && (process.env.NODE_ENV !== 'production' || parsed.protocol === 'https:');
+        } catch (_) {
+            // Un Origin inválido se rechaza como cualquier otro origen no autorizado.
+        }
     }
+    callback(null, {
+        origin(requestOrigin, done) {
+            if (!requestOrigin || sameOrigin || allowedOrigins.includes(requestOrigin)) {
+                return done(null, true);
+            }
+            return done(new Error('Origen no permitido por CORS'));
+        }
+    });
 }));
 app.use(express.json({ limit: '1mb' }));
 // Muestra cada solicitud atendida y su resultado en la consola.
