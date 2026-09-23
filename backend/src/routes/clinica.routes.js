@@ -3,6 +3,83 @@ const pool = require('../config/database');
 
 const router = express.Router();
 
+const appointmentStates = ['PROGRAMADA', 'POR_CONFIRMAR', 'CONFIRMADA', 'EN_SALA', 'FINALIZADA', 'CANCELADA', 'NO_ASISTIO'];
+const validDateTime = (value) => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)
+    && !Number.isNaN(Date.parse(`${value}:00Z`));
+
+router.patch('/citas/:id', async (req, res, next) => {
+    const id = Number(req.params.id);
+    const { inicioAt, finAt, doctor, motivo, estado, comentario } = req.body || {};
+    const start = String(inicioAt || '');
+    const end = String(finAt || '');
+    const professional = String(doctor ?? '').trim();
+    const reason = String(motivo ?? '').trim();
+    const note = String(comentario ?? '').trim();
+    const status = String(estado || '').trim().toUpperCase();
+    if (!Number.isSafeInteger(id) || id < 1 || !validDateTime(start) || !validDateTime(end)
+        || Date.parse(`${end}:00Z`) <= Date.parse(`${start}:00Z`)
+        || !reason || reason.length > 255 || professional.length > 160 || note.length > 4000
+        || !appointmentStates.includes(status)) {
+        return res.status(400).json({ ok: false, mensaje: 'Revisa la fecha, horario y datos de la cita.' });
+    }
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
+        const [rows] = await connection.query('SELECT id_paciente, estado FROM citas WHERE id_cita = ? FOR UPDATE', [id]);
+        if (!rows.length || rows[0].estado === 'CANCELADA') {
+            await connection.rollback();
+            return res.status(404).json({ ok: false, mensaje: 'La cita ya no está disponible.' });
+        }
+        await connection.query(
+            `UPDATE citas SET inicio_at = ?, fin_at = ?, doctor = ?, motivo = ?, estado = ?, comentario = ?
+             WHERE id_cita = ?`,
+            [start.replace('T', ' '), end.replace('T', ' '), professional || null, reason, status, note || null, id]
+        );
+        await connection.query(
+            `INSERT INTO auditoria (entidad, id_entidad, accion, detalle) VALUES ('pacientes', ?, 'EDITAR_CITA', ?)`,
+            [rows[0].id_paciente, JSON.stringify({ idCita: id })]
+        );
+        await connection.commit();
+        return res.json({ ok: true, mensaje: 'Cita actualizada.' });
+    } catch (error) {
+        if (connection) await connection.rollback();
+        next(error);
+    } finally {
+        connection?.release();
+    }
+});
+
+router.delete('/citas/:id', async (req, res, next) => {
+    const id = Number(req.params.id);
+    if (!Number.isSafeInteger(id) || id < 1) {
+        return res.status(400).json({ ok: false, mensaje: 'El identificador de cita no es válido.' });
+    }
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
+        const [rows] = await connection.query('SELECT id_paciente, estado FROM citas WHERE id_cita = ? FOR UPDATE', [id]);
+        if (!rows.length || rows[0].estado === 'CANCELADA') {
+            await connection.rollback();
+            return res.status(404).json({ ok: false, mensaje: 'La cita ya no está disponible.' });
+        }
+        // Conserva el historial de la cita y la auditoría; las vistas omiten las canceladas.
+        await connection.query("UPDATE citas SET estado = 'CANCELADA' WHERE id_cita = ?", [id]);
+        await connection.query(
+            `INSERT INTO auditoria (entidad, id_entidad, accion, detalle) VALUES ('pacientes', ?, 'CANCELAR_CITA', ?)`,
+            [rows[0].id_paciente, JSON.stringify({ idCita: id })]
+        );
+        await connection.commit();
+        return res.json({ ok: true, mensaje: 'Cita eliminada de la agenda.' });
+    } catch (error) {
+        if (connection) await connection.rollback();
+        next(error);
+    } finally {
+        connection?.release();
+    }
+});
+
 router.get('/citas', async (req, res, next) => {
     try {
         const from = String(req.query.desde || '');
