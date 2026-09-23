@@ -13,6 +13,24 @@ body:not(.login-page) {
 }
 
 /* Navegación compartida por los módulos principales. */
+.dc-month-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dc-month-chip-time {
+  flex: 0 0 auto;
+  min-width: 42px;
+  padding-right: 9px;
+  border-right: 1px solid rgba(48, 57, 76, .22);
+  font-weight: 800;
+}
+.dc-month-chip-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .dc-header {
   min-height: 76px;
   height: auto;
@@ -182,6 +200,8 @@ body:not(.login-page) {
   .grid.kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 760px) {
+  .dc-month-chip { gap: 4px; }
+  .dc-month-chip-time { min-width: 0; padding-right: 4px; }
   .dc-header { min-height: 64px; }
   .dc-header .app-nav { background: #203844; }
   .dc-header .app-nav a, .dc-header .nav-group-trigger { color: #f7fcff; }
