@@ -99,6 +99,8 @@ const odontogramasRoutes = require('./routes/odontogramas.routes');
 const periodontogramasRoutes = require('./routes/periodontogramas.routes');
 const archivosRoutes = require('./routes/archivos.routes');
 const tratamientosRoutes = require('./routes/tratamientos.routes');
+const clinicaRoutes = require('./routes/clinica.routes');
+app.use('/api/clinica', clinicaRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/pacientes', pacientesClinicosRoutes);
 app.use('/api/pacientes', pacientesRoutes);
