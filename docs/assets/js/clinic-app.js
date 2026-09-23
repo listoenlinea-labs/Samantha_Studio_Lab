@@ -243,7 +243,7 @@
   }
 
   function appointmentRows(items = demoAppointments, clinical = false) {
-    return `<div class="agenda-day">${items.map((a) => `<article class="appointment ${a.kind}"><div class="appointment-time"><strong>${esc(a.time)}</strong><span>${a.minutes} min</span></div><div class="appointment-copy"><strong>${esc(a.patient)}</strong><span>${esc(a.treatment)} · ${esc(a.doctor)}</span>${a.chair ? `<span class="appointment-chair chair-${a.chair.toLowerCase()}">Silla ${a.chair}${a.chair === 'A' ? ' · Camitas' : ' · General'}</span>` : ''}${a.note ? `<span class="negative">● ${esc(a.note)}</span>` : ''}</div><div class="appointment-actions">${status(a.state, a.state === 'Confirmada' ? 'success' : 'warning')}${a.idPaciente ? `<a class="button soft" href="historial-paciente.html?id=${Number(a.idPaciente)}">Ver expediente</a>` : clinical ? button('Registrar', 'soft', `data-modal="procedure" data-patient="${esc(a.patient)}"`) : button('WhatsApp', 'soft', 'data-toast="Recordatorio preparado; requiere conectar WhatsApp Business API."')}</div></article>`).join('')}</div>`;
+    return `<div class="agenda-day">${items.map((a) => `<article class="appointment ${a.kind}"><div class="appointment-time"><strong>${esc(a.time)}</strong><span>${a.minutes} min</span></div><div class="appointment-copy"><strong>${esc(a.patient)}</strong><span>${esc(a.treatment)} · ${esc(a.doctor)}</span>${a.chair ? `<span class="appointment-chair chair-${a.chair.toLowerCase()}">Silla ${a.chair}${a.chair === 'A' ? ' · Camitas' : ' · General'}</span>` : ''}${a.note ? `<span class="negative">● ${esc(a.note)}</span>` : ''}</div><div class="appointment-actions">${status(a.state, a.state === 'Confirmada' ? 'success' : 'warning')}${a.idCita ? `<button class="button soft" type="button" data-modal="appointmentDetails" data-appointment-id="${Number(a.idCita)}">Ver cita</button>` : a.idPaciente ? `<a class="button soft" href="historial-paciente.html?id=${Number(a.idPaciente)}">Ver expediente</a>` : clinical ? button('Registrar', 'soft', `data-modal="procedure" data-patient="${esc(a.patient)}"`) : button('WhatsApp', 'soft', 'data-toast="Recordatorio preparado; requiere conectar WhatsApp Business API."')}</div></article>`).join('')}</div>`;
   }
 
   function chairAvailabilityBoard() {
@@ -342,9 +342,12 @@
     agendaRecords = data.items.map((item) => {
       const { date: appointmentDate, time } = mexicoDateTime(item.inicio);
       const minutes = item.fin ? Math.max(15, Math.round((new Date(item.fin) - new Date(item.inicio)) / 60000)) : 30;
-      return { date: appointmentDate, time, minutes, patient: item.paciente,
+      return { idCita: item.idCita, date: appointmentDate, time,
+        endTime: item.fin ? mexicoDateTime(item.fin).time : null,
+        minutes, patient: item.paciente, comment: item.comentario,
         idPaciente: item.idPaciente, treatment: item.motivo, doctor: item.doctor || 'Por asignar',
         state: item.estado === 'CONFIRMADA' ? 'Confirmada' : 'Por confirmar',
+        rawState: item.estado, esFicticio: Boolean(item.esFicticio),
         kind: item.estado === 'CONFIRMADA' ? 'normal' : 'pending',
         tone: item.estado === 'CONFIRMADA' ? 'sage' : 'gold', chair: null };
     });
@@ -1265,6 +1268,23 @@
 
   function modalContent(type, trigger) {
     const close = '<button class="icon-button" data-close-modal aria-label="Cerrar">×</button>';
+    if (type === 'appointmentDetails') {
+      const appointment = agendaRecords.find((item) => Number(item.idCita) === Number(trigger?.dataset.appointmentId));
+      if (!appointment) return `<div class="modal-head"><h2>No se encontró esta cita</h2>${close}</div><p>Actualiza la agenda y vuelve a intentarlo.</p>`;
+      const date = new Date(`${appointment.date}T12:00:00`).toLocaleDateString('es-MX', {
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+      });
+      return `<div class="modal-head"><div><h2>Detalles de la cita</h2><p class="modal-subtitle">${esc(appointment.patient)}${appointment.esFicticio ? ' · Paciente ficticio' : ''}</p></div>${close}</div>
+        <dl class="agenda-appointment-details">
+          <div><dt>Fecha</dt><dd>${esc(date)}</dd></div>
+          <div><dt>Horario</dt><dd>${esc(appointment.time)}${appointment.endTime ? ` – ${esc(appointment.endTime)}` : ''} · ${appointment.minutes} min</dd></div>
+          <div><dt>Motivo</dt><dd>${esc(appointment.treatment)}</dd></div>
+          <div><dt>Profesional</dt><dd>${esc(appointment.doctor)}</dd></div>
+          <div><dt>Estado</dt><dd>${status(appointment.rawState, appointment.rawState === 'CONFIRMADA' ? 'success' : 'warning')}</dd></div>
+          <div><dt>Observaciones</dt><dd>${esc(appointment.comment || 'Sin observaciones registradas.')}</dd></div>
+        </dl>
+        <div class="agenda-appointment-footer"><button type="button" class="button secondary" data-close-modal>Cerrar</button><a class="button primary" href="historial-paciente.html?id=${Number(appointment.idPaciente)}">Ir al historial clínico del paciente</a></div>`;
+    }
     const headers = {
       appointment: ['Nueva cita', 'Programa duración, complejidad y recordatorios.'],
       patient: ['Nuevo paciente', 'Crea el expediente y enlázalo a su tutor o familia.'],
@@ -2058,7 +2078,7 @@
         const muted = cellDate.getMonth() !== month;
         return `<div class="dc-month-day${muted ? ' muted' : ''}${dateKey === todayKey ? ' today' : ''}" data-calendar-date="${dateKey}">
           <strong>${cellDate.getDate()}</strong>
-          ${events.map((item) => `<a class="dc-month-chip ${item.tone}" href="historial-paciente.html?id=${Number(item.idPaciente)}" title="${esc(item.time)} · ${esc(item.patient)}"><span class="dc-month-chip-time">${esc(item.time)}</span><span class="dc-month-chip-name">${esc(item.patient)}</span></a>`).join('')}
+          ${events.map((item) => `<button type="button" class="dc-month-chip ${item.tone}" data-modal="appointmentDetails" data-appointment-id="${Number(item.idCita)}" title="${esc(item.time)} · ${esc(item.patient)}"><span class="dc-month-chip-time">${esc(item.time)}</span><span class="dc-month-chip-name">${esc(item.patient)}</span></button>`).join('')}
           ${!muted ? `<button class="dc-month-add" type="button" data-modal="appointment" data-date="${dateKey}" aria-label="Agendar cita el ${cellDate.getDate()} de ${monthNames[month]}">＋ Agendar</button>` : ''}
         </div>`;
       }).join('');
@@ -2090,7 +2110,7 @@
         if (column > 6 || hour < 8 || hour > 17) return '';
         const start = hour - 8;
         const span = Math.max(1, Math.min(10 - start, Math.ceil(item.minutes / 60)));
-        return `<a class="dc-event ${item.tone}" style="--day:${column};--start:${start};--span:${span}" href="historial-paciente.html?id=${Number(item.idPaciente)}"><b>${esc(item.time)}</b><strong>${esc(item.patient)}</strong><span>${esc(item.treatment)}</span></a>`;
+        return `<button type="button" class="dc-event ${item.tone}" style="--day:${column};--start:${start};--span:${span}" data-modal="appointmentDetails" data-appointment-id="${Number(item.idCita)}"><b>${esc(item.time)}</b><strong>${esc(item.patient)}</strong><span>${esc(item.treatment)}</span></button>`;
       }).join(''));
       const dayRows = document.querySelector('.dc-day-view .agenda-day');
       document.querySelector('.dc-day-view .live-empty')?.remove();
