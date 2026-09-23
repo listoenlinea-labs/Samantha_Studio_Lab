@@ -11,6 +11,7 @@
   const number = new Intl.NumberFormat('es-MX');
   let clinicalData = null;
   let clinicalError = '';
+  let agendaError = '';
   const clinicApi = window.APP_CONFIG?.API_URL ||
     (['localhost', '127.0.0.1'].includes(location.hostname)
       ? 'http://localhost:3000/api' : `${location.origin}/api`);
@@ -337,6 +338,7 @@
     const response = await fetch(`${clinicApi}/clinica/citas?desde=${from}&hasta=${to}`);
     if (!response.ok) throw new Error('No fue posible consultar las citas de este periodo.');
     const data = await response.json();
+    if (!Array.isArray(data.items)) throw new Error('La respuesta de citas no tiene el formato esperado.');
     agendaRecords = data.items.map((item) => {
       const { date: appointmentDate, time } = mexicoDateTime(item.inicio);
       const minutes = item.fin ? Math.max(15, Math.round((new Date(item.fin) - new Date(item.inicio)) / 60000)) : 30;
@@ -347,6 +349,7 @@
         tone: item.estado === 'CONFIRMADA' ? 'sage' : 'gold', chair: null };
     });
     monthAppointmentEvents = agendaRecords;
+    agendaError = '';
     return agendaRecords;
   }
 
@@ -2061,11 +2064,16 @@
       }).join('');
     }
 
-    let loadedAgendaMonth = `${agendaDate.getFullYear()}-${agendaDate.getMonth()}`;
+    let loadedAgendaMonth = agendaError ? '' : `${agendaDate.getFullYear()}-${agendaDate.getMonth()}`;
     let agendaRequest = 0;
 
     function renderAgendaData() {
       if (!document.querySelector('.dc-calendar-body')) return;
+      const monthView = document.querySelector('.dc-month-context');
+      if (monthView) {
+        monthView.querySelector('.live-empty')?.remove();
+        if (agendaError) monthView.insertAdjacentHTML('beforeend', `<p class="live-empty" role="alert">${esc(agendaError)}</p>`);
+      }
       const monday = getMonday(agendaDate);
       const weekEnd = new Date(monday);
       weekEnd.setDate(monday.getDate() + 6);
@@ -2106,10 +2114,13 @@
       loadedAgendaMonth = monthKey;
       loadAgendaAppointments(new Date(agendaDate)).then(() => {
         if (request === agendaRequest) updateAgendaPeriod();
-      }).catch(() => {
+      }).catch((error) => {
         if (request === agendaRequest) {
           loadedAgendaMonth = '';
-          document.getElementById('agendaWeekSummary').textContent = 'No fue posible cargar este periodo.';
+          agendaError = error.message;
+          document.getElementById('agendaPeriodSubtitle').textContent = agendaError;
+          document.getElementById('agendaWeekSummary').textContent = agendaError;
+          renderAgendaData();
         }
       });
     }
@@ -2538,12 +2549,13 @@
   if (['dashboard', 'agenda', 'operacion', 'seguimientos', 'finanzas', 'reportes'].includes(page)) {
     await loadClinicalData();
   }
-  if (page === 'agenda' && clinicalData) {
+  if (page === 'agenda') {
     try {
-      await loadAgendaAppointments(new Date(`${clinicalData.fecha}T12:00:00`));
-      demoAppointments = agendaRecords.filter((item) => item.date === clinicalData.fecha);
+      const selectedDate = clinicalData?.fecha || new Date().toLocaleDateString('en-CA', { timeZone: 'America/Mexico_City' });
+      await loadAgendaAppointments(new Date(`${selectedDate}T12:00:00`));
+      demoAppointments = agendaRecords.filter((item) => item.date === selectedDate);
     } catch (error) {
-      clinicalError = error.message;
+      agendaError = error.message;
     }
   }
   (renderers[page] || renderLiveDashboard)();
