@@ -344,6 +344,7 @@
       const minutes = item.fin ? Math.max(15, Math.round((new Date(item.fin) - new Date(item.inicio)) / 60000)) : 30;
       return { idCita: item.idCita, date: appointmentDate, time,
         endTime: item.fin ? mexicoDateTime(item.fin).time : null,
+        endDate: item.fin ? mexicoDateTime(item.fin).date : null,
         minutes, patient: item.paciente, comment: item.comentario,
         idPaciente: item.idPaciente, treatment: item.motivo, doctor: item.doctor || 'Por asignar',
         state: item.estado === 'CONFIRMADA' ? 'Confirmada' : 'Por confirmar',
@@ -1268,6 +1269,24 @@
 
   function modalContent(type, trigger) {
     const close = '<button class="icon-button" data-close-modal aria-label="Cerrar">×</button>';
+    if (type === 'appointmentEdit') {
+      const appointment = agendaRecords.find((item) => Number(item.idCita) === Number(trigger?.dataset.appointmentId));
+      if (!appointment) return `<div class="modal-head"><h2>No se encontró esta cita</h2>${close}</div>`;
+      const end = appointment.endTime || `${String((Number(appointment.time.slice(0, 2)) + 1) % 24).padStart(2, '0')}:${appointment.time.slice(3)}`;
+      return `<div class="modal-head"><div><h2>Editar cita</h2><p class="modal-subtitle">${esc(appointment.patient)}</p></div>${close}</div>
+        <form id="appointmentEditForm" data-appointment-id="${Number(appointment.idCita)}">
+          <div class="form-grid">
+            <div class="field"><label for="editAppointmentStart">Inicio</label><input class="input" id="editAppointmentStart" name="inicioAt" type="datetime-local" value="${esc(appointment.date)}T${esc(appointment.time)}" required></div>
+            <div class="field"><label for="editAppointmentEnd">Fin</label><input class="input" id="editAppointmentEnd" name="finAt" type="datetime-local" value="${esc(appointment.endDate || appointment.date)}T${esc(end)}" required></div>
+            <div class="field wide"><label for="editAppointmentReason">Motivo</label><input class="input" id="editAppointmentReason" name="motivo" maxlength="255" value="${esc(appointment.treatment)}" required></div>
+            <div class="field"><label for="editAppointmentDoctor">Profesional</label><input class="input" id="editAppointmentDoctor" name="doctor" maxlength="160" value="${esc(appointment.doctor === 'Por asignar' ? '' : appointment.doctor)}"></div>
+            <div class="field"><label for="editAppointmentStatus">Estado</label><select class="select" id="editAppointmentStatus" name="estado">${[['PROGRAMADA', 'Programada'], ['POR_CONFIRMAR', 'Por confirmar'], ['CONFIRMADA', 'Confirmada'], ['EN_SALA', 'En sala'], ['FINALIZADA', 'Finalizada'], ['NO_ASISTIO', 'No asistió']].map(([value, label]) => `<option value="${value}" ${appointment.rawState === value ? 'selected' : ''}>${label}</option>`).join('')}</select></div>
+            <div class="field wide"><label for="editAppointmentNote">Observaciones</label><textarea class="textarea" id="editAppointmentNote" name="comentario" maxlength="4000">${esc(appointment.comment || '')}</textarea></div>
+          </div>
+          <p id="appointmentActionError" class="negative" role="alert" hidden></p>
+          <div class="agenda-appointment-footer"><button class="button secondary" type="button" data-modal="appointmentDetails" data-appointment-id="${Number(appointment.idCita)}">Volver</button><button class="button primary" type="submit">Guardar cambios</button></div>
+        </form>`;
+    }
     if (type === 'appointmentDetails') {
       const appointment = agendaRecords.find((item) => Number(item.idCita) === Number(trigger?.dataset.appointmentId));
       if (!appointment) return `<div class="modal-head"><h2>No se encontró esta cita</h2>${close}</div><p>Actualiza la agenda y vuelve a intentarlo.</p>`;
@@ -1283,7 +1302,8 @@
           <div><dt>Estado</dt><dd>${status(appointment.rawState, appointment.rawState === 'CONFIRMADA' ? 'success' : 'warning')}</dd></div>
           <div><dt>Observaciones</dt><dd>${esc(appointment.comment || 'Sin observaciones registradas.')}</dd></div>
         </dl>
-        <div class="agenda-appointment-footer"><button type="button" class="button secondary" data-close-modal>Cerrar</button><a class="button primary" href="historial-paciente.html?id=${Number(appointment.idPaciente)}">Ir al historial clínico del paciente</a></div>`;
+        <p id="appointmentActionError" class="negative" role="alert" hidden></p>
+        <div class="agenda-appointment-footer"><button type="button" class="button secondary" data-close-modal>Cerrar</button><button type="button" class="button secondary" data-modal="appointmentEdit" data-appointment-id="${Number(appointment.idCita)}">Editar cita</button><button type="button" class="button secondary agenda-delete" data-appointment-delete="${Number(appointment.idCita)}">Eliminar cita</button><a class="button primary" href="historial-paciente.html?id=${Number(appointment.idPaciente)}">Ir al historial clínico del paciente</a></div>`;
     }
     const headers = {
       appointment: ['Nueva cita', 'Programa duración, complejidad y recordatorios.'],
@@ -1817,6 +1837,30 @@
       }
       if (event.target.closest('[data-close-modal]') || event.target.id === 'modalBackdrop') closeModal();
     });
+    const appointmentError = (message) => {
+      const target = document.getElementById('appointmentActionError');
+      if (target) { target.textContent = message; target.hidden = false; }
+    };
+    document.addEventListener('click', async (event) => {
+      const button = event.target.closest('[data-appointment-delete]');
+      if (!button) return;
+      const id = Number(button.dataset.appointmentDelete);
+      if (!window.confirm('¿Eliminar esta cita de la agenda? Se conservará como cancelada en el historial del paciente.')) return;
+      button.disabled = true;
+      try {
+        const response = await fetch(`${clinicApi}/clinica/citas/${id}`, { method: 'DELETE' });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.mensaje || 'No se pudo eliminar la cita.');
+        closeModal();
+        loadedAgendaMonth = '';
+        refreshAgendaRange();
+        showToast('Cita eliminada de la agenda.');
+      } catch (error) {
+        appointmentError(error.message);
+      } finally {
+        button.disabled = false;
+      }
+    });
     document.addEventListener('submit', (event) => {
       if (event.target.id === 'agendaConfigForm') {
         event.preventDefault();
@@ -1841,6 +1885,33 @@
       showToast(
         'Registro guardado en la demostración. El backend persistirá y auditará el cambio.'
       );
+    });
+    document.addEventListener('submit', async (event) => {
+      if (event.target.id !== 'appointmentEditForm') return;
+      event.preventDefault();
+      const form = event.target;
+      const values = Object.fromEntries(new FormData(form));
+      if (values.finAt <= values.inicioAt) {
+        appointmentError('La hora de fin debe ser posterior a la de inicio.');
+        return;
+      }
+      const save = form.querySelector('[type="submit"]');
+      save.disabled = true;
+      try {
+        const response = await fetch(`${clinicApi}/clinica/citas/${Number(form.dataset.appointmentId)}`, {
+          method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(values)
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.mensaje || 'No se pudo actualizar la cita.');
+        closeModal();
+        loadedAgendaMonth = '';
+        refreshAgendaRange();
+        showToast('Cita actualizada correctamente.');
+      } catch (error) {
+        appointmentError(error.message);
+      } finally {
+        save.disabled = false;
+      }
     });
     document
       .querySelectorAll('[data-dentition-button]')
