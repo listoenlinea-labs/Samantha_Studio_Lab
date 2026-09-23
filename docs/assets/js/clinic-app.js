@@ -1,4 +1,4 @@
-(function () {
+(async function () {
   'use strict';
 
   const seed = window.SSL_SEED || {};
@@ -9,6 +9,11 @@
     maximumFractionDigits: 0
   });
   const number = new Intl.NumberFormat('es-MX');
+  let clinicalData = null;
+  let clinicalError = '';
+  const clinicApi = window.APP_CONFIG?.API_URL ||
+    (['localhost', '127.0.0.1'].includes(location.hostname)
+      ? 'http://localhost:3000/api' : `${location.origin}/api`);
 
   const nav = [{
     section: 'Operación'
@@ -25,7 +30,6 @@
     label: 'Agenda',
     href: 'agenda.html',
     icon: '▣',
-    badge: '8',
     permissions: ['Administrador', 'Asistente', 'Recepcionista']
   },
   {
@@ -54,7 +58,6 @@
     label: 'Seguimientos',
     href: 'seguimientos.html',
     icon: '✉',
-    badge: '3',
     permissions: ['Administrador', 'Asistente', 'Recepcionista']
   },
   {
@@ -62,7 +65,6 @@
     label: 'Inventario',
     href: 'inventario.html',
     icon: '▦',
-    badge: '!',
     permissions: ['Administrador', 'Asistente']
   },
   {
@@ -1244,17 +1246,98 @@
     );
   }
 
+  const clinicDate = (value) => new Intl.DateTimeFormat('es-MX', {
+    dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/Mexico_City'
+  }).format(new Date(value));
+
+  function liveAppointments(items) {
+    if (!items.length) return '<div class="live-appointments"><p class="live-empty">No hay citas registradas para esta fecha.</p></div>';
+    return `<div class="live-appointments">${items.map((item) => `
+      <a class="live-appointment" href="historial-paciente.html?id=${Number(item.idPaciente)}">
+        <time>${esc(clinicDate(item.inicio))}</time>
+        <span><strong>${esc(item.paciente)}${item.esFicticio ? ' · Ficticio' : ''}</strong><small>${esc(item.motivo)} · ${esc(item.doctor || 'Profesional por asignar')}</small></span>
+        ${status(item.estado, item.estado === 'CONFIRMADA' ? 'success' : 'warning')}
+      </a>`).join('')}</div>`;
+  }
+
+  function liveUnavailable() {
+    shell(hero('Datos del consultorio', 'No pudimos consultar la base de datos.',
+      clinicalError || 'Intenta actualizar la página en unos momentos.') +
+      '<section class="card"><p>Los datos aparecen cuando se restablece la conexión con la API.</p></section>');
+  }
+
+  function renderLiveDashboard() {
+    if (!clinicalData) return liveUnavailable();
+    const m = clinicalData.metricas;
+    shell(hero('Panel general · datos de MySQL', 'La clínica, sin perder ningún detalle.',
+      'Pacientes, citas y seguimiento conectados al expediente.',
+      '<a class="button primary" href="pacientes.html">Ver pacientes y registrar uno nuevo</a>', 'assets/img/logo-ssl.svg') +
+      `<section class="grid kpis">
+        ${kpi('Pacientes activos', number.format(m.pacientes), `${m.pacientesFicticios} de prueba`, 'var(--lilac-200)')}
+        ${kpi('Citas de hoy', number.format(m.citas), `${m.confirmadas} confirmadas`, 'var(--peach-200)')}
+        ${kpi('Tareas pendientes', number.format(m.tareas), 'Seguimientos por atender', 'var(--gold-400)')}
+        ${kpi('Historias clínicas', number.format(m.historias), 'Versiones vigentes', 'var(--sage-500)')}
+      </section>
+      <section class="card"><div class="card-head"><div><h2>Agenda de hoy</h2><p>Las citas de la base de datos para el día actual.</p></div><a class="button soft" href="agenda.html">Abrir agenda</a></div>${liveAppointments(clinicalData.citas)}</section>`);
+  }
+
+  function renderLiveAgenda() {
+    if (!clinicalData) return liveUnavailable();
+    shell(hero('Agenda clínica', 'Las citas del consultorio.',
+      'Selecciona una fecha para ver los pacientes programados en MySQL.',
+      '<a class="button primary" href="pacientes.html">Abrir pacientes para registrar una cita</a>') +
+      `<section class="card"><div class="card-head"><div><h2>Citas programadas</h2><p>${number.format(clinicalData.metricas.citas)} citas · ${number.format(clinicalData.metricas.confirmadas)} confirmadas</p></div><label class="live-date-label">Fecha <input id="liveAgendaDate" type="date" value="${esc(clinicalData.fecha)}"></label></div>${liveAppointments(clinicalData.citas)}</section>`);
+    document.getElementById('liveAgendaDate')?.addEventListener('change', async (event) => {
+      await loadClinicalData(event.target.value);
+      if (!clinicalData) { renderLiveAgenda(); return; }
+      document.querySelector('.card .live-appointments').outerHTML = liveAppointments(clinicalData.citas);
+      document.querySelector('.card-head p').textContent = `${clinicalData.metricas.citas} citas · ${clinicalData.metricas.confirmadas} confirmadas`;
+    });
+  }
+
+  function renderLiveOperation() {
+    if (!clinicalData) return liveUnavailable();
+    shell(hero('Jornada clínica', 'Pacientes citados hoy.',
+      'Abre el expediente de cada paciente para registrar su atención.') +
+      `<section class="card"><div class="card-head"><div><h2>Atenciones del día</h2><p>${clinicalData.metricas.citas} citas registradas</p></div><a class="button soft" href="agenda.html">Ver otra fecha</a></div>${liveAppointments(clinicalData.citas)}</section>`);
+  }
+
+  function renderLiveFollowups() {
+    if (!clinicalData) return liveUnavailable();
+    const rows = clinicalData.tareas.map((item) => `<a class="live-appointment" href="historial-paciente.html?id=${Number(item.idPaciente)}"><span><strong>${esc(item.paciente)}${item.esFicticio ? ' · Ficticio' : ''}</strong><small>${esc(item.nombre)} · ${esc(item.descripcion || 'Sin descripción')}</small></span>${status(item.estado, 'warning')}</a>`).join('');
+    shell(hero('Seguimientos', 'Tareas pendientes del consultorio.', 'Las tareas se leen directamente del expediente de cada paciente.') +
+      `<section class="card"><div class="card-head"><h2>${clinicalData.metricas.tareas} pendientes</h2></div><div class="live-appointments">${rows || '<p class="live-empty">No hay tareas pendientes.</p>'}</div></section>`);
+  }
+
+  function renderLiveFinance() {
+    if (!clinicalData) return liveUnavailable();
+    const rows = clinicalData.presupuestos.map((item) => `<a class="live-appointment" href="historial-paciente.html?id=${Number(item.idPaciente)}"><span><strong>${esc(item.paciente)}${item.esFicticio ? ' · Ficticio' : ''}</strong><small>${esc(item.concepto)}</small></span><strong>${money.format(Number(item.total))}</strong>${status(item.estado)}</a>`).join('');
+    shell(hero('Finanzas', 'Presupuestos registrados.', 'Importes guardados en MySQL, sin cifras simuladas.') +
+      `<section class="card"><div class="card-head"><h2>Presupuestos recientes</h2></div><div class="live-appointments">${rows || '<p class="live-empty">No hay presupuestos registrados.</p>'}</div></section>`);
+  }
+
+  function renderLiveReports() {
+    if (!clinicalData) return liveUnavailable();
+    const m = clinicalData.metricas;
+    shell(hero('Reporte operativo', 'Datos registrados en el consultorio.',
+      'Resumen de pacientes, expedientes, citas y tareas consultado en MySQL.') +
+      `<section class="grid kpis">${kpi('Pacientes activos', number.format(m.pacientes), 'Registro actual', 'var(--lilac-200)')}
+      ${kpi('Citas del día', number.format(m.citas), `${m.confirmadas} confirmadas`, 'var(--peach-200)')}
+      ${kpi('Historias clínicas', number.format(m.historias), 'Vigentes', 'var(--gold-400)')}
+      ${kpi('Seguimientos', number.format(m.tareas), 'Pendientes', 'var(--sage-500)')}</section>`);
+  }
+
   const renderers = {
-    dashboard: renderDashboard,
-    agenda: renderAgenda,
+    dashboard: renderLiveDashboard,
+    agenda: renderLiveAgenda,
     pacientes: renderPatients,
-    operacion: renderOperation,
+    operacion: renderLiveOperation,
     tratamientos: renderTreatments,
-    seguimientos: renderFollowups,
+    seguimientos: renderLiveFollowups,
     inventario: renderInventory,
-    finanzas: renderFinance,
+    finanzas: renderLiveFinance,
     radiografias: renderRx,
-    reportes: renderReports,
+    reportes: renderLiveReports,
     configuracion: renderConfig,
   };
 
@@ -2473,6 +2556,21 @@
     }));
   }
 
-  (renderers[page] || renderDashboard)();
+  async function loadClinicalData(date = '') {
+    try {
+      const response = await fetch(`${clinicApi}/clinica/resumen${date ? `?fecha=${encodeURIComponent(date)}` : ''}`);
+      if (!response.ok) throw new Error('No se pudo cargar la información clínica.');
+      clinicalData = await response.json();
+      clinicalError = '';
+    } catch (error) {
+      clinicalData = null;
+      clinicalError = error.message;
+    }
+  }
+
+  if (['dashboard', 'agenda', 'operacion', 'seguimientos', 'finanzas', 'reportes'].includes(page)) {
+    await loadClinicalData();
+  }
+  (renderers[page] || renderLiveDashboard)();
   bindCommon();
 })();
