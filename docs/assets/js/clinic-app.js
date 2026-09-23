@@ -213,7 +213,11 @@
     '"': '&quot;'
   }[character]));
   const status = (label, tone = 'info') => `<span class="status ${tone}"><span class="dot"></span>${esc(label)}</span>`;
-  const kpi = (label, value, note, color) => `<article class="card kpi" style="--kpi:${color}"><span class="kpi-label">${label}</span><strong class="kpi-value">${value}</strong><div class="kpi-note">${note}</div></article>`;
+  const kpi = (label, value, note, color) => {
+    const icon = /pacient/i.test(label) ? '♙' : /cita|agenda/i.test(label) ? '▦'
+      : /ingreso|venta|meta|cobro|presupuesto/i.test(label) ? '▥' : '◇';
+    return `<article class="card kpi" style="--kpi:${color}" data-icon="${icon}"><span class="kpi-label">${label}</span><strong class="kpi-value">${value}</strong><div class="kpi-note">${note}</div></article>`;
+  };
   const button = (label, className = 'secondary', attrs = '') => `<button class="button ${className}" ${attrs}>${label}</button>`;
 
   function currentRole() {
