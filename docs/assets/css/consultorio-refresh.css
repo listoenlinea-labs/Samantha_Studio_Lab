@@ -9,7 +9,7 @@
 body:not(.login-page) {
   color: var(--ssl-ink);
   background: radial-gradient(circle at 4% 8%, #fff8f2 0, transparent 27%),
-              radial-gradient(circle at 96% 10%, #f8f4ff 0, transparent 29%), #fdfcff;
+    radial-gradient(circle at 96% 10%, #f8f4ff 0, transparent 29%), #fdfcff;
 }
 
 /* Navegación compartida por los módulos principales. */
@@ -18,6 +18,7 @@ body:not(.login-page) {
   align-items: center;
   gap: 10px;
 }
+
 .dc-month-chip-time {
   flex: 0 0 auto;
   min-width: 42px;
@@ -25,26 +26,76 @@ body:not(.login-page) {
   border-right: 1px solid rgba(48, 57, 76, .22);
   font-weight: 800;
 }
+
 .dc-month-chip-name {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.agenda-appointment-details { display: grid; gap: 0; margin: 0; }
-.agenda-appointment-details > div {
+
+.agenda-appointment-details {
+  display: grid;
+  gap: 0;
+  margin: 0;
+}
+
+.agenda-appointment-details>div {
   display: grid;
   grid-template-columns: minmax(100px, 35%) 1fr;
   gap: 14px;
   padding: 13px 0;
   border-bottom: 1px solid var(--ssl-outline);
 }
-.agenda-appointment-details dt { color: var(--ssl-muted); font-weight: 700; }
-.agenda-appointment-details dd { margin: 0; overflow-wrap: anywhere; }
-.agenda-appointment-footer { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
-.agenda-appointment-footer .agenda-delete { color: #a33838; border-color: #e9c5c5; }
-.agenda-appointment-footer .agenda-delete:hover { background: #fff1f1; }
-.dc-header .dc-search { min-width: 168px; text-align: left; }
-.dc-month-chip:focus-visible, .dc-event:focus-visible { outline: 2px solid var(--dc-teal); outline-offset: 2px; }
+
+.agenda-appointment-details dt {
+  color: var(--ssl-muted);
+  font-weight: 700;
+}
+
+.agenda-appointment-details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Da espacio a los cuatro botones del modal de detalles. */
+#modal:has(.agenda-appointment-details) {
+  box-sizing: border-box;
+  width: min(860px, calc(100vw - 36px));
+}
+
+.agenda-appointment-footer {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  gap: 10px;
+  margin-top: 24px;
+  overflow-x: auto;
+}
+
+.agenda-appointment-footer .button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.agenda-appointment-footer .agenda-delete {
+  color: #a33838;
+  border-color: #e9c5c5;
+}
+
+.agenda-appointment-footer .agenda-delete:hover {
+  background: #fff1f1;
+}
+
+.dc-header .dc-search {
+  min-width: 168px;
+  text-align: left;
+}
+
+.dc-month-chip:focus-visible,
+.dc-event:focus-visible {
+  outline: 2px solid var(--dc-teal);
+  outline-offset: 2px;
+}
 
 .dc-header {
   min-height: 76px;
@@ -54,6 +105,7 @@ body:not(.login-page) {
   background: linear-gradient(110deg, #1e3440, #344e60);
   box-shadow: 0 9px 26px rgba(25, 46, 57, .12);
 }
+
 .dc-header .brand strong,
 .dc-header .brand span,
 .dc-header .app-nav a,
@@ -61,34 +113,64 @@ body:not(.login-page) {
 .dc-header .app-nav .nav-icon,
 .dc-header .nav-chevron,
 .dc-header .dc-profile,
-.dc-header .dc-header-tools { color: #f7fcff; }
-.dc-header .brand span { opacity: .78; }
-.dc-header .brand img { background: rgba(255, 255, 255, .12); filter: brightness(0) invert(1); }
+.dc-header .dc-header-tools {
+  color: #f7fcff;
+}
+
+.dc-header .brand span {
+  opacity: .78;
+}
+
+.dc-header .brand img {
+  background: rgba(255, 255, 255, .12);
+  filter: brightness(0) invert(1);
+}
+
 .dc-header .app-nav a:hover,
 .dc-header .nav-group:hover .nav-group-trigger,
 .dc-header .nav-group.open .nav-group-trigger {
   color: #fff;
   background: rgba(255, 255, 255, .1);
 }
+
 .dc-header .app-nav a.active,
 .dc-header .nav-group.active .nav-group-trigger {
   color: #fff;
   background: transparent;
 }
+
 .dc-header .app-nav a.active::after,
-.dc-header .nav-group.active .nav-group-trigger::after { background: #69d1dc; }
+.dc-header .nav-group.active .nav-group-trigger::after {
+  background: #69d1dc;
+}
+
 .dc-header .dc-search,
-.dc-header .dc-notification { color: #fff; border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.09); }
-.dc-header .dc-profile-copy small { color: #c5d6dc; }
-.dc-header .nav-group-menu { color: var(--ssl-ink); }
+.dc-header .dc-notification {
+  color: #fff;
+  border-color: rgba(255, 255, 255, .22);
+  background: rgba(255, 255, 255, .09);
+}
+
+.dc-header .dc-profile-copy small {
+  color: #c5d6dc;
+}
+
+.dc-header .nav-group-menu {
+  color: var(--ssl-ink);
+}
+
 .dc-header .app-nav .nav-group-menu a,
-.dc-header .app-nav .nav-group-menu .nav-icon { color: var(--ssl-ink); }
+.dc-header .app-nav .nav-group-menu .nav-icon {
+  color: var(--ssl-ink);
+}
+
 .dc-header .app-nav .nav-group-menu a.active,
 .dc-header .app-nav .nav-group-menu a:hover {
   color: #174e5e;
   background: #e8f6f7;
   font-weight: 750;
 }
+
 .dc-header .app-nav .nav-group-menu a.active::before {
   content: '';
   position: absolute;
@@ -98,8 +180,16 @@ body:not(.login-page) {
   background: #258fa1;
 }
 
-.app-topbar { background: rgba(255,255,255,.94); border-bottom-color: var(--ssl-outline); }
-.content { width: min(1680px, 100%); padding: 30px clamp(18px, 2.7vw, 48px) 70px; }
+.app-topbar {
+  background: rgba(255, 255, 255, .94);
+  border-bottom-color: var(--ssl-outline);
+}
+
+.content {
+  width: min(1680px, 100%);
+  padding: 30px clamp(18px, 2.7vw, 48px) 70px;
+}
+
 .hero {
   min-height: 218px;
   padding: clamp(26px, 3vw, 48px);
@@ -108,29 +198,83 @@ body:not(.login-page) {
   background: linear-gradient(110deg, #fff9f5 0%, #fff 40%, #f5f6ff 74%, #fff0e8 100%);
   box-shadow: var(--ssl-shadow);
 }
-.hero::after { width: 210px; height: 210px; right: -72px; top: -85px; background: rgba(255, 208, 162, .36); }
-.hero h1 { color: var(--ssl-ink); font-size: clamp(29px, 3.5vw, 51px); line-height: 1.08; }
-.hero p:not(.eyebrow) { color: var(--ssl-muted); font-size: clamp(13px, 1vw, 16px); }
-.hero .eyebrow, .eyebrow { color: #bb7535; font-size: 11px; }
-.content > .hero:has(.hero-actions) {
+
+.hero::after {
+  width: 210px;
+  height: 210px;
+  right: -72px;
+  top: -85px;
+  background: rgba(255, 208, 162, .36);
+}
+
+.hero h1 {
+  color: var(--ssl-ink);
+  font-size: clamp(29px, 3.5vw, 51px);
+  line-height: 1.08;
+}
+
+.hero p:not(.eyebrow) {
+  color: var(--ssl-muted);
+  font-size: clamp(13px, 1vw, 16px);
+}
+
+.hero .eyebrow,
+.eyebrow {
+  color: #bb7535;
+  font-size: 11px;
+}
+
+.content>.hero:has(.hero-actions) {
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
   gap: 0;
 }
-.content > .hero .hero-actions { align-self: flex-start; margin-top: 21px; }
-.content > .hero .hero-mark { position: absolute; right: 38px; bottom: 28px; opacity: .55; }
 
-.card, .ph-card, .ph-profile, .ph-info-strip article {
+.content>.hero .hero-actions {
+  align-self: flex-start;
+  margin-top: 21px;
+}
+
+.content>.hero .hero-mark {
+  position: absolute;
+  right: 38px;
+  bottom: 28px;
+  opacity: .55;
+}
+
+.card,
+.ph-card,
+.ph-profile,
+.ph-info-strip article {
   border: 1px solid var(--ssl-outline);
   border-radius: 20px;
   box-shadow: var(--ssl-shadow);
 }
-.card { padding: 24px; }
-.card-head h2, .card-head h3 { color: var(--ssl-ink); font-size: 18px; }
-.card-head p { font-size: 13px; }
-.grid { gap: 18px; }
-.grid.kpis { gap: 18px; margin: 20px 0 24px; }
+
+.card {
+  padding: 24px;
+}
+
+.card-head h2,
+.card-head h3 {
+  color: var(--ssl-ink);
+  font-size: 18px;
+}
+
+.card-head p {
+  font-size: 13px;
+}
+
+.grid {
+  gap: 18px;
+}
+
+.grid.kpis {
+  gap: 18px;
+  margin: 20px 0 24px;
+}
+
 .grid.kpis .kpi {
   display: grid;
   grid-template-columns: 54px minmax(0, 1fr);
@@ -141,9 +285,22 @@ body:not(.login-page) {
   background: var(--kpi-surface, #f5faff);
   border-color: var(--kpi-border, #d9e9f7);
 }
-.grid.kpis .kpi:nth-child(4n + 2) { --kpi-surface: #f3fcf7; --kpi-border: #d5eee0; }
-.grid.kpis .kpi:nth-child(4n + 3) { --kpi-surface: #fff9f1; --kpi-border: #f4dfc4; }
-.grid.kpis .kpi:nth-child(4n + 4) { --kpi-surface: #faf6ff; --kpi-border: #e7d9f5; }
+
+.grid.kpis .kpi:nth-child(4n + 2) {
+  --kpi-surface: #f3fcf7;
+  --kpi-border: #d5eee0;
+}
+
+.grid.kpis .kpi:nth-child(4n + 3) {
+  --kpi-surface: #fff9f1;
+  --kpi-border: #f4dfc4;
+}
+
+.grid.kpis .kpi:nth-child(4n + 4) {
+  --kpi-surface: #faf6ff;
+  --kpi-border: #e7d9f5;
+}
+
 .grid.kpis .kpi::before {
   content: attr(data-icon);
   grid-column: 1;
@@ -159,27 +316,92 @@ body:not(.login-page) {
   font-size: 24px;
   font-weight: 700;
 }
-.grid.kpis .kpi:nth-child(4n + 2)::before { color: #329a72; background: #dff6e9; }
-.grid.kpis .kpi:nth-child(4n + 3)::before { color: #dc8a34; background: #ffead3; }
-.grid.kpis .kpi:nth-child(4n + 4)::before { color: #9270c0; background: #efe3fa; }
-.grid.kpis .kpi::after { display: none; }
+
+.grid.kpis .kpi:nth-child(4n + 2)::before {
+  color: #329a72;
+  background: #dff6e9;
+}
+
+.grid.kpis .kpi:nth-child(4n + 3)::before {
+  color: #dc8a34;
+  background: #ffead3;
+}
+
+.grid.kpis .kpi:nth-child(4n + 4)::before {
+  color: #9270c0;
+  background: #efe3fa;
+}
+
+.grid.kpis .kpi::after {
+  display: none;
+}
+
 .grid.kpis .kpi-label,
 .grid.kpis .kpi-value,
-.grid.kpis .kpi-note { grid-column: 2; margin: 0; }
-.grid.kpis .kpi-label { font-size: 12px; color: var(--ssl-muted); }
-.grid.kpis .kpi-value { font-size: clamp(23px, 2vw, 32px); line-height: 1.25; color: var(--ssl-ink); }
-.grid.kpis .kpi-note { font-size: 11px; color: var(--ssl-muted); }
+.grid.kpis .kpi-note {
+  grid-column: 2;
+  margin: 0;
+}
+
+.grid.kpis .kpi-label {
+  font-size: 12px;
+  color: var(--ssl-muted);
+}
+
+.grid.kpis .kpi-value {
+  font-size: clamp(23px, 2vw, 32px);
+  line-height: 1.25;
+  color: var(--ssl-ink);
+}
+
+.grid.kpis .kpi-note {
+  font-size: 11px;
+  color: var(--ssl-muted);
+}
 
 /* Expediente: la barra propia conserva la misma navegación oscura. */
-.ph-body { min-width: 0; }
-.ph-header { background: linear-gradient(110deg, #1e3440, #344e60); box-shadow: 0 9px 26px rgba(25,46,57,.12); }
-.ph-header nav a.active { border-bottom-color: #69d1dc; }
-.ph-sidebar { background: transparent; }
-.ph-profile, .ph-info-strip article, .ph-card { background: #fff; }
-.ph-record-nav { border: 1px solid var(--ssl-outline); border-radius: 18px; box-shadow: var(--ssl-shadow); }
-.ph-record-nav button.active { background: #ddeff1; color: #1e5660; }
-.ph-info-strip { gap: 10px; overflow: visible; }
-.ph-workspace { padding: 24px; }
+.ph-body {
+  min-width: 0;
+}
+
+.ph-header {
+  background: linear-gradient(110deg, #1e3440, #344e60);
+  box-shadow: 0 9px 26px rgba(25, 46, 57, .12);
+}
+
+.ph-header nav a.active {
+  border-bottom-color: #69d1dc;
+}
+
+.ph-sidebar {
+  background: transparent;
+}
+
+.ph-profile,
+.ph-info-strip article,
+.ph-card {
+  background: #fff;
+}
+
+.ph-record-nav {
+  border: 1px solid var(--ssl-outline);
+  border-radius: 18px;
+  box-shadow: var(--ssl-shadow);
+}
+
+.ph-record-nav button.active {
+  background: #ddeff1;
+  color: #1e5660;
+}
+
+.ph-info-strip {
+  gap: 10px;
+  overflow: visible;
+}
+
+.ph-workspace {
+  padding: 24px;
+}
 
 /* Mantiene las opciones del odontograma dentro de la ventana. */
 .ph-finding-popover:not([hidden]) {
@@ -189,9 +411,19 @@ body:not(.login-page) {
   max-height: min(470px, calc(100dvh - 20px));
   overflow: hidden;
 }
-.ph-finding-popover .ph-findings { flex: 1 1 auto; min-height: 0; overflow-y: auto; align-content: start; }
 
-.live-appointments { display: grid; gap: 10px; }
+.ph-finding-popover .ph-findings {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  align-content: start;
+}
+
+.live-appointments {
+  display: grid;
+  gap: 10px;
+}
+
 .live-appointment {
   display: flex;
   align-items: center;
@@ -203,33 +435,136 @@ body:not(.login-page) {
   border-radius: 15px;
   background: #fff;
 }
-.live-appointment:hover { background: #f6fbfc; }
-.live-appointment time { width: 155px; flex: 0 0 auto; color: #536e78; font-weight: 700; }
-.live-appointment span:not(.status) { display: grid; gap: 4px; min-width: 0; flex: 1; }
-.live-appointment small { color: var(--ssl-muted); font-size: 12px; }
-.live-empty { padding: 24px 0; color: var(--ssl-muted); }
-.live-date-label { display: grid; gap: 5px; font-size: 12px; color: var(--ssl-muted); }
-.live-date-label input { min-height: 40px; border: 1px solid var(--ssl-outline); border-radius: 9px; padding: 0 10px; background: #fff; }
+
+.live-appointment:hover {
+  background: #f6fbfc;
+}
+
+.live-appointment time {
+  width: 155px;
+  flex: 0 0 auto;
+  color: #536e78;
+  font-weight: 700;
+}
+
+.live-appointment span:not(.status) {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.live-appointment small {
+  color: var(--ssl-muted);
+  font-size: 12px;
+}
+
+.live-empty {
+  padding: 24px 0;
+  color: var(--ssl-muted);
+}
+
+.live-date-label {
+  display: grid;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--ssl-muted);
+}
+
+.live-date-label input {
+  min-height: 40px;
+  border: 1px solid var(--ssl-outline);
+  border-radius: 9px;
+  padding: 0 10px;
+  background: #fff;
+}
 
 @media (max-width: 1180px) {
-  .dc-header .dc-search { min-width: 0; text-align: center; }
-  .grid.kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dc-header .dc-search {
+    min-width: 0;
+    text-align: center;
+  }
+
+  .grid.kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
+
 @media (max-width: 760px) {
-  .dc-header .dc-search { min-width: 0; text-align: center; }
-  .dc-month-chip { gap: 4px; }
-  .dc-month-chip-time { min-width: 0; padding-right: 4px; }
-  .dc-header { min-height: 64px; }
-  .dc-header .app-nav { background: #203844; }
-  .dc-header .app-nav a, .dc-header .nav-group-trigger { color: #f7fcff; }
-  .content { padding: 18px 12px 44px; }
-  .hero { min-height: 0; padding: 24px 20px; border-radius: 20px; }
-  .grid.kpis { gap: 10px; }
-  .grid.kpis .kpi { min-height: 125px; grid-template-columns: 42px 1fr; gap: 4px 9px; padding: 12px; }
-  .grid.kpis .kpi::before { width: 40px; height: 40px; border-radius: 12px; font-size: 18px; }
-  .grid.kpis .kpi-value { font-size: 21px; }
-  .ph-workspace { padding: 12px; }
-  .ph-info-strip { display: grid; gap: 6px; }
-  .live-appointment { flex-wrap: wrap; gap: 8px 14px; }
-  .live-appointment time { width: 100%; }
+  .dc-header .dc-search {
+    min-width: 0;
+    text-align: center;
+  }
+
+  .dc-month-chip {
+    gap: 4px;
+  }
+
+  .dc-month-chip-time {
+    min-width: 0;
+    padding-right: 4px;
+  }
+
+  .dc-header {
+    min-height: 64px;
+  }
+
+  .dc-header .app-nav {
+    background: #203844;
+  }
+
+  .dc-header .app-nav a,
+  .dc-header .nav-group-trigger {
+    color: #f7fcff;
+  }
+
+  .content {
+    padding: 18px 12px 44px;
+  }
+
+  .hero {
+    min-height: 0;
+    padding: 24px 20px;
+    border-radius: 20px;
+  }
+
+  .grid.kpis {
+    gap: 10px;
+  }
+
+  .grid.kpis .kpi {
+    min-height: 125px;
+    grid-template-columns: 42px 1fr;
+    gap: 4px 9px;
+    padding: 12px;
+  }
+
+  .grid.kpis .kpi::before {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    font-size: 18px;
+  }
+
+  .grid.kpis .kpi-value {
+    font-size: 21px;
+  }
+
+  .ph-workspace {
+    padding: 12px;
+  }
+
+  .ph-info-strip {
+    display: grid;
+    gap: 6px;
+  }
+
+  .live-appointment {
+    flex-wrap: wrap;
+    gap: 8px 14px;
+  }
+
+  .live-appointment time {
+    width: 100%;
+  }
 }
