@@ -34,3 +34,28 @@ test('el resumen clínico entrega métricas y citas consultadas a MySQL', async 
         await new Promise((resolve) => server.close(resolve));
     }
 });
+
+test('la agenda consulta citas de un periodo y rechaza rangos inválidos', async () => {
+    const previousQuery = pool.query;
+    const calls = [];
+    pool.query = async (sql, params) => {
+        calls.push({ sql, params });
+        return [[{ idCita: 18, idPaciente: 4, paciente: 'Itzel Navarro Mejía', estado: 'CONFIRMADA' }]];
+    };
+    const app = express();
+    app.use('/api/clinica', routes);
+    const server = app.listen(0);
+    try {
+        const url = `http://127.0.0.1:${server.address().port}/api/clinica/citas`;
+        const response = await fetch(`${url}?desde=2026-09-01&hasta=2026-09-30`);
+        assert.equal(response.status, 200);
+        assert.equal((await response.json()).items[0].paciente, 'Itzel Navarro Mejía');
+        assert.deepEqual(calls[0].params, ['2026-09-01', '2026-09-30']);
+        assert.equal((await fetch(`${url}?desde=2026-09-30&hasta=2026-09-01`)).status, 400);
+        assert.equal((await fetch(`${url}?desde=2026-09-01&hasta=2026-12-01`)).status, 400);
+        assert.equal(calls.length, 1);
+    } finally {
+        pool.query = previousQuery;
+        await new Promise((resolve) => server.close(resolve));
+    }
+});

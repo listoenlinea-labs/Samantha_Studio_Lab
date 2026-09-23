@@ -3,6 +3,33 @@ const pool = require('../config/database');
 
 const router = express.Router();
 
+router.get('/citas', async (req, res, next) => {
+    try {
+        const from = String(req.query.desde || '');
+        const to = String(req.query.hasta || '');
+        const valid = (value) => /^\d{4}-\d{2}-\d{2}$/.test(value)
+            && !Number.isNaN(Date.parse(`${value}T12:00:00Z`));
+        const days = (Date.parse(`${to}T12:00:00Z`) - Date.parse(`${from}T12:00:00Z`)) / 86400000;
+        if (!valid(from) || !valid(to) || days < 0 || days > 62) {
+            return res.status(400).json({ ok: false, mensaje: 'Selecciona un periodo válido de hasta 63 días.' });
+        }
+        const [items] = await pool.query(
+            `SELECT c.id_cita AS idCita, c.id_paciente AS idPaciente,
+                    CONCAT_WS(' ', p.nombres, p.apellido_paterno, p.apellido_materno) AS paciente,
+                    c.inicio_at AS inicio, c.fin_at AS fin, c.doctor, c.motivo, c.estado,
+                    (p.correo LIKE '%@ejemplo.invalid') AS esFicticio
+             FROM citas c INNER JOIN pacientes p ON p.id_paciente = c.id_paciente
+             WHERE c.inicio_at >= ? AND c.inicio_at < DATE_ADD(?, INTERVAL 1 DAY)
+               AND c.estado NOT IN ('CANCELADA', 'NO_ASISTIO')
+             ORDER BY c.inicio_at LIMIT 500`,
+            [from, to]
+        );
+        return res.json({ items });
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.get('/resumen', async (req, res, next) => {
     try {
         const date = String(req.query.fecha || '').trim();

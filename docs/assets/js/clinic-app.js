@@ -114,68 +114,8 @@
     configuracion: ['Seguridad', 'Usuarios y permisos'],
   };
 
-  const demoAppointments = [{
-    time: '09:00',
-    minutes: 45,
-    patient: 'Paciente demo A',
-    treatment: 'Camitas · procedimiento preventivo',
-    doctor: 'Profesional A',
-    chair: 'A',
-    state: 'Confirmada',
-    kind: 'normal'
-  },
-  {
-    time: '10:00',
-    minutes: 90,
-    patient: 'Paciente demo B',
-    treatment: 'Procedimiento clínico demo',
-    doctor: 'Profesional A',
-    chair: 'B',
-    state: 'Confirmada',
-    kind: 'complex',
-    note: 'Paciente sensible · reservar tiempo adicional'
-  },
-  {
-    time: '11:30',
-    minutes: 30,
-    patient: 'Paciente demo C',
-    treatment: 'Revisión especializada',
-    doctor: 'Profesional B',
-    chair: 'C',
-    state: 'Por confirmar',
-    kind: 'pending'
-  },
-  {
-    time: '12:30',
-    minutes: 60,
-    patient: 'Paciente demo D',
-    treatment: 'Camitas · adaptación',
-    doctor: 'Profesional C',
-    chair: 'A',
-    state: 'Confirmada',
-    kind: 'normal'
-  },
-  {
-    time: '14:30',
-    minutes: 40,
-    patient: 'Paciente demo E',
-    treatment: 'Valoración inicial',
-    doctor: 'Profesional A',
-    chair: 'B',
-    state: 'Por confirmar',
-    kind: 'pending'
-  },
-  {
-    time: '15:30',
-    minutes: 60,
-    patient: 'Paciente demo F',
-    treatment: 'Procedimiento restaurativo',
-    doctor: 'Profesional A',
-    chair: 'C',
-    state: 'Confirmada',
-    kind: 'normal'
-  },
-  ];
+  let demoAppointments = [];
+  let agendaRecords = [];
 
   const dentalChairs = [{
     id: 'A',
@@ -200,12 +140,7 @@
     tone: 'general'
   }];
 
-  const monthAppointmentEvents = [{ date: '2026-09-14', time: '09:00', patient: 'Paciente demo A', chair: 'A', tone: 'lilac' },
-  { date: '2026-09-17', time: '13:00', patient: 'Paciente demo E', chair: 'B', tone: 'gold' },
-  { date: '2026-09-23', time: '11:30', patient: 'Paciente demo C', chair: 'C', tone: 'sage' },
-  { date: '2026-10-06', time: '10:00', patient: 'Paciente futura A', chair: 'A', tone: 'lilac' },
-  { date: '2026-10-19', time: '12:30', patient: 'Paciente futura B', chair: 'B', tone: 'coral' },
-  { date: '2026-11-12', time: '09:30', patient: 'Paciente futura C', chair: 'C', tone: 'sage' }];
+  let monthAppointmentEvents = [];
 
   const esc = (value) => String(value ?? '').replace(/[&<>'"]/g, (character) => ({
     '&': '&amp;',
@@ -307,10 +242,13 @@
   }
 
   function appointmentRows(items = demoAppointments, clinical = false) {
-    return `<div class="agenda-day">${items.map((a) => `<article class="appointment ${a.kind}"><div class="appointment-time"><strong>${a.time}</strong><span>${a.minutes} min</span></div><div class="appointment-copy"><strong>${a.patient}</strong><span>${a.treatment} · ${a.doctor}</span>${a.chair ? `<span class="appointment-chair chair-${a.chair.toLowerCase()}">Silla ${a.chair}${a.chair === 'A' ? ' · Camitas' : ' · General'}</span>` : ''}${a.note ? `<span class="negative">● ${a.note}</span>` : ''}</div><div class="appointment-actions">${status(a.state, a.state === 'Confirmada' ? 'success' : 'warning')}${clinical ? button('Registrar', 'soft', `data-modal="procedure" data-patient="${esc(a.patient)}"`) : button('WhatsApp', 'soft', 'data-toast="Recordatorio preparado; requiere conectar WhatsApp Business API."')}</div></article>`).join('')}</div>`;
+    return `<div class="agenda-day">${items.map((a) => `<article class="appointment ${a.kind}"><div class="appointment-time"><strong>${esc(a.time)}</strong><span>${a.minutes} min</span></div><div class="appointment-copy"><strong>${esc(a.patient)}</strong><span>${esc(a.treatment)} · ${esc(a.doctor)}</span>${a.chair ? `<span class="appointment-chair chair-${a.chair.toLowerCase()}">Silla ${a.chair}${a.chair === 'A' ? ' · Camitas' : ' · General'}</span>` : ''}${a.note ? `<span class="negative">● ${esc(a.note)}</span>` : ''}</div><div class="appointment-actions">${status(a.state, a.state === 'Confirmada' ? 'success' : 'warning')}${a.idPaciente ? `<a class="button soft" href="historial-paciente.html?id=${Number(a.idPaciente)}">Ver expediente</a>` : clinical ? button('Registrar', 'soft', `data-modal="procedure" data-patient="${esc(a.patient)}"`) : button('WhatsApp', 'soft', 'data-toast="Recordatorio preparado; requiere conectar WhatsApp Business API."')}</div></article>`).join('')}</div>`;
   }
 
   function chairAvailabilityBoard() {
+    if (!demoAppointments.some((appointment) => appointment.chair)) {
+      return '<div class="card live-empty">La base de datos aún no registra la silla asignada a cada cita. Consulta las vistas Día, Semana y Mes para ver las citas existentes.</div>';
+    }
     return `<section class="dc-chair-section" aria-labelledby="chairAvailabilityTitle">
       <div class="dc-chair-section-head">
         <div><p class="eyebrow">Resumen de ocupación de hoy</p><h2 id="chairAvailabilityTitle">Reservas de las tres sillas</h2><p>Compara rápidamente las reservas de hoy y después consulta el detalle diario, semanal o mensual de cada silla.</p></div>
@@ -382,6 +320,36 @@
     );
   }
 
+  function mexicoDateTime(value) {
+    const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'America/Mexico_City', year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+    }).formatToParts(new Date(value)).map((part) => [part.type, part.value]));
+    return { date: `${parts.year}-${parts.month}-${parts.day}`, time: `${parts.hour}:${parts.minute}` };
+  }
+
+  async function loadAgendaAppointments(date) {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const key = (value) => `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`;
+    const from = key(new Date(year, month, -7));
+    const to = key(new Date(year, month + 1, 14));
+    const response = await fetch(`${clinicApi}/clinica/citas?desde=${from}&hasta=${to}`);
+    if (!response.ok) throw new Error('No fue posible consultar las citas de este periodo.');
+    const data = await response.json();
+    agendaRecords = data.items.map((item) => {
+      const { date: appointmentDate, time } = mexicoDateTime(item.inicio);
+      const minutes = item.fin ? Math.max(15, Math.round((new Date(item.fin) - new Date(item.inicio)) / 60000)) : 30;
+      return { date: appointmentDate, time, minutes, patient: item.paciente,
+        idPaciente: item.idPaciente, treatment: item.motivo, doctor: item.doctor || 'Por asignar',
+        state: item.estado === 'CONFIRMADA' ? 'Confirmada' : 'Por confirmar',
+        kind: item.estado === 'CONFIRMADA' ? 'normal' : 'pending',
+        tone: item.estado === 'CONFIRMADA' ? 'sage' : 'gold', chair: null };
+    });
+    monthAppointmentEvents = agendaRecords;
+    return agendaRecords;
+  }
+
   function renderAgenda() {
     const canCreateAppointment = ['Administrador', 'Recepcionista'].includes(currentRole());
     shell(
@@ -414,8 +382,8 @@
           </button>
 
           <div>
-            <strong id="agendaPeriodTitle">14 – 19 septiembre 2026</strong>
-            <small id="agendaPeriodSubtitle">Semana clínica · 38 citas</small>
+            <strong id="agendaPeriodTitle">Agenda</strong>
+            <small id="agendaPeriodSubtitle">Cargando citas…</small>
           </div>
         </div>
 
@@ -558,14 +526,14 @@
             <div class="dc-dropdown-menu dc-options-menu" id="agendaOptionsMenu" hidden>
               <button
                 type="button"
-                data-toast="La descarga de la agenda se habilitará al conectar la base de datos.">
+                data-toast="La exportación de citas todavía no está disponible.">
                 <span>⇩</span>
                 Descargar
               </button>
 
               <button
                 type="button"
-                data-toast="No existen citas eliminadas en esta demostración.">
+                data-toast="La consulta de citas eliminadas todavía no está disponible.">
                 <span>▦</span>
                 Citas eliminadas
               </button>
@@ -604,15 +572,8 @@
   <strong>19</strong>
 </div></div><div class="dc-calendar-body">
         ${['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'].map((time) => `<div class="dc-hour"><span>${time}</span></div>`).join('')}
-        <button class="dc-event lilac" style="--day:1;--start:1;--span:2" data-modal="appointment"><b>09:00 · Silla A</b><strong>Paciente demo A</strong><span>Camitas · 45 min</span></button>
-        <button class="dc-event coral complex" style="--day:2;--start:2;--span:3" data-modal="appointment"><b>10:00 · Silla B</b><strong>Paciente demo B</strong><span>General · tiempo extra</span></button>
-        <button class="dc-event sage" style="--day:3;--start:4;--span:2" data-modal="appointment"><b>12:00 · Silla C</b><strong>Paciente demo C</strong><span>General · revisión ortopedia</span></button>
-        <button class="dc-event gold" style="--day:4;--start:1;--span:2" data-modal="appointment"><b>09:00 · Silla A</b><strong>Paciente demo D</strong><span>Camitas · por confirmar</span></button>
-        <button class="dc-event lilac" style="--day:4;--start:5;--span:2" data-modal="appointment"><b>13:00 · Silla B</b><strong>Paciente demo E</strong><span>General · primera consulta</span></button>
-        <button class="dc-event coral" style="--day:5;--start:3;--span:2" data-modal="appointment"><b>11:00 · Silla C</b><strong>Paciente demo F</strong><span>General · resina · 60 min</span></button>
-        <button class="dc-event sage" style="--day:6;--start:2;--span:2" data-modal="appointment"><b>10:00 · Silla B</b><strong>Paciente demo G</strong><span>General · estudio RX</span></button>
-      </div></article><aside class="dc-agenda-rail"><article class="card"><div class="card-head"><div><h2>Profesionales</h2><p>Visibilidad en agenda</p></div></div><label class="dc-doctor"><span class="avatar">SA</span><span><strong>Samantha</strong><small>5 citas hoy</small></span><input type="checkbox" checked></label><label class="dc-doctor"><span class="avatar peach">AS</span><span><strong>Asistente</strong><small>3 apoyos</small></span><input type="checkbox" checked></label><label class="dc-doctor"><span class="avatar sage">RX</span><span><strong>Samantha RX</strong><small>2 estudios</small></span><input type="checkbox" checked></label></article><article class="card"><div class="card-head"><div><h2>Estado de hoy</h2><p>Jueves 17</p></div></div><div class="dc-legend"><span><i class="lilac"></i>Confirmadas <b>6</b></span><span><i class="gold"></i>Por confirmar <b>2</b></span><span><i class="coral"></i>Complejas <b>1</b></span><span><i class="sage"></i>RX / apoyo <b>2</b></span></div><div class="callout warning"><strong>Atención:</strong> una cita requiere 90 minutos y manejo especial.</div></article></aside></section></section>
-      <section class="dc-agenda-view dc-day-view" data-agenda-view="day" hidden><article class="card"><div class="card-head"><div><h2 id="agendaDayTitle">Jueves 17 de septiembre</h2><p>Citas ordenadas por hora, duración y complejidad.</p></div>${status('8 citas', 'info')}</div>${appointmentRows(demoAppointments)}</article><aside class="dc-day-summary"><article class="card"><div class="card-head"><div><h2>Resumen del día</h2><p>Estado operativo</p></div></div><div class="dc-legend"><span><i class="lilac"></i>Confirmadas <b>6</b></span><span><i class="gold"></i>Por confirmar <b>2</b></span><span><i class="coral"></i>Complejas <b>1</b></span><span><i class="sage"></i>RX / apoyo <b>2</b></span></div></article><div class="callout warning"><strong>Atención:</strong> una cita requiere 90 minutos y manejo especial.</div></aside></section>
+      </div></article><aside class="dc-agenda-rail"><article class="card"><div class="card-head"><div><h2>Agenda real</h2><p>Citas almacenadas en MySQL</p></div></div><div id="agendaWeekSummary" class="dc-legend"></div></article></aside></section></section>
+      <section class="dc-agenda-view dc-day-view" data-agenda-view="day" hidden><article class="card"><div class="card-head"><div><h2 id="agendaDayTitle">Agenda diaria</h2><p>Citas ordenadas por hora.</p></div></div>${appointmentRows(demoAppointments)}</article><aside class="dc-day-summary"><article class="card"><h2>Resumen del día</h2><div id="agendaDaySummary" class="dc-legend"></div></article></aside></section>
       <section class="dc-agenda-view dc-month-view card" data-agenda-view="month" hidden><div class="dc-month-context"><strong id="agendaMonthHeading">Septiembre 2026</strong><span>Usa ‹ y › para consultar y agendar meses futuros.</span></div><div class="dc-month-head">${['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((day) => `<span>${day}</span>`).join('')}</div><div class="dc-month-grid" id="agendaMonthGrid"></div></section>
       </div>
       ${chairModeView()}
@@ -650,49 +611,7 @@
           </tr>
         </thead>
 
-        <tbody>
-          <tr>
-            <td>18 sep 2026</td>
-            <td>
-              <strong>Paciente demo A</strong>
-              <span class="table-sub">SSL-DEM-001</span>
-            </td>
-            <td>Confirmar próxima consulta</td>
-            <td>
-              ${status('Pendiente', 'warning')}
-            </td>
-            <td>Contactar al tutor por WhatsApp.</td>
-            <td>Samantha</td>
-          </tr>
-
-          <tr>
-            <td>19 sep 2026</td>
-            <td>
-              <strong>Paciente demo B</strong>
-              <span class="table-sub">SSL-DEM-002</span>
-            </td>
-            <td>Revisar evolución</td>
-            <td>
-              ${status('En proceso', 'info')}
-            </td>
-            <td>Revisar respuesta posterior al tratamiento.</td>
-            <td>Asistente</td>
-          </tr>
-
-          <tr>
-            <td>22 sep 2026</td>
-            <td>
-              <strong>Paciente demo C</strong>
-              <span class="table-sub">SSL-DEM-003</span>
-            </td>
-            <td>Programar estudio RX</td>
-            <td>
-              ${status('Confirmado', 'success')}
-            </td>
-            <td>Estudio solicitado por el profesional.</td>
-            <td>Samantha RX</td>
-          </tr>
-        </tbody>
+        <tbody>${(clinicalData?.tareas || []).map((task) => `<tr><td>${task.fechaEnvio ? esc(clinicDate(task.fechaEnvio)) : 'Por definir'}</td><td><a href="historial-paciente.html?id=${Number(task.idPaciente)}">${esc(task.paciente)}</a></td><td>${esc(task.nombre)}</td><td>${esc(task.estado)}</td><td>${esc(task.descripcion || '—')}</td><td>—</td></tr>`).join('') || '<tr><td colspan="6">No hay seguimientos pendientes.</td></tr>'}</tbody>
       </table>
     </div>
   </article>
@@ -1329,7 +1248,7 @@
 
   const renderers = {
     dashboard: renderLiveDashboard,
-    agenda: renderLiveAgenda,
+    agenda: renderAgenda,
     pacientes: renderPatients,
     operacion: renderLiveOperation,
     tratamientos: renderTreatments,
@@ -2043,7 +1962,7 @@
       });
     });
 
-    const agendaDate = new Date(2026, 8, 17);
+    const agendaDate = new Date(`${clinicalData?.fecha || new Date().toLocaleDateString('en-CA', { timeZone: 'America/Mexico_City' })}T12:00:00`);
 
     let currentAgendaView =
       localStorage.getItem('ssl-agenda-view') || 'week';
@@ -2136,30 +2055,79 @@
         const muted = cellDate.getMonth() !== month;
         return `<div class="dc-month-day${muted ? ' muted' : ''}${dateKey === todayKey ? ' today' : ''}" data-calendar-date="${dateKey}">
           <strong>${cellDate.getDate()}</strong>
-          ${events.map((item) => `<button class="dc-month-chip ${item.tone}" type="button" data-modal="appointment" data-date="${item.date}" data-time="${item.time}" data-chair="${item.chair}" title="${item.time} · ${item.patient} · Silla ${item.chair}"><span class="dc-month-chip-time">${item.time} · Silla ${item.chair}</span><span class="dc-month-chip-name">${item.patient}</span></button>`).join('')}
+          ${events.map((item) => `<a class="dc-month-chip ${item.tone}" href="historial-paciente.html?id=${Number(item.idPaciente)}" title="${esc(item.time)} · ${esc(item.patient)}"><span class="dc-month-chip-time">${esc(item.time)}</span><span class="dc-month-chip-name">${esc(item.patient)}</span></a>`).join('')}
           ${!muted ? `<button class="dc-month-add" type="button" data-modal="appointment" data-date="${dateKey}" aria-label="Agendar cita el ${cellDate.getDate()} de ${monthNames[month]}">＋ Agendar</button>` : ''}
         </div>`;
       }).join('');
     }
 
-    function chairAppointmentsForDate(chairId, dateKey) {
-      if (dateKey === '2026-09-17') {
-        return demoAppointments.filter((item) => item.chair === chairId);
-      }
+    let loadedAgendaMonth = `${agendaDate.getFullYear()}-${agendaDate.getMonth()}`;
+    let agendaRequest = 0;
 
+    function renderAgendaData() {
+      if (!document.querySelector('.dc-calendar-body')) return;
+      const monday = getMonday(agendaDate);
+      const weekEnd = new Date(monday);
+      weekEnd.setDate(monday.getDate() + 6);
+      const week = agendaRecords.filter((item) => item.date >= toDateKey(monday) && item.date < toDateKey(weekEnd));
+      const day = agendaRecords.filter((item) => item.date === toDateKey(agendaDate));
+      demoAppointments = day;
+
+      const calendar = document.querySelector('.dc-calendar-body');
+      calendar.querySelectorAll('.dc-event').forEach((event) => event.remove());
+      calendar.insertAdjacentHTML('beforeend', week.map((item) => {
+        const appointmentDate = new Date(`${item.date}T12:00:00`);
+        const column = (appointmentDate.getDay() + 6) % 7 + 1;
+        const hour = Number(item.time.slice(0, 2));
+        if (column > 6 || hour < 8 || hour > 17) return '';
+        const start = hour - 8;
+        const span = Math.max(1, Math.min(10 - start, Math.ceil(item.minutes / 60)));
+        return `<a class="dc-event ${item.tone}" style="--day:${column};--start:${start};--span:${span}" href="historial-paciente.html?id=${Number(item.idPaciente)}"><b>${esc(item.time)}</b><strong>${esc(item.patient)}</strong><span>${esc(item.treatment)}</span></a>`;
+      }).join(''));
+      const dayRows = document.querySelector('.dc-day-view .agenda-day');
+      document.querySelector('.dc-day-view .live-empty')?.remove();
+      if (dayRows) dayRows.outerHTML = appointmentRows(day) + (day.length ? '' : '<p class="live-empty">No hay citas para este día.</p>');
+      const weekSummary = document.getElementById('agendaWeekSummary');
+      if (weekSummary) weekSummary.textContent = `${week.length} citas · ${week.filter((item) => item.state === 'Confirmada').length} confirmadas`;
+      const daySummary = document.getElementById('agendaDaySummary');
+      if (daySummary) daySummary.textContent = `${day.length} citas · ${day.filter((item) => item.state === 'Confirmada').length} confirmadas`;
+      renderMonthGrid();
+      if (currentAgendaMode === 'chairs') renderChairSchedule();
+      const search = document.getElementById('agendaSearch')?.value.trim().toLowerCase();
+      if (search) document.querySelectorAll('.dc-event, .dc-month-chip').forEach((item) => {
+        item.hidden = !item.textContent.toLowerCase().includes(search);
+      });
+    }
+
+    function refreshAgendaRange() {
+      const monthKey = `${agendaDate.getFullYear()}-${agendaDate.getMonth()}`;
+      if (loadedAgendaMonth === monthKey) { renderAgendaData(); return; }
+      const request = ++agendaRequest;
+      loadedAgendaMonth = monthKey;
+      loadAgendaAppointments(new Date(agendaDate)).then(() => {
+        if (request === agendaRequest) updateAgendaPeriod();
+      }).catch(() => {
+        if (request === agendaRequest) {
+          loadedAgendaMonth = '';
+          document.getElementById('agendaWeekSummary').textContent = 'No fue posible cargar este periodo.';
+        }
+      });
+    }
+
+    function chairAppointmentsForDate(chairId, dateKey) {
       return monthAppointmentEvents
         .filter((item) => item.chair === chairId && item.date === dateKey)
-        .map((item) => ({
-          ...item,
-          minutes: 60,
-          treatment: chairId === 'A' ? 'Camitas' : 'Atención general',
-          state: 'Confirmada'
-        }));
+        .map((item) => ({ ...item }));
     }
 
     function renderChairSchedule() {
       const timeline = document.getElementById('chairScheduleTimeline');
       if (!timeline) return;
+
+      if (!agendaRecords.some((item) => item.chair)) {
+        timeline.innerHTML = '<p class="live-empty">Las citas existentes todavía no tienen una silla asignada en MySQL. Esta vista se activará al guardar esa asignación.</p>';
+        return;
+      }
 
       const chair = dentalChairs.find((item) => item.id === selectedChair) || dentalChairs[0];
       const dateKey = toDateKey(agendaDate);
@@ -2263,13 +2231,13 @@
         periodTitle.textContent = formatAgendaDate(agendaDate);
         periodSubtitle.textContent = currentAgendaMode === 'chairs' ?
           `Vista diaria · Silla ${selectedChair}` :
-          'Agenda del día · 8 citas';
+          `Agenda del día · ${agendaRecords.filter((item) => item.date === toDateKey(agendaDate)).length} citas`;
 
         if (dayTitle) {
           dayTitle.textContent = formatAgendaDate(agendaDate);
         }
 
-        if (currentAgendaMode === 'chairs') renderChairSchedule();
+        refreshAgendaRange();
 
         return;
       }
@@ -2281,10 +2249,9 @@
 
         periodSubtitle.textContent = currentAgendaMode === 'chairs' ?
           `Vista mensual · Silla ${selectedChair}` :
-          'Vista mensual · 38 citas';
+          `Vista mensual · ${agendaRecords.filter((item) => item.date.startsWith(`${agendaDate.getFullYear()}-${String(agendaDate.getMonth() + 1).padStart(2, '0')}`)).length} citas`;
 
-        if (currentAgendaMode === 'chairs') renderChairSchedule();
-        else renderMonthGrid();
+        refreshAgendaRange();
 
         return;
       }
@@ -2311,10 +2278,10 @@
 
       periodSubtitle.textContent = currentAgendaMode === 'chairs' ?
         `Vista semanal · Silla ${selectedChair}` :
-        'Semana clínica · 38 citas';
+        `Semana clínica · ${agendaRecords.filter((item) => item.date >= toDateKey(monday) && item.date < toDateKey(new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6))).length} citas`;
 
       updateWeeklyHeader();
-      if (currentAgendaMode === 'chairs') renderChairSchedule();
+      refreshAgendaRange();
     }
 
     const setAgendaView = (view) => {
@@ -2570,6 +2537,14 @@
 
   if (['dashboard', 'agenda', 'operacion', 'seguimientos', 'finanzas', 'reportes'].includes(page)) {
     await loadClinicalData();
+  }
+  if (page === 'agenda' && clinicalData) {
+    try {
+      await loadAgendaAppointments(new Date(`${clinicalData.fecha}T12:00:00`));
+      demoAppointments = agendaRecords.filter((item) => item.date === clinicalData.fecha);
+    } catch (error) {
+      clinicalError = error.message;
+    }
   }
   (renderers[page] || renderLiveDashboard)();
   bindCommon();
