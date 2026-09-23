@@ -126,13 +126,22 @@ router.post('/:id/hallazgos', async (req, res, next) => {
             await connection.rollback();
             return res.status(400).json({ ok: false, mensaje: 'Selecciona una superficie para este hallazgo.' });
         }
+        const [legacyPieceColumns] = await connection.query(
+            `SELECT column_name FROM information_schema.columns
+             WHERE table_schema = DATABASE()
+               AND table_name = 'odontograma_hallazgos'
+               AND column_name = 'pieza_dental'`
+        );
+        const hasLegacyPiece = legacyPieceColumns.length > 0;
         const values = pieces.map((piece) => [
-            odontogramId, catalog[0].id_catalogo_hallazgo, piece, surface,
+            odontogramId, catalog[0].id_catalogo_hallazgo, piece,
+            ...(hasLegacyPiece ? [piece] : []), surface,
             normalizedState, variant, extraData ? JSON.stringify(extraData) : null, observations
         ]);
         await connection.query(
             `INSERT INTO odontograma_hallazgos
-                (id_odontograma, id_catalogo_hallazgo, pieza, superficie,
+                (id_odontograma, id_catalogo_hallazgo, pieza,
+                 ${hasLegacyPiece ? 'pieza_dental, ' : ''}superficie,
                  estado_visual, variante, datos_json, observaciones)
              VALUES ?`,
             [values]
