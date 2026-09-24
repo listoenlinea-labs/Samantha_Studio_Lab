@@ -329,6 +329,20 @@
     return { date: `${parts.year}-${parts.month}-${parts.day}`, time: `${parts.hour}:${parts.minute}` };
   }
 
+  function mapAgendaAppointment(item) {
+    const { date: appointmentDate, time } = mexicoDateTime(item.inicio);
+    const minutes = item.fin ? Math.max(15, Math.round((new Date(item.fin) - new Date(item.inicio)) / 60000)) : 30;
+    return { idCita: item.idCita, date: appointmentDate, time,
+      endTime: item.fin ? mexicoDateTime(item.fin).time : null,
+      endDate: item.fin ? mexicoDateTime(item.fin).date : null,
+      minutes, patient: item.paciente, comment: item.comentario,
+      idPaciente: item.idPaciente, treatment: item.motivo, doctor: item.doctor || 'Por asignar',
+      state: item.estado === 'CONFIRMADA' ? 'Confirmada' : 'Por confirmar',
+      rawState: item.estado, esFicticio: Boolean(item.esFicticio),
+      kind: item.estado === 'CONFIRMADA' ? 'normal' : 'pending',
+      tone: item.estado === 'CONFIRMADA' ? 'sage' : 'gold', chair: null };
+  }
+
   async function loadAgendaAppointments(date) {
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -339,19 +353,7 @@
     if (!response.ok) throw new Error('No fue posible consultar las citas de este periodo.');
     const data = await response.json();
     if (!Array.isArray(data.items)) throw new Error('La respuesta de citas no tiene el formato esperado.');
-    agendaRecords = data.items.map((item) => {
-      const { date: appointmentDate, time } = mexicoDateTime(item.inicio);
-      const minutes = item.fin ? Math.max(15, Math.round((new Date(item.fin) - new Date(item.inicio)) / 60000)) : 30;
-      return { idCita: item.idCita, date: appointmentDate, time,
-        endTime: item.fin ? mexicoDateTime(item.fin).time : null,
-        endDate: item.fin ? mexicoDateTime(item.fin).date : null,
-        minutes, patient: item.paciente, comment: item.comentario,
-        idPaciente: item.idPaciente, treatment: item.motivo, doctor: item.doctor || 'Por asignar',
-        state: item.estado === 'CONFIRMADA' ? 'Confirmada' : 'Por confirmar',
-        rawState: item.estado, esFicticio: Boolean(item.esFicticio),
-        kind: item.estado === 'CONFIRMADA' ? 'normal' : 'pending',
-        tone: item.estado === 'CONFIRMADA' ? 'sage' : 'gold', chair: null };
-    });
+    agendaRecords = data.items.map(mapAgendaAppointment);
     monthAppointmentEvents = agendaRecords;
     agendaError = '';
     return agendaRecords;
@@ -1179,11 +1181,11 @@
   function liveAppointments(items) {
     if (!items.length) return '<div class="live-appointments"><p class="live-empty">No hay citas registradas para esta fecha.</p></div>';
     return `<div class="live-appointments">${items.map((item) => `
-      <a class="live-appointment" href="historial-paciente.html?id=${Number(item.idPaciente)}">
+      <button type="button" class="live-appointment" data-modal="appointmentDetails" data-appointment-id="${Number(item.idCita)}">
         <time>${esc(clinicDate(item.inicio))}</time>
         <span><strong>${esc(item.paciente)}${item.esFicticio ? ' · Ficticio' : ''}</strong><small>${esc(item.motivo)} · ${esc(item.doctor || 'Profesional por asignar')}</small></span>
         ${status(item.estado, item.estado === 'CONFIRMADA' ? 'success' : 'warning')}
-      </a>`).join('')}</div>`;
+      </button>`).join('')}</div>`;
   }
 
   function liveUnavailable() {
@@ -1852,6 +1854,7 @@
         const result = await response.json();
         if (!response.ok) throw new Error(result.mensaje || 'No se pudo eliminar la cita.');
         closeModal();
+        if (page === 'dashboard') { window.location.reload(); return; }
         loadedAgendaMonth = '';
         refreshAgendaRange();
         showToast('Cita eliminada de la agenda.');
@@ -1904,6 +1907,7 @@
         const result = await response.json();
         if (!response.ok) throw new Error(result.mensaje || 'No se pudo actualizar la cita.');
         closeModal();
+        if (page === 'dashboard') { window.location.reload(); return; }
         loadedAgendaMonth = '';
         refreshAgendaRange();
         showToast('Cita actualizada correctamente.');
@@ -2648,6 +2652,9 @@
     } catch (error) {
       agendaError = error.message;
     }
+  }
+  if (page === 'dashboard' && clinicalData) {
+    agendaRecords = clinicalData.citas.map(mapAgendaAppointment);
   }
   (renderers[page] || renderLiveDashboard)();
   bindCommon();
