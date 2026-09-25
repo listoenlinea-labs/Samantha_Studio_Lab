@@ -151,7 +151,7 @@
     const patient = state.patient;
     const tags = patient.etiquetas?.length ? patient.etiquetas.map((tag) => tag.nombre).join(', ') : 'Paciente activo';
     app.innerHTML = `
-      <header class="ph-header"><a href="pacientes.html" class="ph-brand"><img src="assets/img/logo-ssl.svg" alt=""><strong>samantha's studio lab</strong></a><nav><a href="agenda.html">Agenda</a><a class="active" href="pacientes.html">Pacientes</a><a href="finanzas.html">Finanzas</a><a href="inventario.html">Inventario</a></nav><div><button data-notify="Nueva cita preparada">＋ Crear</button><span>Administrador</span></div></header>
+      <header class="ph-header"><a href="pacientes.html" class="ph-brand"><img src="assets/img/logo-ssl.svg" alt=""><strong>samantha's studio lab</strong></a><nav><a href="agenda.html">Agenda</a><a class="active" href="pacientes.html">Pacientes</a><a href="finanzas.html">Finanzas</a><a href="inventario.html">Inventario</a></nav><div><button type="button" id="globalSearchToggle" aria-label="Buscar en la aplicación" aria-haspopup="dialog" aria-expanded="false" aria-controls="globalSearchPanel">⌕ Buscar</button><button data-notify="Nueva cita preparada">＋ Crear</button><span>Administrador</span></div></header>
       <main class="ph-layout">
         <aside class="ph-sidebar"><section class="ph-profile"><div class="ph-profile-cover"></div>${avatar(patient)}<h1>${escapeHtml(patient.nombreCompleto)}</h1><p>${patient.edad ?? 'Edad no registrada'}${patient.edad !== null ? ' años' : ''}</p><small>Creado el ${formatDate(patient.creadoAt)}</small><div class="ph-contact"><a href="${patient.telefono ? `tel:${escapeHtml(patient.telefono)}` : '#'}">☎</a><a href="${patient.correo ? `mailto:${escapeHtml(patient.correo)}` : '#'}">✉</a><button id="phMoreButton">⋮</button></div><div class="ph-more-menu" id="phMoreMenu" hidden><a href="pacientes.html">Editar datos y foto</a><button data-notify="La descarga del expediente se habilitará en Archivos">Descargar expediente</button></div></section>
           <nav class="ph-record-nav">${navigation.map(([id,label]) => `<button class="${id === 'odontogram' ? 'active' : ''}" data-record-view="${id}"><i>${icons[id]}</i>${label}</button>`).join('')}</nav></aside>
@@ -537,6 +537,7 @@
       state.patient = patient;
       state.findingCatalog = catalog.items || [];
       shell();
+      window.dispatchEvent(new Event('ssl:ready'));
       await loadOdontograms();
     } catch (error) {
       app.innerHTML = `<main class="ph-fatal"><h1>No se pudo abrir el expediente</h1><p>${escapeHtml(error.message)}</p><a href="pacientes.html">Volver a pacientes</a></main>`;

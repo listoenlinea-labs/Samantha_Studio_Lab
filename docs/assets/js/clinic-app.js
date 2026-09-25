@@ -219,7 +219,7 @@
           <button class="dc-menu-button" id="menuButton" aria-label="Abrir navegación" aria-controls="appSidebar">☰</button>
           <nav class="app-nav" id="appSidebar" aria-label="Navegación principal">${navigation(role)}</nav>
           <div class="dc-header-tools">
-            <button class="dc-search" data-toast="La búsqueda global se conectará al expediente clínico.">⌕ <span>Buscar</span></button>
+            <button class="dc-search" id="globalSearchToggle" type="button" aria-label="Buscar en la aplicación" aria-haspopup="dialog" aria-expanded="false" aria-controls="globalSearchPanel">⌕ <span>Buscar</span></button>
             <button class="dc-notification" data-toast="No tienes alertas críticas nuevas." aria-label="Notificaciones">♧<span></span></button>
             <div class="dc-profile"><span class="dc-avatar">SS</span><span class="dc-profile-copy"><strong>Samantha Studio</strong><small>${role}</small></span></div>
           </div>
@@ -234,6 +234,7 @@
         </main>
       </div>
       <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true"><div class="modal" id="modal"></div></div>
+      <div class="global-search-backdrop" id="globalSearchBackdrop" hidden><section class="global-search-panel" id="globalSearchPanel" role="dialog" aria-label="Buscar en la aplicación"><div class="global-search-head"><label for="globalSearchInput">Buscar en el consultorio</label><button type="button" id="globalSearchClose" aria-label="Cerrar búsqueda">×</button></div><input id="globalSearchInput" type="search" autocomplete="off" placeholder="Paciente, cita, tratamiento o sección"><div id="globalSearchResults" class="global-search-results" role="status" aria-live="polite"></div></section></div>
       <div class="toast" id="toast" role="status"></div>`;
   }
 
@@ -2094,7 +2095,8 @@
       });
     });
 
-    const agendaDate = new Date(`${clinicalData?.fecha || new Date().toLocaleDateString('en-CA', { timeZone: 'America/Mexico_City' })}T12:00:00`);
+    const requestedDate = new URLSearchParams(location.search).get('fecha');
+    const agendaDate = new Date(`${/^\d{4}-\d{2}-\d{2}$/.test(requestedDate || '') ? requestedDate : clinicalData?.fecha || new Date().toLocaleDateString('en-CA', { timeZone: 'America/Mexico_City' })}T12:00:00`);
 
     let currentAgendaView =
       localStorage.getItem('ssl-agenda-view') || 'week';
@@ -2680,7 +2682,8 @@
   }
   if (page === 'agenda') {
     try {
-      const selectedDate = clinicalData?.fecha || new Date().toLocaleDateString('en-CA', { timeZone: 'America/Mexico_City' });
+      const requestedDate = new URLSearchParams(location.search).get('fecha');
+      const selectedDate = /^\d{4}-\d{2}-\d{2}$/.test(requestedDate || '') ? requestedDate : clinicalData?.fecha || new Date().toLocaleDateString('en-CA', { timeZone: 'America/Mexico_City' });
       await loadAgendaAppointments(new Date(`${selectedDate}T12:00:00`));
       demoAppointments = agendaRecords.filter((item) => item.date === selectedDate);
     } catch (error) {
@@ -2692,4 +2695,17 @@
   }
   (renderers[page] || renderLiveDashboard)();
   bindCommon();
+  window.dispatchEvent(new Event('ssl:ready'));
+  if (page === 'agenda') {
+    const id = Number(new URLSearchParams(location.search).get('cita'));
+    if (Number.isSafeInteger(id) && id > 0 && agendaRecords.some((item) => Number(item.idCita) === id)) {
+      const trigger = document.createElement('button');
+      trigger.dataset.modal = 'appointmentDetails';
+      trigger.dataset.appointmentId = String(id);
+      trigger.hidden = true;
+      document.body.appendChild(trigger);
+      trigger.click();
+      trigger.remove();
+    }
+  }
 })();
