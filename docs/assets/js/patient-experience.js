@@ -449,7 +449,7 @@
           <div class="px-attendance-date"><button type="button" data-attendance-day="-1" aria-label="Día anterior">‹</button><label>Fecha <input type="date" id="pxAttendanceDate" value="${todayMexico()}"></label><button type="button" data-attendance-day="1" aria-label="Día siguiente">›</button><button type="button" id="pxAttendanceToday">Hoy</button></div>
         </header>
         <div class="px-attendance-summary" id="pxAttendanceSummary"></div>
-        <div class="px-attendance-filters"><label>Buscar paciente o motivo<input type="search" id="pxAttendanceSearch" placeholder="Escribe un nombre o motivo"></label><label>Estado<select id="pxAttendanceStatus"><option value="">Todos</option><option value="PENDIENTE">Pendientes</option><option value="EN_SALA">Llegaron</option><option value="FINALIZADA">Atendidas</option><option value="NO_ASISTIO">No asistieron</option></select></label><span id="pxAttendanceCount" role="status"></span></div>
+        <div class="px-attendance-filters"><label>Buscar paciente o motivo<input type="search" id="pxAttendanceSearch" placeholder="Escribe un nombre o motivo"></label><div class="px-attendance-status-field"><span id="pxAttendanceStatusLabel">Estado</span><select id="pxAttendanceStatus" tabindex="-1" aria-hidden="true"><option value="">Todos</option><option value="PENDIENTE">Pendientes</option><option value="EN_SALA">Llegaron</option><option value="FINALIZADA">Atendidas</option><option value="NO_ASISTIO">No asistieron</option></select><button type="button" class="dc-role-trigger px-attendance-status-trigger" id="pxAttendanceStatusToggle" aria-labelledby="pxAttendanceStatusLabel pxAttendanceStatusSelected" aria-haspopup="listbox" aria-expanded="false" aria-controls="pxAttendanceStatusMenu"><span id="pxAttendanceStatusSelected">Todos</span><span class="dc-select-chevron" aria-hidden="true"></span></button><div class="dc-role-menu px-attendance-status-menu" id="pxAttendanceStatusMenu" role="listbox" aria-labelledby="pxAttendanceStatusLabel" hidden>${[['', 'Todos'], ['PENDIENTE', 'Pendientes'], ['EN_SALA', 'Llegaron'], ['FINALIZADA', 'Atendidas'], ['NO_ASISTIO', 'No asistieron']].map(([value, label]) => `<button type="button" role="option" data-attendance-filter="${value}" aria-selected="${value === ''}">${label}<span aria-hidden="true">${value === '' ? '✓' : ''}</span></button>`).join('')}</div></div><span id="pxAttendanceCount" role="status"></span></div>
         <div class="px-attendance-table"><table><thead><tr><th>Hora y motivo</th><th>Paciente y profesional</th><th>Estado</th><th>Registrar asistencia</th></tr></thead><tbody id="pxAttendanceRows"></tbody></table></div>
       </section>
     </section>
@@ -486,6 +486,49 @@
   }));
   document.getElementById('pxAttendanceSearch').addEventListener('input', renderAttendance);
   document.getElementById('pxAttendanceStatus').addEventListener('change', renderAttendance);
+  const statusToggle = document.getElementById('pxAttendanceStatusToggle');
+  const statusMenu = document.getElementById('pxAttendanceStatusMenu');
+  const closeStatusMenu = (restoreFocus = false) => {
+    statusMenu.hidden = true;
+    statusToggle.setAttribute('aria-expanded', 'false');
+    if (restoreFocus) statusToggle.focus();
+  };
+  statusToggle.addEventListener('click', () => {
+    const opening = statusMenu.hidden;
+    statusMenu.hidden = !opening;
+    statusToggle.setAttribute('aria-expanded', String(opening));
+    if (opening) statusMenu.querySelector('[aria-selected="true"]')?.focus();
+  });
+  statusMenu.addEventListener('click', (event) => {
+    const option = event.target.closest('[data-attendance-filter]');
+    if (!option) return;
+    const value = option.dataset.attendanceFilter;
+    const filter = document.getElementById('pxAttendanceStatus');
+    filter.value = value;
+    document.getElementById('pxAttendanceStatusSelected').textContent = option.firstChild.textContent.trim();
+    statusMenu.querySelectorAll('[data-attendance-filter]').forEach((item) => {
+      const selected = item === option;
+      item.setAttribute('aria-selected', String(selected));
+      item.querySelector('span').textContent = selected ? '✓' : '';
+    });
+    closeStatusMenu(true);
+    filter.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  statusMenu.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') { event.preventDefault(); closeStatusMenu(true); return; }
+    if (event.key === 'Tab') { closeStatusMenu(); return; }
+    const options = [...statusMenu.querySelectorAll('[data-attendance-filter]')];
+    const index = options.indexOf(document.activeElement);
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp' || event.key === 'Home' || event.key === 'End') {
+      event.preventDefault();
+      const next = event.key === 'Home' ? 0 : event.key === 'End' ? options.length - 1
+        : (index + (event.key === 'ArrowDown' ? 1 : options.length - 1)) % options.length;
+      options[next]?.focus();
+    }
+  });
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.px-attendance-status-field')) closeStatusMenu();
+  });
   document.getElementById('pxAttendanceRows').addEventListener('click', async (event) => {
     const button = event.target.closest('[data-attendance-id]');
     if (!button || button.disabled) return;

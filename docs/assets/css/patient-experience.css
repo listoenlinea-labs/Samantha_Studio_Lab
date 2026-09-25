@@ -22,6 +22,11 @@
 .px-attendance-filters { display: flex; align-items: end; gap: 12px; margin-bottom: 17px; }
 .px-attendance-filters input { width: min(320px, 38vw); }
 .px-attendance-filters select { min-width: 160px; }
+.px-attendance-status-field { position: relative; display: grid; gap: 6px; color: #435a68; font-size: 12px; font-weight: 750; }
+#pxAttendanceStatus { position: absolute; width: 1px; height: 1px; min-width: 0; padding: 0; border: 0; opacity: 0; pointer-events: none; }
+.px-attendance-status-field .px-attendance-status-trigger { width: 200px; height: 42px; padding: 0 14px; border-color: #c9dce4; font-size: 13px; font-weight: 700; }
+.px-attendance-status-field .px-attendance-status-menu:not([hidden]) { right: auto; left: 0; width: 200px; box-sizing: border-box; }
+.px-attendance-status-field .px-attendance-status-menu button { min-height: 40px; font-size: 13px; }
 .px-attendance-filters > span { margin-left: auto; color: #657887; font-size: 13px; }
 .px-attendance-table { overflow-x: auto; border: 1px solid #d7e5e9; border-radius: 13px; }
 .px-attendance-table table { width: 100%; border-collapse: collapse; text-align: left; }
