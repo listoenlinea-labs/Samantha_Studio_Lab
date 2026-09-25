@@ -11,6 +11,9 @@
   let searchTimer;
   let activePatient = null;
   let activeDrawerTab = 'citas';
+  let attendanceItems = [];
+  let attendanceRequest = 0;
+  const todayMexico = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Mexico_City' });
 
   const escapeHtml = (value) =>
     String(value ?? '').replace(/[&<>"']/g, (char) => ({
@@ -340,13 +343,73 @@
     activePatient = null;
   }
 
+  const attendanceLabel = (status) => ({
+    EN_SALA: 'Llegó', NO_ASISTIO: 'No asistió', FINALIZADA: 'Atendida',
+    CONFIRMADA: 'Confirmada', POR_CONFIRMAR: 'Por confirmar', PROGRAMADA: 'Programada'
+  }[status] || status);
+
+  function renderAttendance() {
+    const search = document.getElementById('pxAttendanceSearch').value.trim().toLocaleLowerCase('es-MX');
+    const status = document.getElementById('pxAttendanceStatus').value;
+    const items = attendanceItems.filter((item) => {
+      const matchesSearch = !search || `${item.paciente} ${item.motivo || ''}`.toLocaleLowerCase('es-MX').includes(search);
+      const matchesStatus = !status || (status === 'PENDIENTE'
+        ? ['PROGRAMADA', 'CONFIRMADA', 'POR_CONFIRMAR'].includes(item.estado)
+        : item.estado === status);
+      return matchesSearch && matchesStatus;
+    });
+    const count = (states) => attendanceItems.filter((item) => states.includes(item.estado)).length;
+    document.getElementById('pxAttendanceSummary').innerHTML = `
+      <article><span>Citas del día</span><strong>${attendanceItems.length}</strong></article>
+      <article><span>Pendientes</span><strong>${count(['PROGRAMADA', 'CONFIRMADA', 'POR_CONFIRMAR'])}</strong></article>
+      <article><span>Llegaron o atendidas</span><strong>${count(['EN_SALA', 'FINALIZADA'])}</strong></article>
+      <article><span>No asistieron</span><strong>${count(['NO_ASISTIO'])}</strong></article>`;
+    document.getElementById('pxAttendanceCount').textContent = `${items.length} ${items.length === 1 ? 'cita' : 'citas'}`;
+    const future = document.getElementById('pxAttendanceDate').value > todayMexico();
+    document.getElementById('pxAttendanceRows').innerHTML = items.length ? items.map((item) => {
+      const fixed = item.estado === 'FINALIZADA';
+      const canMark = !future && !fixed;
+      return `<tr>
+        <td><strong>${escapeHtml(item.hora)}</strong><small>${escapeHtml(item.motivo || 'Consulta')}</small></td>
+        <td><a class="px-attendance-patient" href="historial-paciente.html?id=${Number(item.idPaciente)}">${escapeHtml(item.paciente)}</a><small>${escapeHtml(item.doctor || 'Profesional por asignar')}</small></td>
+        <td><span class="px-attendance-state ${escapeHtml(item.estado.toLowerCase())}">${escapeHtml(attendanceLabel(item.estado))}</span></td>
+        <td><div class="px-attendance-actions">
+          ${canMark && item.estado !== 'EN_SALA' ? `<button type="button" data-attendance-id="${Number(item.idCita)}" data-attendance-status="EN_SALA">Llegó</button>` : ''}
+          ${canMark && item.estado !== 'NO_ASISTIO' ? `<button type="button" class="absent" data-attendance-id="${Number(item.idCita)}" data-attendance-status="NO_ASISTIO">No asistió</button>` : ''}
+          ${canMark && ['EN_SALA', 'NO_ASISTIO'].includes(item.estado) ? `<button type="button" data-attendance-id="${Number(item.idCita)}" data-attendance-status="CONFIRMADA">Restablecer</button>` : ''}
+          ${future ? '<small>Disponible el día de la cita</small>' : fixed ? '<small>Cita finalizada</small>' : ''}
+        </div></td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="4" class="px-attendance-empty">No hay citas para esta fecha y filtros.</td></tr>';
+  }
+
+  async function loadAttendance() {
+    const fecha = document.getElementById('pxAttendanceDate').value;
+    const request = ++attendanceRequest;
+    const rows = document.getElementById('pxAttendanceRows');
+    rows.innerHTML = '<tr><td colspan="4" class="px-attendance-empty">Consultando citas…</td></tr>';
+    try {
+      const data = await api(`/clinica/asistencias?fecha=${encodeURIComponent(fecha)}`);
+      if (request !== attendanceRequest) return;
+      attendanceItems = data.items || [];
+      renderAttendance();
+    } catch (error) {
+      if (request !== attendanceRequest) return;
+      attendanceItems = [];
+      document.getElementById('pxAttendanceSummary').innerHTML = '';
+      document.getElementById('pxAttendanceCount').textContent = 'Sin datos';
+      rows.innerHTML = `<tr><td colspan="4" class="px-attendance-empty" role="alert">${escapeHtml(error.message)}</td></tr>`;
+    }
+  }
+
   content.innerHTML = `
     <section class="px-page" aria-labelledby="patientTitle">
       <div class="px-section-tabs" role="tablist">
-        <button class="active" type="button">Mis pacientes</button>
-        <button type="button" data-demo-toast="Asistencias estará conectada con la agenda clínica.">Asistencias</button>
+        <button class="active" type="button" data-px-view="patients" aria-selected="true">Mis pacientes</button>
+        <button type="button" data-px-view="attendance" aria-selected="false">Asistencias</button>
       </div>
 
+      <div id="pxPatientsView">
       <header class="px-toolbar">
         <div>
           <h1 id="patientTitle">Todos los pacientes</h1>
@@ -379,6 +442,16 @@
         <button disabled>‹</button><button class="current">1</button><button disabled>›</button>
         <span>Mostrar <b>20</b> resultados por página</span>
       </footer>
+      </div>
+
+      <section class="px-attendance" id="pxAttendanceView" hidden aria-label="Asistencias de pacientes">
+        <header class="px-attendance-header"><div><p>Agenda clínica · MySQL</p><h1>Asistencias</h1><span>Registra la llegada o la falta en la cita del paciente.</span></div>
+          <div class="px-attendance-date"><button type="button" data-attendance-day="-1" aria-label="Día anterior">‹</button><label>Fecha <input type="date" id="pxAttendanceDate" value="${todayMexico()}"></label><button type="button" data-attendance-day="1" aria-label="Día siguiente">›</button><button type="button" id="pxAttendanceToday">Hoy</button></div>
+        </header>
+        <div class="px-attendance-summary" id="pxAttendanceSummary"></div>
+        <div class="px-attendance-filters"><label>Buscar paciente o motivo<input type="search" id="pxAttendanceSearch" placeholder="Escribe un nombre o motivo"></label><label>Estado<select id="pxAttendanceStatus"><option value="">Todos</option><option value="PENDIENTE">Pendientes</option><option value="EN_SALA">Llegaron</option><option value="FINALIZADA">Atendidas</option><option value="NO_ASISTIO">No asistieron</option></select></label><span id="pxAttendanceCount" role="status"></span></div>
+        <div class="px-attendance-table"><table><thead><tr><th>Hora y motivo</th><th>Paciente y profesional</th><th>Estado</th><th>Registrar asistencia</th></tr></thead><tbody id="pxAttendanceRows"></tbody></table></div>
+      </section>
     </section>
 
     <div class="px-drawer-scrim" id="pxDrawerScrim"></div>
@@ -386,6 +459,50 @@
       <button class="px-drawer-close" id="pxDrawerClose" aria-label="Cerrar ficha">×</button>
       <div id="pxDrawerContent"></div>
     </aside>`;
+
+  document.querySelectorAll('[data-px-view]').forEach((button) => button.addEventListener('click', () => {
+    const attendance = button.dataset.pxView === 'attendance';
+    document.getElementById('pxPatientsView').hidden = attendance;
+    document.getElementById('pxAttendanceView').hidden = !attendance;
+    document.querySelectorAll('[data-px-view]').forEach((tab) => {
+      const selected = tab === button;
+      tab.classList.toggle('active', selected);
+      tab.setAttribute('aria-selected', String(selected));
+    });
+    if (attendance) loadAttendance();
+  }));
+
+  document.getElementById('pxAttendanceDate').addEventListener('change', loadAttendance);
+  document.getElementById('pxAttendanceToday').addEventListener('click', () => {
+    document.getElementById('pxAttendanceDate').value = todayMexico();
+    loadAttendance();
+  });
+  document.querySelectorAll('[data-attendance-day]').forEach((button) => button.addEventListener('click', () => {
+    const picker = document.getElementById('pxAttendanceDate');
+    const value = new Date(`${picker.value}T12:00:00`);
+    value.setDate(value.getDate() + Number(button.dataset.attendanceDay));
+    picker.value = `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`;
+    loadAttendance();
+  }));
+  document.getElementById('pxAttendanceSearch').addEventListener('input', renderAttendance);
+  document.getElementById('pxAttendanceStatus').addEventListener('change', renderAttendance);
+  document.getElementById('pxAttendanceRows').addEventListener('click', async (event) => {
+    const button = event.target.closest('[data-attendance-id]');
+    if (!button || button.disabled) return;
+    const fecha = document.getElementById('pxAttendanceDate').value;
+    button.disabled = true;
+    try {
+      await api(`/clinica/asistencias/${button.dataset.attendanceId}`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado: button.dataset.attendanceStatus })
+      });
+      showToast('Asistencia guardada en la base de datos.');
+      if (fecha === document.getElementById('pxAttendanceDate').value) await loadAttendance();
+    } catch (error) {
+      showToast(error.message);
+      button.disabled = false;
+    }
+  });
 
   document.getElementById('pxPatientRows').addEventListener('click', (event) => {
     const row = event.target.closest('[data-patient-id]');
