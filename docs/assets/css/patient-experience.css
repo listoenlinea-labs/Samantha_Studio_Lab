@@ -1,4 +1,52 @@
 /* Experiencia de pacientes y ficha rápida — Samantha's Studio Lab */
+#pxPatientsView[hidden], #pxAttendanceView[hidden] { display: none; }
+.px-attendance { padding: 30px; }
+.px-attendance-header { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+.px-attendance-header h1 { margin: 3px 0 7px; color: #263b49; font-size: 25px; }
+.px-attendance-header p { margin: 0; color: #087e91; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.px-attendance-header span { color: #708392; font-size: 14px; }
+.px-attendance-date { display: flex; align-items: end; gap: 8px; }
+.px-attendance-date label, .px-attendance-filters label { display: grid; gap: 6px; color: #435a68; font-size: 12px; font-weight: 750; }
+.px-attendance-date input, .px-attendance-filters input, .px-attendance-filters select { height: 42px; padding: 0 12px; border: 1px solid #c9dce4; border-radius: 9px; background: #fff; color: #2d4151; font: inherit; box-sizing: border-box; }
+.px-attendance-date button, .px-attendance-actions button { min-height: 42px; padding: 0 12px; border: 1px solid #bcdbe5; border-radius: 9px; background: #fff; color: #006f81; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.px-attendance-date button:hover, .px-attendance-actions button:hover { background: #eaf7f8; }
+.px-attendance-actions button.absent { border-color: #efcfba; color: #965329; }
+.px-attendance-actions button.absent:hover { background: #fff3e9; }
+.px-attendance-actions button:disabled { opacity: .55; cursor: wait; }
+.px-attendance-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 26px 0; }
+.px-attendance-summary article { display: grid; gap: 9px; padding: 19px 20px; border: 1px solid #d4e8ec; border-radius: 14px; background: #f6fbfc; }
+.px-attendance-summary article:nth-child(3) { border-color: #cce6d7; background: #f2faf5; }
+.px-attendance-summary article:nth-child(4) { border-color: #f0d8c4; background: #fff9f2; }
+.px-attendance-summary span { color: #617582; font-size: 12px; font-weight: 700; }
+.px-attendance-summary strong { color: #293d4d; font-size: 27px; }
+.px-attendance-filters { display: flex; align-items: end; gap: 12px; margin-bottom: 17px; }
+.px-attendance-filters input { width: min(320px, 38vw); }
+.px-attendance-filters select { min-width: 160px; }
+.px-attendance-filters > span { margin-left: auto; color: #657887; font-size: 13px; }
+.px-attendance-table { overflow-x: auto; border: 1px solid #d7e5e9; border-radius: 13px; }
+.px-attendance-table table { width: 100%; border-collapse: collapse; text-align: left; }
+.px-attendance-table th { padding: 18px; background: #345164; color: #fff; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; }
+.px-attendance-table td { padding: 16px 18px; border-top: 1px solid #e0e9ed; color: #344959; font-size: 13px; }
+.px-attendance-table td strong, .px-attendance-table td small { display: block; }
+.px-attendance-table td small { margin-top: 5px; color: #768b97; }
+.px-attendance-patient { color: #007d91; font-weight: 750; text-decoration: none; }
+.px-attendance-patient:hover { text-decoration: underline; }
+.px-attendance-state { display: inline-block; padding: 6px 10px; border-radius: 999px; background: #edf4f6; color: #506576; font-weight: 750; white-space: nowrap; }
+.px-attendance-state.en_sala, .px-attendance-state.finalizada { background: #e0f5e9; color: #197450; }
+.px-attendance-state.no_asistio { background: #fff1e7; color: #965329; }
+.px-attendance-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+.px-attendance-actions button { min-height: 34px; white-space: nowrap; }
+.px-attendance-empty { padding: 36px !important; text-align: center; color: #617582; }
+@media (max-width: 760px) {
+  .px-attendance { padding: 20px 14px; }
+  .px-attendance-header { align-items: stretch; flex-direction: column; }
+  .px-attendance-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .px-attendance-summary article { padding: 14px; }
+  .px-attendance-filters { flex-wrap: wrap; }
+  .px-attendance-filters input { width: min(100%, 310px); }
+  .px-attendance-filters > span { margin-left: 0; }
+  .px-attendance-table table { min-width: 710px; }
+}
 .px-page {
     margin: -20px -26px -50px;
     min-height: calc(100vh - 119px);
