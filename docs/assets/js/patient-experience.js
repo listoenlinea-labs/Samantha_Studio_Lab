@@ -126,7 +126,7 @@
         </td>
         <td><strong>${formatDate(patient.ultimaCita)}</strong><small>Control clínico</small></td>
         <td><strong>${formatDate(patient.proximaCita)}</strong><small>${patient.proximaCita ? 'Cita programada' : 'Sin próxima cita'}</small></td>
-        <td>${patient.tareasPendientes ? `<span class="px-check">⚠ ${patient.tareasPendientes}</span>` : '—'}</td>
+        <td>${patient.tareasPendientes ? `<span class="px-check" aria-label="${patient.tareasPendientes} ${patient.tareasPendientes === 1 ? 'tarea pendiente' : 'tareas pendientes'}" title="${patient.tareasPendientes} ${patient.tareasPendientes === 1 ? 'tarea pendiente' : 'tareas pendientes'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 2.8 19.2a1.1 1.1 0 0 0 1 1.6h16.4a1.1 1.1 0 0 0 1-1.6L12 3.5Z"/><path d="M12 9v5.5M12 17.5h.01"/></svg><span class="px-check-count" aria-hidden="true">${patient.tareasPendientes}</span></span>` : '—'}</td>
         <td>${patient.presupuestoPendiente ? `$${Number(patient.presupuestoPendiente).toLocaleString('es-MX')}` : '—'}</td>
         <td>${escapeHtml(patient.comoNosConocio || '—')}</td>
         <td>${escapeHtml(patient.notaGeneral || '—')}</td>

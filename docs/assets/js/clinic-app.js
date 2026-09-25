@@ -225,7 +225,7 @@
         <main class="app-main">
           <header class="app-topbar">
             <div class="page-identity"><small>${meta[0]}</small><strong>${meta[1]}</strong></div>
-            <div class="top-actions"><span class="dc-live"><i></i> Sistema operativo</span><label class="dc-role"><span>Vista</span><select id="activeRole"><option ${role === 'Administrador' ? 'selected' : ''}>Administrador</option><option ${role === 'Asistente' ? 'selected' : ''}>Asistente</option><option ${role === 'Recepcionista' ? 'selected' : ''}>Recepcionista</option></select></label></div>
+            <div class="top-actions"><span class="dc-live"><i></i> Sistema operativo</span><div class="dc-role"><span>Vista</span><select id="activeRole" tabindex="-1" aria-hidden="true"><option ${role === 'Administrador' ? 'selected' : ''}>Administrador</option><option ${role === 'Asistente' ? 'selected' : ''}>Asistente</option><option ${role === 'Recepcionista' ? 'selected' : ''}>Recepcionista</option></select><button class="dc-role-trigger" type="button" id="roleToggle" aria-label="Vista: ${esc(role)}" aria-haspopup="listbox" aria-expanded="false" aria-controls="roleMenu">${esc(role)}<span class="dc-select-chevron" aria-hidden="true"></span></button><div class="dc-role-menu" id="roleMenu" role="listbox" aria-label="Seleccionar vista" hidden>${['Administrador', 'Asistente', 'Recepcionista'].map((name) => `<button type="button" role="option" data-role-option="${name}" aria-selected="${role === name}">${name}${role === name ? '<span aria-hidden="true">✓</span>' : ''}</button>`).join('')}</div></div></div>
           </header>
           <div class="content">${allowed ? content : accessDenied(role)}</div>
         </main>
@@ -1786,6 +1786,37 @@
     document.getElementById('activeRole')?.addEventListener('change', (event) => {
       localStorage.setItem('ssl-active-role', event.target.value);
       window.location.href = 'index.html';
+    });
+    const roleToggle = document.getElementById('roleToggle');
+    const roleMenu = document.getElementById('roleMenu');
+    const closeRoleMenu = () => {
+      if (!roleMenu || !roleToggle) return;
+      roleMenu.hidden = true;
+      roleToggle.setAttribute('aria-expanded', 'false');
+    };
+    roleToggle?.addEventListener('click', () => {
+      roleMenu.hidden = !roleMenu.hidden;
+      roleToggle.setAttribute('aria-expanded', String(!roleMenu.hidden));
+      if (!roleMenu.hidden) roleMenu.querySelector('[aria-selected="true"]')?.focus();
+    });
+    roleMenu?.addEventListener('click', (event) => {
+      const option = event.target.closest('[data-role-option]');
+      if (!option) return;
+      const select = document.getElementById('activeRole');
+      select.value = option.dataset.roleOption;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    roleMenu?.addEventListener('keydown', (event) => {
+      const options = Array.from(roleMenu.querySelectorAll('[data-role-option]'));
+      const index = options.indexOf(document.activeElement);
+      if (event.key === 'Escape') { closeRoleMenu(); roleToggle.focus(); }
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        options[(index + (event.key === 'ArrowDown' ? 1 : options.length - 1)) % options.length]?.focus();
+      }
+    });
+    document.addEventListener('click', (event) => {
+      if (!event.target.closest('.dc-role')) closeRoleMenu();
     });
 
     let toastTimer;
