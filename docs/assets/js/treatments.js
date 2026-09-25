@@ -177,9 +177,14 @@
     }
   }
 
+  function init() {
   document.getElementById('newTreatmentButton')?.addEventListener('click', () => openForm());
   document.getElementById('calcTreatment')?.addEventListener('change', syncSelectedTreatment);
   document.getElementById('treatmentSearch')?.addEventListener('input', applyFilters);
+  const requestedTreatment = new URLSearchParams(location.search).get('buscar');
+  if (requestedTreatment && document.getElementById('treatmentSearch')) {
+    document.getElementById('treatmentSearch').value = requestedTreatment;
+  }
   document.getElementById('treatmentStatusFilter')?.addEventListener('change', applyFilters);
 
   document.addEventListener('click', (event) => {
@@ -229,4 +234,7 @@
   });
 
   loadTreatments();
+  }
+  if (document.getElementById('treatmentTable')) init();
+  else window.addEventListener('ssl:ready', init, { once: true });
 })();
