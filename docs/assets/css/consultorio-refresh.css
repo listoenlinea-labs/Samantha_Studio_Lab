@@ -577,3 +577,179 @@ button.live-appointment:focus-visible { outline: 2px solid #367d85; outline-offs
     width: 100%;
   }
 }
+
+/* Alertas, contadores e iconos con el mismo lenguaje visual. */
+.px-check {
+  display: inline-flex;
+  width: auto;
+  min-width: 58px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 9px;
+  border: 1px solid #edcfaa;
+  border-radius: 999px;
+  color: #865719;
+  background: #fff7e9;
+  box-shadow: 0 2px 6px rgba(92, 65, 33, .06);
+  font-size: 11px;
+  line-height: 1;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+.px-check svg { width: 15px; height: 15px; flex: none; }
+.px-check-count { font-size: 11px; font-weight: 800; }
+.app-nav .nav-badge {
+  display: inline-grid;
+  min-width: 20px;
+  min-height: 20px;
+  place-items: center;
+  padding: 2px 6px;
+  border: 1px solid #c6e2e4;
+  border-radius: 999px;
+  color: #245b65;
+  background: #e7f5f5;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  box-sizing: border-box;
+}
+.dc-header .app-nav .nav-icon {
+  display: inline-grid;
+  width: 25px;
+  height: 25px;
+  flex: none;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .08);
+  font-size: 13px;
+}
+.dc-header .dc-notification {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 11px;
+  box-shadow: 0 3px 10px rgba(11, 31, 43, .12);
+}
+.dc-header .dc-notification span {
+  top: 5px;
+  right: 5px;
+  width: 7px;
+  height: 7px;
+  border: 2px solid #2c4554;
+  background: #f1bb82;
+}
+.callout.warning {
+  border-radius: 13px;
+  box-shadow: 0 5px 15px rgba(94, 70, 37, .06);
+}
+.toast { border: 1px solid rgba(255, 255, 255, .2); border-radius: 14px; box-shadow: 0 14px 34px rgba(23, 38, 50, .18); }
+
+/* Selectores nativos coherentes; el menú del rol usa opciones propias. */
+.dc-role { position: relative; gap: 9px; }
+.dc-role select#activeRole { position: absolute; width: 1px; height: 1px; padding: 0; opacity: 0; pointer-events: none; }
+.dc-role-trigger {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 11px;
+  border: 1px solid #d8e5e8;
+  border-radius: 9px;
+  color: #263f4d;
+  background: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(23, 48, 59, .05);
+}
+.dc-select-chevron {
+  width: 7px;
+  height: 7px;
+  border-right: 1.8px solid currentColor;
+  border-bottom: 1.8px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform .18s ease;
+}
+.dc-role-trigger[aria-expanded="true"] .dc-select-chevron { transform: translateY(2px) rotate(225deg); }
+.dc-role-menu:not([hidden]) {
+  position: absolute;
+  z-index: 120;
+  top: calc(100% + 7px);
+  right: 0;
+  display: grid;
+  min-width: 180px;
+  gap: 3px;
+  padding: 6px;
+  border: 1px solid #dce9eb;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 14px 34px rgba(24, 46, 58, .16);
+}
+.dc-role-menu button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 36px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  color: #344c59;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1;
+  text-align: left;
+  cursor: pointer;
+}
+.dc-role-menu button:hover,
+.dc-role-menu button:focus-visible,
+.dc-role-menu button[aria-selected="true"] { color: #195865; background: #e9f5f6; }
+:where(.dc-role-trigger, .dc-role-menu button):focus-visible { outline: 2px solid #368c99; outline-offset: 2px; }
+
+.app-shell select:not([multiple]):not(#activeRole),
+.px-quick-modal select,
+.ph-workspace select:not([multiple]) {
+  box-sizing: border-box;
+  min-height: 42px;
+  padding: 0 38px 0 13px;
+  border: 1px solid #d8e3e8;
+  border-radius: 10px;
+  color: #2b4350;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='m1 1.5 5 5 5-5' stroke='%23547580' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 13px center;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color .16s ease, box-shadow .16s ease;
+}
+.app-shell select:not([multiple]):not(#activeRole):focus-visible,
+.px-quick-modal select:focus-visible,
+.ph-workspace select:not([multiple]):focus-visible { outline: 0; border-color: #58a9b4; box-shadow: 0 0 0 3px rgba(88, 169, 180, .16); }
+select option { color: #2b4350; background: #fff; }
+
+/* Los formularios mantienen columnas, etiquetas y controles alineados. */
+.modal .form-grid,
+.px-quick-modal .px-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 16px; align-items: start; }
+.modal .form-grid .field,
+.px-quick-modal .px-form-grid label { min-width: 0; align-content: start; }
+.modal .form-grid .field label { min-height: 16px; line-height: 1.35; }
+.modal .form-grid :is(.input, .select, .textarea),
+.px-quick-modal .px-form-grid :is(input, select, textarea) { box-sizing: border-box; width: 100%; min-width: 0; }
+.modal .form-grid :is(.input, .select),
+.px-quick-modal .px-form-grid :is(input, select) { min-height: 44px; }
+.modal .form-grid .wide,
+.px-quick-modal .px-form-grid .wide { grid-column: 1 / -1; }
+@media (max-width: 640px) {
+  .modal .form-grid,
+  .px-quick-modal .px-form-grid { grid-template-columns: minmax(0, 1fr); }
+}
