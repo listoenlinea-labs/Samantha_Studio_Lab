@@ -176,8 +176,10 @@
       icon: '▦',
       items: ['finanzas', 'reportes', 'configuracion']
     }];
+    const badge = (count) => Number(count) > 0
+      ? `<span class="nav-badge" aria-label="${Number(count)} notificaciones">${Number(count) > 99 ? '99+' : Number(count)}</span>` : '';
     const link = (item, child = false) =>
-      `<a href="${item.href}" class="${page === item.id ? 'active' : ''}${child ? ' nav-child' : ''}" data-module="${item.id}"><span class="nav-icon">${item.icon}</span><span>${item.label}</span>${item.badge ? `<span class="nav-badge">${item.badge}</span>` : ''}</a>`;
+      `<a href="${item.href}" class="${page === item.id ? 'active' : ''}${child ? ' nav-child' : ''}" data-module="${item.id}"><span>${item.label}</span>${badge(item.badge)}</a>`;
     const directLinks = directIds
       .map((id) => allowedItems.find((item) => item.id === id))
       .filter(Boolean)
@@ -191,9 +193,10 @@
       if (!items.length) return '';
 
       const isActive = items.some((item) => item.id === page);
+      const alertCount = items.reduce((total, item) => total + (Number(item.badge) > 0 ? Number(item.badge) : 0), 0);
       return `<div class="nav-group${isActive ? ' active' : ''}">
         <button class="nav-group-trigger" type="button" aria-expanded="false">
-          <span class="nav-icon">${group.icon}</span><span>${group.label}</span><span class="nav-chevron" aria-hidden="true"><svg viewBox="0 0 12 8" focusable="false"><path d="M1 1.5 6 6.5 11 1.5" /></svg></span>
+          <span>${group.label}</span>${badge(alertCount)}<span class="nav-chevron" aria-hidden="true"><svg viewBox="0 0 12 8" focusable="false"><path d="M1 1.5 6 6.5 11 1.5" /></svg></span>
         </button>
         <div class="nav-group-menu" role="menu" aria-label="${group.label}">
           ${items.map((item) => link(item, true)).join('')}
