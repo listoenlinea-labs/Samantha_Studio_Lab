@@ -602,30 +602,22 @@ button.live-appointment:focus-visible { outline: 2px solid #367d85; outline-offs
 .px-check-count { font-size: 11px; font-weight: 800; }
 .app-nav .nav-badge {
   display: inline-grid;
-  min-width: 20px;
-  min-height: 20px;
+  min-width: 22px;
+  min-height: 22px;
   place-items: center;
-  padding: 2px 6px;
-  border: 1px solid #c6e2e4;
+  padding: 2px 7px;
+  border: 1px solid #edcfaa;
   border-radius: 999px;
-  color: #245b65;
-  background: #e7f5f5;
-  font-size: 10px;
+  color: #865719;
+  background: #fff7e9;
+  font-size: 11px;
   font-weight: 800;
   line-height: 1;
   box-sizing: border-box;
+  box-shadow: 0 2px 6px rgba(92, 65, 33, .08);
 }
-.dc-header .app-nav .nav-icon {
-  display: inline-grid;
-  width: 25px;
-  height: 25px;
-  flex: none;
-  place-items: center;
-  border: 1px solid rgba(255, 255, 255, .12);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, .08);
-  font-size: 13px;
-}
+.dc-header .app-nav .nav-badge { color: #865719; }
+.dc-header .nav-group-trigger > .nav-badge { display: inline-grid; }
 .dc-header .dc-notification {
   display: grid;
   width: 38px;
