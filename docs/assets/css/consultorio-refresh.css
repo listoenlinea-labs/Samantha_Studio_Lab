@@ -829,3 +829,15 @@ select option { color: #2b4350; background: #fff; }
     flex: 1 1 280px;
   }
 }
+
+/* Controles de navegación legibles sobre el encabezado oscuro en celular. */
+@media (max-width: 760px) {
+  .dc-header .dc-menu-button,
+  .dc-header .nav-group-trigger,
+  .dc-header .nav-group-trigger > span,
+  .dc-header .nav-group:hover .nav-group-trigger,
+  .dc-header .nav-group.open .nav-group-trigger,
+  .dc-header .nav-group.active .nav-group-trigger {
+    color: #fff;
+  }
+}
