@@ -870,31 +870,72 @@ tbody tr:hover {
 
   .dc-profile-copy,
   .dc-search span {
-    display: none
+    display: none;
+  }
+
+  /*
+   * Tablet navigation
+   * -----------------
+   * The desktop links do not render a .nav-icon, so hiding their text at this
+   * breakpoint left only the dropdown chevrons visible on iPad/tablet widths.
+   * Keep the labels visible and compact the header instead.
+   */
+  .dc-header {
+    padding-inline: 16px;
   }
 
   .dc-header .brand {
-    min-width: 170px
+    min-width: 150px;
+    padding-right: 12px;
   }
 
-  .app-nav a {
-    padding: 0 8px
+  .dc-header .brand img {
+    width: 38px;
+    height: 38px;
   }
 
-  .app-nav a span:not(.nav-icon):not(.nav-badge) {
-    display: none
+  .dc-header .brand strong {
+    font-size: 11px;
   }
 
+  .app-nav {
+    gap: 0;
+  }
+
+  .app-nav a,
+  .nav-group-trigger {
+    padding: 0 7px;
+    font-size: 10.5px;
+  }
+
+  .app-nav a span:not(.nav-icon):not(.nav-badge),
   .nav-group-trigger>span:not(.nav-icon):not(.nav-chevron) {
-    display: none
+    display: inline;
   }
 
-  .app-nav a .nav-icon {
-    font-size: 15px
+  .nav-chevron {
+    width: 10px;
+    margin-left: 0;
+  }
+
+  .dc-header-tools {
+    gap: 4px;
+    margin-left: 6px;
+  }
+
+  .dc-search {
+    width: 34px;
+    min-width: 34px;
+    padding: 0;
+    text-align: center;
+  }
+
+  .dc-profile {
+    display: none;
   }
 
   .dc-agenda-layout {
-    grid-template-columns: minmax(0, 1fr) 210px
+    grid-template-columns: minmax(0, 1fr) 210px;
   }
 }
 
