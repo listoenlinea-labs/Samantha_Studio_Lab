@@ -792,3 +792,40 @@ select option { color: #2b4350; background: #fff; }
   .modal .form-grid,
   .px-quick-modal .px-form-grid { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* En tablet, la fecha conserva una fila propia y las acciones se acomodan debajo. */
+@media (min-width: 761px) and (max-width: 1180px) {
+  body[data-page="agenda"] .dc-agenda-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  body[data-page="agenda"] .dc-date-nav {
+    width: 100%;
+    min-width: 0;
+    justify-content: flex-start;
+  }
+
+  body[data-page="agenda"] .dc-date-nav > div {
+    min-width: 0;
+  }
+
+  body[data-page="agenda"] .dc-agenda-actions {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+
+  body[data-page="agenda"] .dc-agenda-create {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  body[data-page="agenda"] .dc-agenda-search {
+    width: auto;
+    min-width: 220px;
+    flex: 1 1 280px;
+  }
+}
