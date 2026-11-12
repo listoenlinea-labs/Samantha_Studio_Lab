@@ -57,9 +57,12 @@ router.put('/:id/mediciones', async (req, res, next) => {
         if (!periodontogramId) {
             return res.status(400).json({ ok: false, mensaje: 'El id del periodontograma no es válido.' });
         }
-        const measurements = Array.isArray(req.body.mediciones) ? req.body.mediciones : [];
-        if (!measurements.length || measurements.length > 384) {
-            return res.status(400).json({ ok: false, mensaje: 'Envía el arreglo completo de mediciones (máximo 384 sitios).' });
+        if (!Array.isArray(req.body?.mediciones)) {
+            return res.status(400).json({ ok: false, mensaje: 'El campo mediciones debe ser un arreglo.' });
+        }
+        const measurements = req.body.mediciones;
+        if (measurements.length > 384) {
+            return res.status(400).json({ ok: false, mensaje: 'Envía máximo 384 sitios periodontales.' });
         }
         const faces = new Set(['VESTIBULAR', 'PALATINA', 'LINGUAL']);
         const points = new Set(['MESIAL', 'CENTRAL', 'DISTAL']);
@@ -109,13 +112,15 @@ router.put('/:id/mediciones', async (req, res, next) => {
             item.placa ? 1 : 0, item.movilidad, item.furcacion,
             item.supuracion ? 1 : 0
         ]);
-        await connection.query(
-            `INSERT INTO periodontograma_mediciones
-                (id_periodontograma, pieza, cara, punto, profundidad_sondaje,
-                 margen_gingival, sangrado, placa, movilidad, furcacion, supuracion)
-             VALUES ?`,
-            [values]
-        );
+        if (values.length) {
+            await connection.query(
+                `INSERT INTO periodontograma_mediciones
+                    (id_periodontograma, pieza, cara, punto, profundidad_sondaje,
+                     margen_gingival, sangrado, placa, movilidad, furcacion, supuracion)
+                 VALUES ?`,
+                [values]
+            );
+        }
         await connection.query(
             `INSERT INTO auditoria (entidad, id_entidad, accion, detalle)
              VALUES ('periodontogramas', ?, 'GUARDAR_MEDICIONES', ?)`,

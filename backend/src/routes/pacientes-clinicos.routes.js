@@ -774,7 +774,7 @@ router.get('/:id/periodontogramas', async (req, res, next) => {
              FROM periodontogramas p
              LEFT JOIN periodontograma_mediciones m ON m.id_periodontograma = p.id_periodontograma
              WHERE p.id_paciente = ? GROUP BY p.id_periodontograma
-             ORDER BY p.created_at DESC`,
+             ORDER BY p.created_at DESC, p.id_periodontograma DESC`,
             [patientId]
         );
         return res.json({ items: items.map((item) => ({ ...item, totalMediciones: Number(item.totalMediciones) })) });

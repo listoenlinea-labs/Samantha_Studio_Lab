@@ -598,6 +598,423 @@
     margin-top: 22px
 }
 
+/* Odontograma con símbolos clínicos múltiples */
+.ph-dialog-open {
+    overflow: hidden
+}
+
+.ph-odontogram-help,
+.ph-perio-help {
+    margin: 0 0 12px;
+    padding: 8px 12px;
+    border-radius: 7px;
+    color: #58707a;
+    background: #f3fafb;
+    font-size: 10px;
+    line-height: 1.5
+}
+
+.ph-tooth>.ph-tooth-number {
+    position: relative;
+    z-index: 4;
+    height: 30px;
+    background: #f4f6f7
+}
+
+.ph-tooth>.ph-tooth-visual {
+    position: relative;
+    display: grid;
+    width: 100%;
+    height: 132px;
+    place-items: center;
+    color: inherit;
+    background: transparent
+}
+
+.ph-tooth>.ph-tooth-overflow {
+    position: absolute;
+    top: 35px;
+    right: 1px;
+    z-index: 8;
+    display: grid;
+    width: 22px;
+    height: 17px;
+    place-items: center;
+    border-radius: 9px;
+    color: #fff;
+    background: #263d49;
+    font-size: 8px;
+    line-height: 1
+}
+
+.ph-tooth>.ph-tooth-overflow[aria-hidden="true"] {
+    display: none
+}
+
+.ph-tooth-visual .ph-tooth-art {
+    display: block
+}
+
+.ph-tooth-markers {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none
+}
+
+.ph-tooth-marker {
+    top: 45%;
+    left: 50%
+}
+
+.ph-tooth-marker:nth-child(1) {
+    top: 38%;
+    left: 37%
+}
+
+.ph-tooth-marker:nth-child(2) {
+    top: 54%;
+    left: 64%
+}
+
+.ph-tooth-marker:nth-child(3) {
+    top: 70%;
+    left: 40%
+}
+
+.ph-symbol {
+    box-sizing: border-box
+}
+
+.ph-symbol .ph-finding-glyph,
+.ph-tooth .ph-symbol .ph-finding-glyph {
+    width: 28px;
+    height: 28px;
+    max-width: none;
+    margin: 0;
+    overflow: visible;
+    filter: none;
+    transform: none
+}
+
+.ph-symbol.compact .ph-finding-glyph,
+.ph-tooth .ph-symbol.compact .ph-finding-glyph {
+    width: 18px;
+    height: 18px
+}
+
+.ph-tooth:hover .ph-finding-glyph,
+.ph-tooth.selected .ph-finding-glyph,
+.ph-tooth:hover .ph-symbol,
+.ph-tooth.selected .ph-symbol {
+    filter: none;
+    transform: none
+}
+
+.ph-finding-popover {
+    position: fixed;
+    inset: 0 !important;
+    z-index: 180;
+    display: grid;
+    width: auto;
+    max-height: none;
+    padding: 24px;
+    place-items: center;
+    border-radius: 0;
+    background: rgba(19, 40, 49, .62);
+    box-shadow: none
+}
+
+.ph-finding-popover[hidden] {
+    display: none
+}
+
+.ph-finding-dialog {
+    display: grid;
+    grid-template-columns: minmax(260px, .9fr) minmax(340px, 1.1fr);
+    gap: 12px 20px;
+    width: min(900px, calc(100vw - 48px));
+    max-height: min(780px, calc(100vh - 48px));
+    padding: 20px;
+    overflow: auto;
+    border-radius: 13px;
+    background: #fff;
+    box-shadow: 0 25px 70px rgba(8, 28, 36, .4)
+}
+
+.ph-finding-dialog.multi {
+    grid-template-columns: 1fr;
+    width: min(620px, calc(100vw - 48px))
+}
+
+.ph-finding-dialog.multi>header,
+.ph-finding-dialog.multi>.ph-dialog-note,
+.ph-finding-dialog.multi>.ph-finding-tags,
+.ph-finding-dialog.multi>.ph-finding-search,
+.ph-finding-dialog.multi>.ph-finding-form,
+.ph-finding-dialog.multi>.ph-findings,
+.ph-finding-dialog.multi>.ph-finding-bottom {
+    grid-column: 1
+}
+
+.ph-finding-dialog>header,
+.ph-finding-dialog>.ph-dialog-note,
+.ph-finding-dialog>.ph-finding-tags,
+.ph-finding-dialog>.ph-finding-search,
+.ph-finding-dialog>.ph-finding-form,
+.ph-finding-dialog>.ph-finding-bottom {
+    grid-column: 2
+}
+
+.ph-finding-dialog>header {
+    align-items: center;
+    min-height: 32px
+}
+
+.ph-finding-dialog>header button {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    color: #52656e;
+    cursor: pointer
+}
+
+.ph-tooth-detail {
+    grid-column: 1;
+    grid-row: 1 / span 7;
+    min-width: 0;
+    padding: 15px;
+    border: 1px solid #dcebed;
+    border-radius: 10px;
+    background: #f8fcfd
+}
+
+.ph-tooth-enlarged {
+    display: grid;
+    min-height: 170px;
+    place-items: center
+}
+
+.ph-tooth-enlarged .ph-tooth-visual {
+    position: relative;
+    display: block;
+    width: 130px;
+    height: 160px
+}
+
+.ph-tooth-enlarged .ph-tooth-art {
+    width: 100%;
+    height: 160px
+}
+
+.ph-tooth-enlarged .ph-tooth-art g {
+    fill: #eee2c8;
+    stroke: #ded4bf;
+    stroke-width: 1.1
+}
+
+.ph-tooth-enlarged .ph-tooth-art .crown {
+    fill: #fff;
+    stroke: #e1e5e6
+}
+
+.ph-tooth-detail-content h4 {
+    margin: 8px 0 2px;
+    font-size: 13px
+}
+
+.ph-detail-hint {
+    margin: 0 0 10px;
+    color: #748b94;
+    font-size: 9px;
+    line-height: 1.4
+}
+
+.ph-tooth-detail-list {
+    display: grid;
+    gap: 6px;
+    max-height: 300px;
+    overflow: auto
+}
+
+.ph-tooth-detail-row {
+    display: grid;
+    grid-template-columns: 46px 1fr;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 7px;
+    background: #fff
+}
+
+.ph-tooth-detail-row>div {
+    display: grid;
+    gap: 3px;
+    min-width: 0
+}
+
+.ph-tooth-detail-row strong {
+    font-size: 11px
+}
+
+.ph-tooth-detail-row small {
+    color: #718892;
+    font-size: 9px
+}
+
+.ph-tooth-detail-row p {
+    margin: 2px 0 0;
+    font-size: 10px
+}
+
+.ph-dialog-note {
+    margin: 0;
+    color: #607983;
+    font-size: 11px
+}
+
+.ph-finding-form {
+    display: grid;
+    grid-template-columns: .7fr 1.3fr;
+    gap: 10px
+}
+
+.ph-finding-form label {
+    display: grid;
+    gap: 5px;
+    color: #607983;
+    font-size: 10px
+}
+
+.ph-finding-form select,
+.ph-finding-form input {
+    box-sizing: border-box;
+    width: 100%;
+    height: 36px;
+    padding: 0 9px;
+    border: 1px solid #b9d7df;
+    border-radius: 6px;
+    background: #fff
+}
+
+.ph-finding-dialog>.ph-findings {
+    grid-column: 2;
+    max-height: 300px
+}
+
+.ph-finding-bottom {
+    color: #718892;
+    font-size: 9px
+}
+
+/* Periodontograma de seis sitios por diente */
+.ph-perio-help {
+    margin: 12px 15px 0
+}
+
+.ph-perio-labels,
+.ph-perio-col {
+    grid-template-rows: 34px repeat(7, 34px)
+}
+
+.ph-perio-labels>b,
+.ph-perio-col>b {
+    min-height: 34px
+}
+
+.ph-perio-col>b {
+    flex-direction: column;
+    gap: 1px
+}
+
+.ph-perio-col>b small,
+.ph-site-key {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    width: 100%;
+    color: #80939a;
+    font-size: 7px;
+    font-weight: 600;
+    text-align: center
+}
+
+.ph-site-key {
+    width: 92px
+}
+
+.ph-site-key abbr,
+.ph-perio-col abbr {
+    border: 0;
+    text-decoration: none
+}
+
+.ph-perio-col>input,
+.ph-triple input[type="number"] {
+    box-sizing: border-box;
+    min-height: 33px;
+    outline-color: var(--ph-teal);
+    background: #fff
+}
+
+.ph-perio-col input:focus {
+    position: relative;
+    z-index: 2;
+    box-shadow: inset 0 0 0 2px rgba(0, 149, 169, .35)
+}
+
+.ph-perio-col input::placeholder {
+    color: #c1cdd1
+}
+
+.ph-perio-chart>svg {
+    left: 145px;
+    width: calc(100% - 145px)
+}
+
+.ph-perio-tooth {
+    position: relative;
+    display: grid;
+    height: 210px;
+    place-items: center
+}
+
+.ph-perio-tooth>b {
+    position: absolute;
+    top: 2px;
+    z-index: 2;
+    color: #415963;
+    font-size: 9px
+}
+
+.ph-perio-tooth .ph-tooth-art {
+    width: 48px;
+    height: 190px;
+    margin-top: 12px
+}
+
+.ph-perio-tooth .ph-tooth-art.lower {
+    transform: rotate(180deg)
+}
+
+.ph-perio-tooth .ph-tooth-art g {
+    fill: #eee2c8;
+    stroke: #ded4bf;
+    stroke-width: 1.1
+}
+
+.ph-perio-tooth .ph-tooth-art .crown {
+    fill: #fff;
+    stroke: #e4e6e5
+}
+
+.ph-perio-teeth {
+    opacity: .45;
+    pointer-events: none
+}
+
+.ph-perio-status b {
+    white-space: nowrap
+}
+
 .ph-history-form label {
     display: grid;
     gap: 6px;
@@ -689,18 +1106,102 @@
     }
 }
 
-/* Mantener las opciones dentro del cuadro del diente */
-.ph-finding-popover:not([hidden]) {
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-    max-height: min(470px, calc(100dvh - 20px));
-    overflow: hidden;
-}
+@media(max-width:760px) {
+    .ph-finding-popover {
+        inset: 0 !important;
+        align-items: end;
+        padding: 0;
+        background: rgba(19, 40, 49, .68)
+    }
 
-.ph-finding-popover .ph-findings {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-    align-content: start;
+    .ph-finding-dialog {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        width: 100%;
+        max-height: 92dvh;
+        padding: 16px;
+        border-radius: 16px 16px 0 0
+    }
+
+    .ph-finding-dialog>header,
+    .ph-finding-dialog>.ph-dialog-note,
+    .ph-finding-dialog>.ph-finding-tags,
+    .ph-finding-dialog>.ph-finding-search,
+    .ph-finding-dialog>.ph-finding-form,
+    .ph-finding-dialog>.ph-finding-bottom,
+    .ph-finding-dialog>.ph-findings {
+        grid-column: 1
+    }
+
+    .ph-tooth-detail {
+        grid-column: 1;
+        grid-row: auto;
+        display: grid;
+        grid-template-columns: 110px 1fr;
+        gap: 10px;
+        padding: 10px
+    }
+
+    .ph-tooth-enlarged {
+        min-height: 125px
+    }
+
+    .ph-tooth-enlarged .ph-tooth-visual {
+        width: 96px;
+        height: 125px
+    }
+
+    .ph-tooth-enlarged .ph-tooth-art {
+        height: 125px
+    }
+
+    .ph-tooth-detail-list {
+        max-height: 150px
+    }
+
+    .ph-finding-dialog>.ph-findings {
+        max-height: 230px
+    }
+
+    .ph-finding-form {
+        grid-template-columns: 1fr
+    }
+
+    .ph-odontogram-help {
+        min-width: 800px
+    }
+
+    .ph-perio-help {
+        margin-inline: 0
+    }
+
+    .ph-simple-tabs {
+        flex-wrap: wrap
+    }
+
+    .ph-simple-tabs label {
+        margin-left: 0
+    }
+
+    .ph-simple-tabs .ph-save {
+        margin-left: auto
+    }
+
+    .ph-perio-table {
+        grid-template-columns: 120px minmax(700px, 1fr);
+        min-width: 820px
+    }
+
+    .ph-perio-chart {
+        min-width: 820px
+    }
+
+    .ph-perio-chart>svg {
+        left: 120px;
+        width: calc(100% - 120px)
+    }
+
+    .ph-perio-teeth {
+        left: 120px
+    }
 }
