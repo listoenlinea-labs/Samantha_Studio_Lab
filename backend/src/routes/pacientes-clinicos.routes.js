@@ -587,24 +587,32 @@ router.get('/:id/historia-clinica', async (req, res, next) => {
         const patientId = parsePositiveId(req.params.id);
         if (!patientId) return invalidId(res);
 
-        if (!(await patientExists(pool, patientId))) {
-            return res.status(404).json({ ok: false, mensaje: 'Paciente no encontrado.' });
-        }
-
+        // La alergia actual se consulta en pacientes; las versiones clínicas
+        // anteriores se conservan sin modificaciones al usar el editor rápido.
+        // LEFT JOIN funciona también cuando todavía no existe historia clínica.
         const [rows] = await pool.query(
-            `SELECT id_historia AS idHistoria, motivo_consulta AS motivoConsulta,
-                    alergias, antecedentes_medicos AS antecedentesMedicos,
-                    antecedentes_odontologicos AS antecedentesOdontologicos,
-                    medicamentos_actuales AS medicamentosActuales,
-                    diagnostico_general AS diagnosticoGeneral, observaciones,
-                    vigente, created_at AS creadoAt, updated_at AS actualizadoAt
-             FROM historias_clinicas
-             WHERE id_paciente = ? AND vigente = 1
-             ORDER BY id_historia DESC LIMIT 1`,
+            `SELECT h.id_historia AS idHistoria, h.motivo_consulta AS motivoConsulta,
+                    h.antecedentes_medicos AS antecedentesMedicos,
+                    h.antecedentes_odontologicos AS antecedentesOdontologicos,
+                    h.medicamentos_actuales AS medicamentosActuales,
+                    h.diagnostico_general AS diagnosticoGeneral, h.observaciones,
+                    h.vigente, h.created_at AS creadoAt, h.updated_at AS actualizadoAt,
+                    p.alergias AS alergiasActuales
+             FROM pacientes p
+             LEFT JOIN historias_clinicas h ON h.id_paciente = p.id_paciente AND h.vigente = 1
+             WHERE p.id_paciente = ?
+             ORDER BY h.id_historia DESC LIMIT 1`,
             [patientId]
         );
+        if (!rows.length) {
+            return res.status(404).json({ ok: false, mensaje: 'Paciente no encontrado.' });
+        }
+        const { alergiasActuales, ...record } = rows[0];
+        const historia = record.idHistoria !== null
+            ? { ...record, alergias: alergiasActuales }
+            : (alergiasActuales ? { alergias: alergiasActuales } : null);
 
-        return res.json({ idPaciente: patientId, historia: rows[0] || null });
+        return res.json({ idPaciente: patientId, historia });
     } catch (error) {
         next(error);
     }
