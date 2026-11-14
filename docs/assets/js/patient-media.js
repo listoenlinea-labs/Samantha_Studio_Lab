@@ -211,8 +211,10 @@
   return window.SamanthaSTLViewer.openStudy(file);
  }
  async function openSelectedStudy(files,label){
+  const token=modeToken;
   if(files.length===1){
    const study=await stlFromSelection(files);
+   if(token!==modeToken)return null;
    if(study){
     const host=$('sslMediaViewer');if(!host)return;
     viewer?.dispose?.();viewer=null;
@@ -224,6 +226,7 @@
   }
   if(files.some(f=>isSTLName(f.name)))throw Error('Selecciona un STL individual, sin mezclar con cortes DICOM.');
   await openVolume(files,label);
+  if(token!==modeToken)return null;
   finishProgress('Tomografía CBCT lista · 2D, 3D y panorámica');
   return 'CBCT';
  }
@@ -237,7 +240,9 @@
   return {volume,loaded};
  }
  async function openVolume(files,label){
+  const token=modeToken;
   const {volume}=await volumeFromFiles(files);
+  if(token!==modeToken)return;
   const host=$('sslMediaViewer');
   if(!host)return;
   if(viewer){viewer.dispose?.();viewer=null}
@@ -247,7 +252,9 @@
  }
  async function persistSeries(){
   if(!selection.length)throw Error('Selecciona un estudio.');
+  const token=modeToken;
   const stl=await stlFromSelection(selection);
+  if(token!==modeToken)throw Error('Cambió el expediente; vuelve a seleccionar el estudio.');
   if(stl){
    if(selection[0].size>14*1024*1024)
     throw Error('El STL o ZIP de modelo supera 14 MB para MySQL. Puedes visualizarlo localmente o reducirlo.');
@@ -260,6 +267,7 @@
   }
   if(selection.some(f=>isSTLName(f.name)))throw Error('Selecciona un solo STL, sin mezclar modelos con DICOM.');
   const {volume,loaded}=await volumeFromFiles(selection);
+  if(token!==modeToken)throw Error('Cambió el expediente; se canceló el guardado.');
   const zip=loaded.kind==='zip';
   const unit=zip?selection:[...loaded.records.map(r=>r.file)];
   const max=zip?1:unit.length;
@@ -268,6 +276,7 @@
   const uid=loaded.records[0]?window.YerenaDicomViewer.parse(loaded.records[0].buffer).metadata?.seriesUID:'';
   if(!uid)throw Error('Falta identificador SeriesInstanceUID; no se puede guardar una serie sin identificación.');
   for(let i=0;i<unit.length;i++){
+   if(token!==modeToken)throw Error('Cambió el expediente; se detuvo el guardado de cortes.');
    const desc='CBCT:'+uid;
    const src=unit[i];
    await uploadFile(src,desc,'RADIOGRAFIA',()=>{const e=$('sslCbctSelected');if(e)e.textContent='Guardado '+(i+1)+' de '+max;});
@@ -304,7 +313,7 @@
   });
   if(category()!=='RADIOGRAFIA')return;
   $('sslCbctFiles').addEventListener('change',e=>setSelection(e.target.files));
-  $('sslCbctFolder').addEventListener('change',e=>setSelection(Array.from(e.target.files).filter(f=>/\.(dcm|dicom|ima)$/i.test(f.name))));
+  $('sslCbctFolder').addEventListener('change',e=>setSelection(Array.from(e.target.files).filter(f=>/\.(dcm|dicom|ima|stl)$/i.test(f.name))));
   $('sslCbctPreview').addEventListener('click',async ()=>{
    if(processing||!selection.length)return;
    setBusy(true,'Preparando estudio');
