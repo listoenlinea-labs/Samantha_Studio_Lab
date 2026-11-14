@@ -61,7 +61,7 @@
    if(onProgress)onProgress(i+1,files.length,'Leyendo geometría de los cortes');
    await Promise.resolve();
   }
-  return assemble(slices,onProgress);
+  return assembleResponsive(slices,onProgress);
  }
  function assemble(slices,onProgress){
   const s=validateSeries(slices),[w,h,d]=s.sourceSize;
@@ -87,6 +87,43 @@
   if(!(p99>p1))throw Error('La serie no contiene contraste suficiente para reconstrucción volumétrica.');
   const densities=new Uint8Array(raw.length);
   for(let i=0;i<raw.length;i++)densities[i]=Math.max(0,Math.min(255,Math.round((raw[i]-p1)*255/(p99-p1))));
+  return {nx,ny,nz,data:densities,spacing:[s.spacing[0]*w/nx,s.spacing[1]*h/ny,s.spacing[2]*d/nz],
+   sourceSize:s.sourceSize,seriesUID:s.seriesUID,modality:s.modality,percentiles:[p1,p99],
+   units:'intensidad relativa; no HU verificados',isMedicalCertified:false};
+ }
+ async function assembleResponsive(slices,onProgress){
+  const s=validateSeries(slices),[w,h,d]=s.sourceSize;
+  if(w*h*d>150000000)throw Error('Volumen demasiado grande para procesamiento seguro en el navegador.');
+  const scale=Math.min(1,160/w,160/h,224/d);
+  // Axes downsample uniformly to preserve anatomy proportions.
+  const nx=Math.max(2,Math.floor(w*scale)),ny=Math.max(2,Math.floor(h*scale)),nz=Math.max(2,Math.floor(d*scale));
+  if(nx*ny*nz>MAX_VOXELS)throw Error('Memoria de volumen excedida.');
+  const raw=new Float32Array(nx*ny*nz),sample=[];
+  for(let z=0;z<nz;z++){
+   const f=s.ordered[Math.min(d-1,Math.floor((z+.5)*d/nz))].slice.pixels(0).values;
+   for(let y=0;y<ny;y++)for(let x=0;x<nx;x++){
+    const ox=Math.min(w-1,Math.floor((x+.5)*w/nx)),oy=Math.min(h-1,Math.floor((y+.5)*h/ny));
+    const value=f[oy*w+ox];raw[z*nx*ny+y*nx+x]=value;
+   }
+   if(onProgress)onProgress(z+1,nz,'Construyendo volumen');
+   if(z%4===3)await new Promise(resolve=>setTimeout(resolve,0));
+  }
+  onProgress?.(nz,nz,'Calculando contraste');
+  await new Promise(resolve=>setTimeout(resolve,0));
+  const stride=Math.max(1,Math.floor(raw.length/150000));
+  for(let i=0;i<raw.length;i+=stride)if(Number.isFinite(raw[i]))sample.push(raw[i]);
+  if(!sample.length)throw Error('DICOM sin intensidades válidas.');
+  sample.sort((a,b)=>a-b);
+  onProgress?.(nz,nz,'Normalizando intensidades');
+  await new Promise(resolve=>setTimeout(resolve,0));
+  const p1=sample[Math.floor(sample.length*.01)],p99=sample[Math.floor(sample.length*.99)];
+  if(!(p99>p1))throw Error('La serie no contiene contraste suficiente para reconstrucción volumétrica.');
+  const densities=new Uint8Array(raw.length);
+  for(let i=0;i<raw.length;i++){
+   densities[i]=Math.max(0,Math.min(255,Math.round((raw[i]-p1)*255/(p99-p1))));
+   if(i%180000===179999)await new Promise(resolve=>setTimeout(resolve,0));
+  }
+  onProgress?.(nz,nz,'Volumen listo para visualizar');
   return {nx,ny,nz,data:densities,spacing:[s.spacing[0]*w/nx,s.spacing[1]*h/ny,s.spacing[2]*d/nz],
    sourceSize:s.sourceSize,seriesUID:s.seriesUID,modality:s.modality,percentiles:[p1,p99],
    units:'intensidad relativa; no HU verificados',isMedicalCertified:false};
