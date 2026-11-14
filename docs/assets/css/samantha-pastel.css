@@ -338,3 +338,79 @@ body.ph-sidebar-open .ph-sidebar{transform:translateX(0)}
  .ph-perio .ph-simple-tabs{flex-direction:column;align-items:stretch}
  .ph-perio .ph-simple-tabs button{width:100%}
 }
+
+
+/* Corrección del menú móvil: la navegación no debe conservar el fondo
+   azul oscuro original ni enlaces morados de bajo contraste. */
+@media (max-width:760px){
+  .dc-header{height:64px!important;min-height:64px!important;padding:0 12px!important}
+  .dc-header .dc-menu-button{
+    display:grid!important;place-items:center;width:43px;height:43px;
+    padding:0;border:1px solid #cbb6d9!important;border-radius:12px!important;
+    background:#f9f4fc!important;color:#654b79!important;
+    font-size:23px;line-height:1;cursor:pointer
+  }
+  .dc-header .brand{min-width:0;padding-right:0}
+  .dc-header .brand img{width:39px;height:39px}
+  .app-nav#appSidebar{
+    position:fixed!important;top:64px!important;bottom:0!important;left:0!important;right:auto!important;
+    width:min(85vw,320px)!important;max-width:100vw;max-height:calc(100dvh - 64px);
+    padding:18px 13px calc(24px + env(safe-area-inset-bottom))!important;
+    overflow-y:auto!important;overscroll-behavior:contain;
+    background:linear-gradient(165deg,#f7effb 0%,#fffafd 55%,#f9f1fa 100%)!important;
+    border:0!important;border-right:1px solid #ddcee8!important;border-radius:0 0 18px 0!important;
+    box-shadow:16px 8px 34px rgba(62,43,79,.17)!important;
+    transform:translateX(-105%);transition:transform .22s ease;
+    z-index:80!important;
+  }
+  body.nav-open .app-nav#appSidebar{transform:translateX(0)!important}
+  .app-nav#appSidebar>a,
+  .dc-header .app-nav#appSidebar>a{
+    display:flex;align-items:center;width:100%;min-height:48px;
+    margin:3px 0!important;padding:0 16px!important;
+    color:#574468!important;background:transparent!important;
+    border-radius:12px;font-size:14px!important;font-weight:650;
+    text-decoration:none;
+  }
+  .dc-header .app-nav#appSidebar>a:hover,
+  .dc-header .app-nav#appSidebar>a:focus-visible{
+    color:#4b3465!important;background:#ece0f4!important
+  }
+  .dc-header .app-nav#appSidebar>a.active{
+    color:#593c72!important;background:#e9dbf2!important;font-weight:800!important;
+    box-shadow:inset 4px 0 0 #8d70a4!important;
+  }
+  .dc-header .app-nav#appSidebar>a.active::after{display:none}
+  .dc-header .app-nav#appSidebar .nav-group-trigger{
+    display:flex;width:100%;min-height:48px;align-items:center;justify-content:space-between;
+    border:0;border-radius:12px;padding:0 16px!important;
+    background:transparent!important;color:#654f77!important;font-size:14px!important;font-weight:750;
+  }
+  .dc-header .app-nav#appSidebar .nav-group-trigger:hover,
+  .dc-header .app-nav#appSidebar .nav-group.open>.nav-group-trigger{
+    background:#eee3f5!important;color:#513668!important
+  }
+  .app-nav#appSidebar .nav-group-menu{
+    position:static!important;background:transparent!important;
+    margin:4px 0 10px 18px!important;padding:3px 0 3px 11px!important;
+    border:0!important;border-left:2px solid #d5bfe4!important;border-radius:0!important;
+    box-shadow:none!important;
+  }
+  .dc-header .app-nav#appSidebar .nav-group-menu a{
+    display:flex;align-items:center;min-height:44px;padding:8px 12px!important;
+    color:#66517a!important;background:transparent!important;font-size:13px!important;
+    border-radius:9px;
+  }
+  .dc-header .app-nav#appSidebar .nav-group-menu a.active,
+  .dc-header .app-nav#appSidebar .nav-group-menu a:hover{
+    background:#ede0f5!important;color:#503466!important;
+    box-shadow:inset 3px 0 0 #a586ba;
+  }
+  body.nav-open #sidebarScrim.sidebar-scrim{
+    display:block!important;position:fixed!important;inset:64px 0 0 0!important;
+    z-index:70!important;background:rgba(51,37,61,.30)!important;
+    backdrop-filter:blur(2px);
+  }
+  .app-topbar{top:64px!important}
+}
+@media(prefers-reduced-motion:reduce){.app-nav#appSidebar{transition:none!important}}
