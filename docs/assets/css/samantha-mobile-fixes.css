@@ -118,3 +118,26 @@ body[data-page="pacientes"] .px-drawer .px-empty-illustration{background:#e8f5fc
 @media(prefers-reduced-motion:reduce){
  body.samantha-app-page #appSidebar.app-nav{transition:none!important}
 }
+
+/* Recetas PDF: selección de paciente y acceso al editor privado existente. */
+body[data-page="recetas"] .ssl-recipes-page{max-width:1060px;margin:0 auto;display:grid;gap:20px}
+body[data-page="recetas"] .ssl-recipes-intro{padding:28px clamp(20px,3vw,40px);border:1px solid #e3d6eb;border-radius:22px;
+ background:linear-gradient(115deg,#eee4f5 0%,#f8f1fa 70%,#fff6f7)}
+body[data-page="recetas"] .ssl-recipes-intro h1{margin:4px 0 12px;color:#70548b;font:400 clamp(28px,3.4vw,43px) Georgia,serif}
+body[data-page="recetas"] .ssl-recipes-intro>p:last-child{font-size:13px;color:#83718d;line-height:1.7}
+body[data-page="recetas"] .ssl-recipes-card{padding:clamp(18px,3vw,30px);border:1px solid #e6daee;border-radius:20px;background:#fff}
+body[data-page="recetas"] .ssl-recipes-card>label{display:block;color:#705782;font-size:13px;font-weight:750;margin-bottom:12px}
+body[data-page="recetas"] .ssl-recipes-search{display:flex;gap:10px;margin-bottom:18px}
+body[data-page="recetas"] .ssl-recipes-search input{min-width:0;flex:1;min-height:44px;border:1px solid #d9c9e6;padding:10px 14px;border-radius:10px;color:#614f72}
+body[data-page="recetas"] .ssl-recipes-search button{border:1px solid #a8d1ef;background:#cbe6f8;color:#31576f;font-weight:800;padding:10px 19px;border-radius:11px;cursor:pointer}
+body[data-page="recetas"] .ssl-recipes-patient{display:flex;align-items:center;justify-content:space-between;gap:13px;border-bottom:1px solid #ede5f0;padding:15px 4px}
+body[data-page="recetas"] .ssl-recipes-patient>span{display:grid;gap:5px;min-width:0}
+body[data-page="recetas"] .ssl-recipes-patient strong{color:#675078;font-size:13px}
+body[data-page="recetas"] .ssl-recipes-patient small{color:#9685a0;font-size:11px}
+body[data-page="recetas"] .ssl-recipes-patient a{display:inline-flex;text-decoration:none;padding:10px 13px;border-radius:10px;background:#f0e6f7;color:#6c5083;font-size:12px;font-weight:750}
+body[data-page="recetas"] .ssl-recipes-disclaimer{font-size:12px;color:#867b8b;line-height:1.6}
+@media(max-width:760px){
+ body[data-page="recetas"] .ssl-recipes-patient{align-items:stretch;flex-direction:column}
+ body[data-page="recetas"] .ssl-recipes-patient a{justify-content:center}
+ body[data-page="recetas"] .ssl-recipes-search{flex-direction:column}
+}
