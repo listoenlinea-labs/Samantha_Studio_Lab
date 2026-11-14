@@ -10,6 +10,14 @@ const pool = require('./config/database');
 const errorHandler = require('./middleware/error-handler');
 
 const app = express();
+
+// En Hostinger pueden existir uno o más proxies entre el navegador y Node.js.
+// Solo confiar en X-Forwarded-For cuando el número de saltos se haya confirmado
+// en la infraestructura; nunca confiar en todos los proxies sin validación.
+const proxyHops = Number(process.env.TRUST_PROXY_HOPS || 0);
+if (Number.isInteger(proxyHops) && proxyHops >= 1 && proxyHops <= 4) {
+    app.set('trust proxy', proxyHops);
+}
 // Protección temporal de todo el sitio hasta conectar el login a usuarios y roles.
 if (process.env.NODE_ENV === 'production') {
     const username = process.env.SITE_USER;
@@ -81,7 +89,24 @@ app.use((req, res, next) => {
 
     next();
 });
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 300 }));
+// El límite anterior (300/15 min) se aplicaba también a HTML, CSS, JS,
+// imágenes y peticiones de API: al agotarse devolvía 429 para TODO el sitio.
+// Proteger solo /api y dejar los recursos estáticos fuera del contador.
+const configuredLimit = Number(process.env.API_RATE_LIMIT_MAX || 1200);
+const apiLimit = Number.isSafeInteger(configuredLimit) && configuredLimit >= 100 && configuredLimit <= 10000
+    ? configuredLimit : 1200;
+app.use('/api', rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: apiLimit,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    handler: (_req, res) => {
+        res.status(429).json({
+            ok: false,
+            mensaje: 'Se alcanzó el límite temporal de consultas a la API. Intenta nuevamente en unos minutos.'
+        });
+    }
+}));
 
 app.get('/api/health', async (req, res, next) => {
     try {
