@@ -234,3 +234,8 @@ body[data-page="dashboard"] .ssl-home-shortcut-arrow{margin-left:auto;color:#977
  .recordatorios-body.ssl-mobile-open .ssl-standalone-scrim{display:block;position:fixed;inset:0;z-index:70;background:#3b2a4b6b;border:0}
 }
 @media(prefers-reduced-motion:reduce){.recordatorios-body .ssl-standalone-sidebar{transition:none}}
+
+/* Ocultar flecha sobre paneles laterales y diálogos (incluidos los de Pacientes). */
+body.samantha-app-page:has(.px-drawer.open) .sidebar-collapse-toggle,
+body.samantha-app-page:has(.modal-backdrop[aria-hidden="false"]) .sidebar-collapse-toggle,
+body.samantha-app-page:has(.modal-backdrop.open) .sidebar-collapse-toggle{visibility:hidden!important;pointer-events:none!important}
