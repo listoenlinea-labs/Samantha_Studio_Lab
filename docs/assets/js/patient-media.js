@@ -125,26 +125,54 @@
  function listRows(items,cat){
   if(!items.length)return '<p class="ssl-media-empty">Todavía no hay archivos en este apartado.</p>';
   const groups=new Map();
-  if(cat==='RADIOGRAFIA')for(const item of items){
-    if(item.tipoMime==='application/dicom'&&String(item.descripcion||'').startsWith('CBCT:')){
-      const key=String(item.descripcion);groups.set(key,[...(groups.get(key)||[]),item]);
-    }
+  if(cat!=='PDF')for(const item of items){
+   if(item.tipoMime==='application/dicom'&&String(item.descripcion||'').startsWith('CBCT:')){
+    const key=String(item.descripcion);groups.set(key,[...(groups.get(key)||[]),item]);
+   }
   }
   const series=[...groups.entries()].filter(([,entries])=>entries.length>=12).map(([uid,entries])=>
-    '<article class="ssl-media-series"><strong>Serie CBCT guardada · '+entries.length+' cortes</strong>'+
-    '<button type="button" data-media-series="'+escape(uid)+'">Ver tomografía 2D / 3D / Panorámica</button></article>').join('');
+   '<article class="ssl-media-series"><strong>Serie CBCT guardada · '+entries.length+' cortes</strong>'+
+   '<button type="button" data-media-series="'+escape(uid)+'">Ver tomografía 2D / 3D / Panorámica</button></article>').join('');
   return '<div class="ssl-media-list">'+series+items.map(item=>{
-   const mime=item.tipoMime||'',id=Number(item.idArchivo),isZip=mime==='application/zip'||/\.zip$/i.test(item.nombre||''),isDicom=mime==='application/dicom';
-   // Compatibilidad con STL antiguos que MySQL guardó como application/octet-stream.
-   const isStl=mime==='model/stl'||/\.stl$/i.test(item.nombre||'');
-   const action=isStl?'Visualizar':isZip?'Ver tomografía':isDicom?'Ver DICOM':
-     mime==='image/tiff'||mime==='image/bmp'?'Descargar':mime.startsWith('image/')?'Ver imagen':mime==='application/pdf'?'Ver PDF':'Descargar';
-   return '<article class="ssl-media-entry" data-file-id="'+id+'"><div><strong>'+escape(item.nombre)+'</strong>'+
-    '<small>'+escape(item.descripcion||'Sin descripción')+' · '+bytes(item.bytes)+' · '+escape(new Date(item.creadoAt).toLocaleDateString('es-MX'))+'</small></div>'+
-    '<div class="ssl-media-entry-actions"><button type="button" data-media-view="'+id+'">'+action+'</button>'+
-    '<button type="button" data-media-download="'+id+'" data-name="'+escape(item.nombre)+'">Descargar</button>'+
-    (current.canDelete?'<button type="button" class="ssl-media-delete" data-media-delete="'+id+'">Eliminar</button>':'')+'</div></article>';
+   const id=Number(item.idArchivo),kind=classify(item),mime=String(item.tipoMime||''),name=String(item.nombre||'');
+   const action={pdf:'Ver PDF',image:'Ver imagen',video:'Reproducir',audio:'Escuchar',
+    '3d':'Visualizar 3D',dicom:'Ver DICOM',cbct:'Ver tomografía'}[kind]||'';
+   const preview=!!action&&supportedPreview(item);
+   const isCompare=current?.mode==='media'&&kind==='image'&&
+    !/\.(tif|tiff|bmp)$/i.test(name);
+   const description=escape(item.descripcion||'Sin descripción'),label=escape(kinds[kind]||'Estudio');
+   return '<article class="ssl-media-entry" data-file-id="'+id+'" data-file-kind="'+kind+
+    '" data-file-query="'+escape((name+' '+(item.descripcion||'')+' '+kinds[kind]).toLowerCase())+'">'+
+    '<div class="ssl-media-entry-info"><span class="ssl-media-kind">'+label+'</span>'+
+    '<strong>'+escape(name)+'</strong>'+
+    '<small>'+description+' · '+bytes(item.bytes)+' · '+escape(new Date(item.creadoAt).toLocaleDateString('es-MX'))+'</small></div>'+
+    '<div class="ssl-media-entry-actions">'+
+    (preview?'<button type="button" data-media-view="'+id+'">'+action+'</button>':'')+
+    '<button type="button" data-media-download="'+id+'" data-name="'+escape(name)+'">Descargar</button>'+
+    (isCompare?'<label class="ssl-media-compare-check"><input type="checkbox" data-media-compare="'+id+'"> Comparar</label>':'')+
+    (current.canDelete?'<button type="button" class="ssl-media-delete" data-media-delete="'+id+'">Eliminar</button>':'')+
+    '</div></article>';
   }).join('')+'</div>';
+ }
+ function filterLibrary(){
+  if(current?.mode!=='media')return;
+  const q=($('sslMediaSearch')?.value||'').trim().toLowerCase();
+  const kind=$('sslMediaKind')?.value||'';
+  const rows=$('sslMediaList')?.querySelectorAll('.ssl-media-entry')||[];
+  let shown=0;
+  for(const row of rows){
+   const yes=(!kind||row.dataset.fileKind===kind)&&(!q||row.dataset.fileQuery.includes(q));
+   row.hidden=!yes;
+   if(yes)shown++;
+  }
+  const count=$('sslMediaCount');if(count)count.textContent=shown+' de '+rows.length+' archivos';
+ }
+ function updateCompareBar(){
+  const bar=$('sslMediaCompareBar');if(!bar)return;
+  const selected=[...document.querySelectorAll('[data-media-compare]:checked')];
+  bar.hidden=selected.length===0;
+  const label=$('sslMediaCompareCount');if(label)label.textContent=selected.length+' de 2 fotografías seleccionadas';
+  const button=$('sslMediaCompareStart');if(button)button.disabled=selected.length!==2;
  }
  async function refresh(){
   const t=modeToken,cat=category(),container=$('sslMediaList');
@@ -155,6 +183,7 @@
    if(t!==modeToken)return;
    current.items=data.items||[];current.canDelete=!!data.canDelete;
    container.innerHTML=listRows(current.items,cat);
+   filterLibrary();updateCompareBar();
   }catch(e){if(t===modeToken)container.textContent=e.message}
  }
  async function viewFile(id){
