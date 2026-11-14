@@ -19,7 +19,7 @@
   const clinicApi = String(explicitApi || (
     ['localhost','127.0.0.1'].includes(location.hostname)
       ? 'http://localhost:3000/api' : location.origin + '/api'
-  )).replace(/\\/$/, '');
+  )).replace(/\/$/, '');
   const requiresBackendConfiguration = isGithubPages && !explicitApi;
 
   const nav = [{
