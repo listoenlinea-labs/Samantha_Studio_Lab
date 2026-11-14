@@ -230,7 +230,7 @@ router.patch('/:id', async (req, res, next) => {
         await connection.query(
             `INSERT INTO auditoria (entidad, id_entidad, accion, detalle)
              VALUES ('odontogramas', ?, 'ACTUALIZAR_CONFIGURACION', ?)`,
-            [odontogramId, JSON.stringify({ tipoDenticion: dentition, nomenclatura })]
+            [odontogramId, JSON.stringify({ tipoDenticion: dentition, nomenclatura: nomenclature })]
         );
         await connection.commit();
         return res.json({ ok: true, mensaje: 'Configuración guardada.' });
