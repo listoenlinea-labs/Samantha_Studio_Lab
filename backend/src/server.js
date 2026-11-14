@@ -33,6 +33,8 @@ async function iniciarServidor() {
         // Esta consulta confirma una conexión REAL con Hostinger/MySQL.
         await pool.query('SELECT 1 AS conexion_ok');
         await asegurarEsquema(pool);
+        // Requiere REMINDERS_ENABLED=true, producción, proveedores y consentimiento.
+        require('./services/reminders').start();
 
         console.log('\n✅ Base de datos MySQL conectada correctamente');
         console.log('✅ Esquema de pacientes y expediente clínico disponible');

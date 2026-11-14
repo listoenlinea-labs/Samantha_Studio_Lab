@@ -82,6 +82,49 @@ async function asegurarEsquema(pool) {
         await pool.query(statement);
     }
 
+    // Las recetas usan una fila por documento: contenido y PDF se guardan juntos.
+    await pool.query(`CREATE TABLE IF NOT EXISTS recetas_clinicas (
+        id_receta BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        id_paciente INT UNSIGNED NOT NULL,
+        folio VARCHAR(45) NOT NULL UNIQUE,
+        titulo VARCHAR(120) NOT NULL,
+        texto TEXT NOT NULL,
+        profesional VARCHAR(160) NULL,
+        cedula VARCHAR(60) NULL,
+        pdf_documento MEDIUMBLOB NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_recetas_paciente (id_paciente, id_receta),
+        CONSTRAINT fk_recetas_paciente FOREIGN KEY (id_paciente) REFERENCES pacientes(id_paciente) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
+
+    // Recordatorios: configuración clínica y bitácora idempotente por cita/canal/ventana.
+    await pool.query(`CREATE TABLE IF NOT EXISTS recordatorios_config (
+        id TINYINT UNSIGNED NOT NULL PRIMARY KEY,
+        nombre_consultorio VARCHAR(120) NOT NULL DEFAULT 'Samantha Studio Lab',
+        direccion_consultorio VARCHAR(300) NULL,
+        dias_antes VARCHAR(80) NOT NULL DEFAULT '[1,3]',
+        horas_antes VARCHAR(80) NOT NULL DEFAULT '[1,3]',
+        hora_envio TINYINT UNSIGNED NOT NULL DEFAULT 9,
+        email_habilitado TINYINT(1) NOT NULL DEFAULT 0,
+        whatsapp_habilitado TINYINT(1) NOT NULL DEFAULT 0,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
+    await pool.query("INSERT IGNORE INTO recordatorios_config (id) VALUES (1)");
+    await pool.query(`CREATE TABLE IF NOT EXISTS recordatorios_envios (
+        id_envio BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        id_cita BIGINT UNSIGNED NOT NULL,
+        canal ENUM('EMAIL','WHATSAPP') NOT NULL,
+        ventana VARCHAR(8) NOT NULL,
+        cita_inicio DATETIME NOT NULL,
+        estado ENUM('ENVIANDO','ENVIADO','FALLIDO') NOT NULL DEFAULT 'ENVIANDO',
+        detalle_error VARCHAR(240) NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_recordatorio_unico (id_cita, canal, ventana, cita_inicio),
+        INDEX idx_recordatorios_estado_fecha (estado, created_at),
+        CONSTRAINT fk_recordatorio_cita FOREIGN KEY (id_cita) REFERENCES citas(id_cita) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
+
     const columns = [
         ['catalogo_hallazgos', 'clasificacion', "VARCHAR(20) NOT NULL DEFAULT 'MALO'"],
         ['catalogo_hallazgos', 'activo', 'TINYINT(1) NOT NULL DEFAULT 1'],
@@ -110,6 +153,14 @@ async function asegurarEsquema(pool) {
         ['pacientes', 'adicional', 'VARCHAR(255) NULL'],
         ['pacientes', 'grupo', 'VARCHAR(100) NULL'],
         ['pacientes', 'linea_negocio', 'VARCHAR(100) NULL'],
+        ['pacientes', 'domicilio', 'VARCHAR(255) NULL'],
+        ['pacientes', 'ocupacion', 'VARCHAR(160) NULL'],
+        ['pacientes', 'tutor_responsable', 'VARCHAR(160) NULL'],
+        ['pacientes', 'contacto_emergencia', 'VARCHAR(160) NULL'],
+        ['pacientes', 'telefono_emergencia', 'VARCHAR(35) NULL'],
+        ['pacientes', 'observaciones_filiacion', 'TEXT NULL'],
+        ['pacientes', 'recordatorio_correo_consentido', 'TINYINT(1) NOT NULL DEFAULT 0'],
+        ['pacientes', 'recordatorio_whatsapp_consentido', 'TINYINT(1) NOT NULL DEFAULT 0'],
         ['citas', 'doctor', 'VARCHAR(160) NULL'],
         ['citas', 'motivo', "VARCHAR(255) NOT NULL DEFAULT 'Consulta'"],
         ['citas', 'comentario', 'TEXT NULL'],

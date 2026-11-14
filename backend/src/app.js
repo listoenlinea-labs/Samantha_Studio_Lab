@@ -102,6 +102,8 @@ const tratamientosRoutes = require('./routes/tratamientos.routes');
 const clinicaRoutes = require('./routes/clinica.routes');
 const asistenciasRoutes = require('./routes/asistencias.routes');
 const busquedaRoutes = require('./routes/busqueda.routes');
+const recetasRoutes = require('./routes/recetas.routes');
+const recordatoriosRoutes = require('./routes/recordatorios.routes');
 app.use('/api/clinica', clinicaRoutes);
 app.use('/api/clinica/asistencias', asistenciasRoutes);
 app.use('/api/busqueda', busquedaRoutes);
@@ -112,6 +114,8 @@ app.use('/api/odontogramas', odontogramasRoutes);
 app.use('/api/periodontogramas', periodontogramasRoutes);
 app.use('/api/archivos', archivosRoutes);
 app.use('/api/tratamientos', tratamientosRoutes);
+app.use('/api/recetas', recetasRoutes);
+app.use('/api/recordatorios', recordatoriosRoutes);
 
 // En producción la interfaz y la API comparten origen; no necesita CORS ni
 // direcciones localhost configuradas en el navegador del visitante.

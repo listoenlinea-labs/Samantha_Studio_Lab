@@ -153,14 +153,35 @@
     const patient = state.patient;
     const tags = patient.etiquetas?.length ? patient.etiquetas.map((tag) => tag.nombre).join(', ') : 'Paciente activo';
     app.innerHTML = `
-      <header class="ph-header"><a href="pacientes.html" class="ph-brand"><img src="assets/img/logo-ssl.svg" alt=""><strong>samantha's studio lab</strong></a><nav><a href="agenda.html">Agenda</a><a class="active" href="pacientes.html">Pacientes</a><a href="finanzas.html">Finanzas</a><a href="inventario.html">Inventario</a></nav><div><button type="button" id="globalSearchToggle" aria-label="Buscar en la aplicación" aria-haspopup="dialog" aria-expanded="false" aria-controls="globalSearchPanel">⌕ Buscar</button><button data-notify="Nueva cita preparada">＋ Crear</button><span>Administrador</span></div></header>
+      <header class="ph-header">
+        <button type="button" id="phSidebarToggle" class="ph-menu-toggle" aria-controls="phClinicalSidebar" aria-expanded="true" aria-label="Mostrar u ocultar menú del expediente">‹</button>
+        <a href="pacientes.html" class="ph-brand"><img src="assets/img/logo-ssl.svg" alt=""><span><strong>samantha's studio lab</strong><small>CONSULTORIO DENTAL</small></span></a>
+        <div class="ph-top-actions"><button type="button" id="globalSearchToggle" class="ph-menu-toggle" aria-label="Buscar" aria-haspopup="dialog" aria-expanded="false" aria-controls="globalSearchPanel">⌕</button><a class="ph-return" href="pacientes.html">← Volver a pacientes</a></div>
+      </header>
       <main class="ph-layout">
-        <aside class="ph-sidebar"><section class="ph-profile"><div class="ph-profile-cover"></div>${avatar(patient)}<h1>${escapeHtml(patient.nombreCompleto)}</h1><p>${patient.edad ?? 'Edad no registrada'}${patient.edad !== null ? ' años' : ''}</p><small>Creado el ${formatDate(patient.creadoAt)}</small><div class="ph-contact"><a href="${patient.telefono ? `tel:${escapeHtml(patient.telefono)}` : '#'}">☎</a><a href="${patient.correo ? `mailto:${escapeHtml(patient.correo)}` : '#'}">✉</a><button id="phMoreButton">⋮</button></div><div class="ph-more-menu" id="phMoreMenu" hidden><a href="pacientes.html">Editar datos y foto</a><button data-notify="La descarga del expediente se habilitará en Archivos">Descargar expediente</button></div></section>
-          <nav class="ph-record-nav">${navigation.map(([id,label]) => `<button class="${id === 'odontogram' ? 'active' : ''}" data-record-view="${id}"><i>${icons[id]}</i>${label}</button>`).join('')}</nav></aside>
-        <section class="ph-workspace"><div class="ph-info-strip"><article><b>▮ Etiquetas</b><button data-summary-edit="tags">＋ Editar</button><span>${escapeHtml(tags)}</span></article><article><b>▰ Nota general</b><button data-summary-edit="note">Editar</button><span>${escapeHtml(patient.notaGeneral || 'Sin notas')}</span></article><article><b>● Alergias</b><button data-summary-edit="allergies">Editar</button><span>${escapeHtml(patient.alergias || 'Sin alergias registradas')}</span></article></div><div id="phView"></div></section>
+        <aside class="ph-sidebar" id="phClinicalSidebar"><section class="ph-profile"><div class="ph-profile-cover"></div>${avatar(patient)}<h1>${escapeHtml(patient.nombreCompleto)}</h1><p>${patient.edad ?? 'Edad no registrada'}${patient.edad !== null ? ' años' : ''}</p><small>Creado el ${formatDate(patient.creadoAt)}</small><div class="ph-contact"><a href="${patient.telefono ? `tel:${escapeHtml(patient.telefono)}` : '#'}">☎</a><a href="${patient.correo ? `mailto:${escapeHtml(patient.correo)}` : '#'}">✉</a><button id="phMoreButton">⋮</button></div><div class="ph-more-menu" id="phMoreMenu" hidden><a href="pacientes.html">Editar datos y foto</a><button data-notify="La descarga del expediente se habilitará en Archivos">Descargar expediente</button></div></section>
+          <nav class="ph-record-nav">${navigation.map(([id,label]) => `<button class="${id === 'filiation' ? 'active' : ''}" data-record-view="${id}"><i>${icons[id]}</i>${label}</button>`).join('')}</nav></aside>
+        <section class="ph-workspace"><div class="ph-clinical-heading"><span class="ph-eyebrow">HISTORIA CLÍNICA DIGITAL</span><h2 id="phViewTitle">Filiación</h2><p id="phViewSubtitle">Datos personales y medios de contacto del paciente.</p></div><div class="ph-info-strip"><article><b>▮ Etiquetas</b><button data-summary-edit="tags">＋ Editar</button><span>${escapeHtml(tags)}</span></article><article><b>▰ Nota general</b><button data-summary-edit="note">Editar</button><span>${escapeHtml(patient.notaGeneral || 'Sin notas')}</span></article><article><b>● Alergias</b><button data-summary-edit="allergies">Editar</button><span>${escapeHtml(patient.alergias || 'Sin alergias registradas')}</span></article></div><div id="phView"></div></section>
         <aside class="ph-clinical-rail"><section><h3>Expediente</h3><div class="ph-illustration">◔</div><strong>${escapeHtml(patient.numeroExpediente || '—')}</strong></section><section><div class="ph-rail-title"><h3>Notas de evolución</h3></div><div class="ph-illustration note">▤</div><button data-record-view-shortcut="history">＋ Registrar evolución</button></section></aside>
-      </main><div class="ph-modal-backdrop" id="phModal" hidden></div><div class="ph-toast" id="phToast" role="status"></div>`;
+      </main><div class="ph-sidebar-backdrop" id="phSidebarBackdrop" hidden></div><div class="ph-modal-backdrop" id="phModal" hidden></div><div class="ph-toast" id="phToast" role="status"></div>`;
     document.querySelector('.ph-record-nav').addEventListener('click', onNavigation);
+    const menu = document.getElementById('phSidebarToggle');
+    const backdrop = document.getElementById('phSidebarBackdrop');
+    const mobile = window.matchMedia('(max-width:760px)');
+    function syncSidebar(){
+      const expanded=mobile.matches?document.body.classList.contains('ph-sidebar-open'):!document.body.classList.contains('ph-sidebar-collapsed');
+      menu.setAttribute('aria-expanded',String(expanded));
+      menu.textContent=expanded?'‹':'›';
+      backdrop.hidden=!mobile.matches||!expanded;
+    }
+    menu.onclick=()=>{
+      if(mobile.matches)document.body.classList.toggle('ph-sidebar-open');
+      else document.body.classList.toggle('ph-sidebar-collapsed');
+      syncSidebar();
+    };
+    backdrop.onclick=()=>{document.body.classList.remove('ph-sidebar-open');syncSidebar();};
+    mobile.addEventListener('change',()=>{document.body.classList.remove('ph-sidebar-open');syncSidebar();});
+    syncSidebar();
     document.getElementById('phMoreButton').addEventListener('click', () => {
       const menu = document.getElementById('phMoreMenu'); menu.hidden = !menu.hidden;
     });
@@ -227,11 +248,30 @@
   }
 
   function activateView(id) {
+    const meta={
+      filiation:['Filiación','Datos personales y de contacto del paciente.'],
+      history:['Historia clínica','Antecedentes médicos y odontológicos del paciente.'],
+      odontogram:['Odontograma','Piezas dentales FDI y hallazgos por etapa clínica.'],
+      perio:['Periodontograma','Profundidades y sangrado por sitio dental.'],
+      prescriptions:['Prescripciones','Redacta, guarda y genera recetas PDF.'],
+      files:['Archivos PDF','Documentos privados del paciente.'],
+      ortho:['Ortodoncia','Diagnósticos, análisis y controles.'],
+      account:['Estado de cuenta','Cargos, abonos y planes de pago.']
+    }[id]||['Expediente clínico','Información del paciente'];
+    const title=document.getElementById('phViewTitle'),subtitle=document.getElementById('phViewSubtitle');
+    if(title)title.textContent=meta[0];
+    if(subtitle)subtitle.textContent=meta[1];
+    document.body.classList.remove('ph-sidebar-open');
+    const overlay=document.getElementById('phSidebarBackdrop');
+    if(overlay)overlay.hidden=true;
+    const toggle=document.getElementById('phSidebarToggle');
+    if(toggle)toggle.setAttribute('aria-expanded',String(!window.matchMedia('(max-width:760px)').matches));
     document.querySelectorAll('[data-record-view]').forEach((button) => button.classList.toggle('active', button.dataset.recordView === id));
     if (id === 'filiation') return renderFiliation();
     if (id === 'history') return renderHistory();
     if (id === 'odontogram') return loadOdontograms();
     if (id === 'perio') return loadPeriodontogram();
+    if(id === 'prescriptions') return window.SamanthaPrescriptions.render({api,patientId,escapeHtml,notify,formatDate,API_URL});
     renderGeneric(id);
   }
 
@@ -240,8 +280,26 @@
     view.innerHTML = '<section class="ph-card ph-loading">Cargando filiación…</section>';
     try {
       const data = await api(`/pacientes/${patientId}/filiacion`);
-      const input = (name, label, type = 'text') => `<label>${label}<input type="${type}" name="${name}" value="${escapeHtml(data[name] || '')}"></label>`;
-      view.innerHTML = `<section class="ph-card ph-history"><header><div><h2>Filiación</h2><p>Datos personales y de contacto del paciente.</p></div><button class="ph-primary" id="saveFiliation">Guardar cambios</button></header><form id="filiationForm" class="ph-history-form">${input('nombres','Nombre(s)')}${input('apellidoPaterno','Apellido paterno')}${input('apellidoMaterno','Apellido materno')}${input('fechaNacimiento','Fecha de nacimiento','date')}<label>Sexo<select name="sexo"><option value="">No especificado</option>${['F','M','X','NO_ESPECIFICA'].map((value) => `<option ${data.sexo === value ? 'selected' : ''}>${value}</option>`).join('')}</select></label>${input('telefono','Teléfono','tel')}${input('correo','Correo','email')}${input('comoNosConocio','¿Cómo nos conoció?')}<label>Antecedentes médicos<textarea name="antecedentesMedicos" rows="4">${escapeHtml(data.antecedentesMedicos || '')}</textarea></label><label>Notas de alerta<textarea name="notasAlerta" rows="4">${escapeHtml(data.notasAlerta || '')}</textarea></label></form></section>`;
+      const input = (name, label, type = 'text') => `<label>${label}<input type="${type}" name="${name}" value="${escapeHtml(type==='date'?String(data[name]||'').slice(0,10):data[name]||'')}" autocomplete="off"></label>`;
+      const multiline=(name,label,rows=3)=>`<label class="ph-wide">${label}<textarea name="${name}" rows="${rows}">${escapeHtml(data[name]||'')}</textarea></label>`;
+      const checkbox=(key,label)=>`<label class="ph-consent"><input type="checkbox" name="${key}" ${data[key]?'checked':''}><span>${label}</span></label>`;
+      view.innerHTML = `<section class="ph-card ph-history ph-filiation"><header><div><h2>Información personal</h2><p>Datos generales, fecha de nacimiento y contacto de emergencia.</p></div><button class="ph-primary" id="saveFiliation" type="button">Guardar cambios</button></header>
+        <form id="filiationForm"><div class="ph-history-form">
+          ${input('nombres','Nombre(s)')}${input('apellidoPaterno','Apellido paterno')}${input('apellidoMaterno','Apellido materno')}
+          ${input('fechaNacimiento','Fecha de nacimiento','date')}${input('ocupacion','Ocupación')}${input('domicilio','Domicilio')}
+          <label>Sexo<select name="sexo"><option value="">No especificado</option>${['F','M','X','NO_ESPECIFICA'].map(value=>`<option value="${value}" ${data.sexo===value?'selected':''}>${value}</option>`).join('')}</select></label>
+          ${input('tutorResponsable','Responsable legal / tutor (si aplica)')}${input('telefono','Teléfono','tel')}${input('correo','Correo','email')}
+          ${input('contactoEmergencia','Contacto de emergencia')}${input('telefonoEmergencia','Teléfono de emergencia','tel')}
+          ${input('comoNosConocio','¿Cómo nos conoció?')}
+          ${multiline('observacionesFiliacion','Observaciones de filiación')}
+        </div>
+        <h3 class="ph-filiation-subhead">Antecedentes y alertas</h3>
+        <div class="ph-history-form">${multiline('antecedentesMedicos','Antecedentes médicos',4)}${multiline('notasAlerta','Notas de alerta',4)}</div>
+        <h3 class="ph-filiation-subhead">Consentimiento para recordatorios</h3>
+        <p class="ph-consent-help">Activa un canal únicamente cuando el paciente autorice recibir avisos de citas. Los recordatorios no incluyen diagnósticos ni datos clínicos.</p>
+        <div class="ph-consent-options">${checkbox('recordatorioCorreoConsentido','El paciente autorizó recordatorios por correo electrónico.')}${checkbox('recordatorioWhatsappConsentido','El paciente autorizó recordatorios por WhatsApp.')}</div>
+        </form></section>`;
+
       document.getElementById('saveFiliation').onclick = async () => {
         try {
           const payload = Object.fromEntries(new FormData(document.getElementById('filiationForm')));
@@ -293,7 +351,7 @@
   }
 
   function odontogramControls() {
-    return `<div class="ph-odo-controls"><label>Tipo<select id="dentitionType" ${state.odontogram?.estado === 'FINALIZADO' ? 'disabled' : ''}><option value="ADULTO" ${state.dentition === 'ADULTO' ? 'selected' : ''}>Adulto</option><option value="MIXTO" ${state.dentition === 'MIXTO' ? 'selected' : ''}>Mixto</option><option value="NINO" ${state.dentition === 'NINO' ? 'selected' : ''}>Niño</option></select></label><label>Nomenclatura<select id="nomenclature" ${state.odontogram?.estado === 'FINALIZADO' ? 'disabled' : ''}><option value="FDI" ${state.nomenclature === 'FDI' ? 'selected' : ''}>Internacional (FDI)</option><option value="ADA" ${state.nomenclature === 'ADA' ? 'selected' : ''}>ADA</option></select></label><label class="ph-multi"><input id="multiSelect" type="checkbox" ${state.odontogram?.estado === 'FINALIZADO' ? 'disabled' : ''}> Marcado múltiple</label></div>`;
+    return `<div class="ph-odo-controls"><label>Tipo de dentición<select id="dentitionType" ${state.odontogram?.estado === 'FINALIZADO' ? 'disabled' : ''}><option value="ADULTO" ${state.dentition === 'ADULTO' ? 'selected' : ''}>Adulto</option><option value="MIXTO" ${state.dentition === 'MIXTO' ? 'selected' : ''}>Mixto</option><option value="NINO" ${state.dentition === 'NINO' ? 'selected' : ''}>Niño</option></select></label><label>Nomenclatura<select id="nomenclature" ${state.odontogram?.estado === 'FINALIZADO' ? 'disabled' : ''}><option value="FDI" ${state.nomenclature === 'FDI' ? 'selected' : ''}>Internacional (FDI)</option><option value="ADA" ${state.nomenclature === 'ADA' ? 'selected' : ''}>ADA</option></select></label><label class="ph-multi"><input id="multiSelect" type="checkbox" ${state.odontogram?.estado === 'FINALIZADO' ? 'disabled' : ''}> Marcado múltiple</label></div>`;
   }
 
   async function loadOdontograms() {
@@ -319,7 +377,7 @@
     const view = document.getElementById('phView');
     findingDialogCleanup?.();
     findingDialogCleanup = null;
-    view.innerHTML = `<section class="ph-card ph-odontogram"><header class="ph-card-tabs"><div>${Object.keys(stages).map((id) => `<button class="${state.stage === id ? 'active' : ''}" data-odo-stage="${id}">${stageLabels[id]}</button>`).join('')}</div><div class="ph-state-key"><span class="bad">● Mal estado</span><span class="good">● Buen estado</span><button id="newOdontogram">${state.odontogram ? 'Nueva versión' : 'Crear odontograma'}</button>${state.odontogram && state.odontogram.estado !== 'FINALIZADO' ? '<button id="finalizeOdontogram" class="ph-finalize">Finalizar</button>' : ''}</div></header>${odontogramControls()}${state.odontogram ? `<div class="ph-record-status"><span>${escapeHtml(state.odontogram.estado)} · ${formatDate(state.odontogram.creadoAt)}</span><input id="odontogramNotes" maxlength="4000" placeholder="Observaciones del odontograma" value="${escapeHtml(state.odontogram.observaciones || '')}" ${state.odontogram.estado === 'FINALIZADO' ? 'disabled' : ''}></div>` : '<p class="ph-empty-notice">Selecciona un diente. El odontograma se guardará automáticamente al registrar el primer hallazgo.</p>'}<p class="ph-odontogram-help">Se muestran hasta tres símbolos por pieza en esta etapa. <b>+N</b> indica registros adicionales. Selecciona una pieza para ampliarla y consultar todos sus hallazgos.</p><div class="ph-teeth-chart">${dentitionChart()}</div><section class="ph-treatment-plan"><h2>Hallazgos</h2><div class="ph-plan-table"><b>N.º diente</b><b>Hallazgo</b><b>Superficie</b><b>Estado</b><b></b>${state.findings.length ? state.findings.map((item) => `<div class="ph-plan-row"><span>${escapeHtml(toothLabel(Number(item.pieza)))}</span><span class="ph-plan-finding">${findingGlyph(item.icono, item.estadoVisual, true)}${escapeHtml(item.nombre)}</span><span>${escapeHtml(surfaceLabels[item.superficie] || item.superficie || 'Diente completo')}</span><span class="${String(item.estadoVisual).toLowerCase()}">${escapeHtml(item.estadoVisual)}</span><span>${state.odontogram.estado !== 'FINALIZADO' ? `<button class="ph-remove-finding" data-remove-finding="${item.idHallazgo}" aria-label="Eliminar ${escapeHtml(item.nombre)}">×</button>` : ''}</span></div>`).join('') : '<div id="phPlanEmpty">Selecciona un diente para registrar un hallazgo.</div>'}</div></section></section><div class="ph-finding-popover" id="phFindingPopover" hidden></div>`;
+    view.innerHTML = `<section class="ph-card ph-odontogram"><header class="ph-card-tabs"><div>${Object.keys(stages).map((id) => `<button class="${state.stage === id ? 'active' : ''}" data-odo-stage="${id}">${stageLabels[id]}</button>`).join('')}</div><div class="ph-state-key"><span class="bad">● Mal estado</span><span class="good">● Buen estado</span></div></header>${odontogramControls()}${state.odontogram ? `<div class="ph-record-status"><span>${escapeHtml(state.odontogram.estado)} · ${formatDate(state.odontogram.creadoAt)}</span><input id="odontogramNotes" maxlength="4000" placeholder="Observaciones del odontograma" value="${escapeHtml(state.odontogram.observaciones || '')}" ${state.odontogram.estado === 'FINALIZADO' ? 'disabled' : ''}></div>` : '<p class="ph-empty-notice">Selecciona un diente. El odontograma se guardará automáticamente al registrar el primer hallazgo.</p>'}<p class="ph-odontogram-help">Se muestran hasta tres símbolos por pieza en esta etapa. <b>+N</b> indica registros adicionales. Selecciona una pieza para ampliarla y consultar todos sus hallazgos.</p><div class="ph-teeth-chart">${dentitionChart()}</div><div class="ph-odo-footer"><span class="ph-odo-selected" id="phSelectionCount" aria-live="polite">0 pieza(s) seleccionada(s)</span><span class="ph-odo-legend">Rojo: mal estado · Azul: buen estado · Lila: neutral</span><div class="ph-odo-actions"><button id="newOdontogram">${state.odontogram ? 'Nueva versión' : 'Crear odontograma'}</button>${state.odontogram && state.odontogram.estado !== 'FINALIZADO' ? '<button id="finalizeOdontogram" class="ph-finalize">Finalizar</button>' : ''}</div></div><section class="ph-treatment-plan"><h2>Hallazgos</h2><div class="ph-plan-table"><b>N.º diente</b><b>Hallazgo</b><b>Superficie</b><b>Estado</b><b></b>${state.findings.length ? state.findings.map((item) => `<div class="ph-plan-row"><span>${escapeHtml(toothLabel(Number(item.pieza)))}</span><span class="ph-plan-finding">${findingGlyph(item.icono, item.estadoVisual, true)}${escapeHtml(item.nombre)}</span><span>${escapeHtml(surfaceLabels[item.superficie] || item.superficie || 'Diente completo')}</span><span class="${String(item.estadoVisual).toLowerCase()}">${escapeHtml(item.estadoVisual)}</span><span>${state.odontogram.estado !== 'FINALIZADO' ? `<button class="ph-remove-finding" data-remove-finding="${item.idHallazgo}" aria-label="Eliminar ${escapeHtml(item.nombre)}">×</button>` : ''}</span></div>`).join('') : '<div id="phPlanEmpty">Selecciona un diente para registrar un hallazgo.</div>'}</div></section></section><div class="ph-finding-popover" id="phFindingPopover" hidden></div>`;
     bindOdontogram();
   }
 
@@ -338,6 +396,8 @@
       button.classList.toggle('selected');
       button.classList.contains('selected') ? selected.add(button.dataset.tooth) : selected.delete(button.dataset.tooth);
       button.setAttribute('aria-pressed', String(button.classList.contains('selected')));
+      const counter=document.getElementById("phSelectionCount");
+      if(counter)counter.textContent=selected.size+" pieza(s) seleccionada(s)";
       showFindingPopover(button, selected);
     });
   }
@@ -527,7 +587,7 @@
       const site = sites[perioPoints.indexOf(point)];
       return `<input type="${type}" ${type === 'number' ? `min="${min}" max="${max}" inputmode="numeric" placeholder="—"` : ''} ${value} ${checked} data-perio="${field}" data-piece="${piece}" data-point="${point}" aria-label="${field}, diente ${piece}, ${site.full}">`;
     };
-    return `<div class="ph-perio-table"><div class="ph-perio-labels"><b><span class="ph-site-key">${sites.map((site) => `<abbr title="${site.full}">${site.short}</abbr>`).join('')}</span></b><span>Movilidad</span><span>Sangrado</span><span>Placa</span><span>Margen gingival</span><span>Profundidad</span><span>Furcación</span><span>Supuración</span></div><div class="ph-perio-cells">${ids.map((id) => `<div class="ph-perio-col"><b>${id}<small>${sites.map((site) => `<abbr title="${site.full}">${site.short}</abbr>`).join('')}</small></b><input type="number" min="0" max="3" inputmode="numeric" placeholder="—" value="${perioValue(toothValue(id, 'movilidad'))}" data-perio="movilidad" data-piece="${id}" aria-label="Movilidad, diente ${id}"><label class="ph-triple">${perioPoints.map((point) => siteInput(id, point, 'sangrado', 'checkbox')).join('')}</label><label class="ph-triple">${perioPoints.map((point) => siteInput(id, point, 'placa', 'checkbox')).join('')}</label><label class="ph-triple">${perioPoints.map((point) => siteInput(id, point, 'margenGingival', 'number', -15, 15)).join('')}</label><label class="ph-triple">${perioPoints.map((point) => siteInput(id, point, 'profundidad', 'number', 0, 15)).join('')}</label><input type="number" min="0" max="3" inputmode="numeric" placeholder="—" value="${perioValue(toothValue(id, 'furcacion'))}" data-perio="furcacion" data-piece="${id}" aria-label="Furcación, diente ${id}"><label class="ph-triple">${perioPoints.map((point) => siteInput(id, point, 'supuracion', 'checkbox')).join('')}</label></div>`).join('')}</div></div>`;
+    return `<div class="ph-perio-group-scroll" tabindex="0" role="region" aria-label="Tabla periodontal de piezas ${ids.join(', ')}"><div class="ph-perio-table"><div class="ph-perio-labels"><b><span class="ph-site-key">${sites.map((site) => `<abbr title="${site.full}">${site.short}</abbr>`).join('')}</span></b><span>Movilidad</span><span>Sangrado</span><span>Placa</span><span>Margen gingival</span><span>Profundidad</span><span>Furcación</span><span>Supuración</span></div><div class="ph-perio-cells">${ids.map((id) => `<div class="ph-perio-col"><b>${id}<small>${sites.map((site) => `<abbr title="${site.full}">${site.short}</abbr>`).join('')}</small></b><input type="number" min="0" max="3" inputmode="numeric" placeholder="—" value="${perioValue(toothValue(id, 'movilidad'))}" data-perio="movilidad" data-piece="${id}" aria-label="Movilidad, diente ${id}"><label class="ph-triple">${perioPoints.map((point) => siteInput(id, point, 'sangrado', 'checkbox')).join('')}</label><label class="ph-triple">${perioPoints.map((point) => siteInput(id, point, 'placa', 'checkbox')).join('')}</label><label class="ph-triple">${perioPoints.map((point) => siteInput(id, point, 'margenGingival', 'number', -15, 15)).join('')}</label><label class="ph-triple">${perioPoints.map((point) => siteInput(id, point, 'profundidad', 'number', 0, 15)).join('')}</label><input type="number" min="0" max="3" inputmode="numeric" placeholder="—" value="${perioValue(toothValue(id, 'furcacion'))}" data-perio="furcacion" data-piece="${id}" aria-label="Furcación, diente ${id}"><label class="ph-triple">${perioPoints.map((point) => siteInput(id, point, 'supuracion', 'checkbox')).join('')}</label></div>`).join('')}</div></div></div>`;
   }
 
   function perioTeeth(ids, arch) {
@@ -537,7 +597,7 @@
   function renderPeriodontogram() {
     const view = document.getElementById('phView');
     const locked = state.periodontogram?.estado === 'FINALIZADO';
-    view.innerHTML = `<section class="ph-card ph-perio"><header class="ph-simple-tabs"><button class="active" type="button">Periodontograma</button><label>Cara <select id="perioFace"><option value="VESTIBULAR">Vestibular</option><option value="LINGUAL">Lingual / palatina</option></select></label><button class="ph-save" id="savePerio" ${locked ? 'disabled' : ''}>Guardar cambios</button>${state.periodontogram && !locked ? '<button class="ph-finalize" id="finalizePerio">Finalizar</button>' : ''}${locked ? '<button class="ph-primary" id="newPerio">Nueva versión</button>' : ''}</header><p class="ph-perio-help">Registro periodontal de seis sitios por diente: tres vestibulares y tres linguales o palatinos. Los campos sin medición pueden dejarse vacíos.</p><div class="ph-perio-status">${state.periodontogram ? `${escapeHtml(state.periodontogram.estado)} · ${formatDate(state.periodontogram.creadoAt)}` : 'Se creará al guardar'} · Placa <b id="plaquePct">0%</b> · Sangrado <b id="bleedPct">0%</b> · Profundidad media <b id="depthAvg">—</b></div><label class="ph-perio-notes">Observaciones <textarea id="perioNotes" rows="2" maxlength="4000" ${locked ? 'disabled' : ''}>${escapeHtml(state.perioNotes)}</textarea></label><fieldset ${locked ? 'disabled' : ''}><div class="ph-perio-scroll">${perioTable(adultUpper.slice(0,8))}${perioTable(adultUpper.slice(8))}<div class="ph-perio-chart"><svg viewBox="0 0 1000 220" preserveAspectRatio="none" aria-label="Gráfica periodontal superior"><g class="grid">${[30,60,90,120,150,180].map((y) => `<line x1="0" y1="${y}" x2="1000" y2="${y}"/>`).join('')}</g><path id="upperMarginLine" class="margin-line"/><path id="upperDepthLine" class="depth-line"/></svg>${perioTeeth(adultUpper, 'upper')}</div>${perioTable(adultLower.slice(0,8))}${perioTable(adultLower.slice(8))}<div class="ph-perio-chart lower"><svg viewBox="0 0 1000 220" preserveAspectRatio="none" aria-label="Gráfica periodontal inferior"><g class="grid">${[30,60,90,120,150,180].map((y) => `<line x1="0" y1="${y}" x2="1000" y2="${y}"/>`).join('')}</g><path id="lowerMarginLine" class="margin-line"/><path id="lowerDepthLine" class="depth-line"/></svg>${perioTeeth(adultLower, 'lower')}</div></div></fieldset></section>`;
+    view.innerHTML = `<section class="ph-card ph-perio"><header class="ph-simple-tabs"><button class="active" type="button">Periodontograma</button><label>Cara <select id="perioFace"><option value="VESTIBULAR">Vestibular</option><option value="LINGUAL">Lingual / palatina</option></select></label><button class="ph-save" id="savePerio" ${locked ? 'disabled' : ''}>Guardar cambios</button>${state.periodontogram && !locked ? '<button class="ph-finalize" id="finalizePerio">Finalizar</button>' : ''}${locked ? '<button class="ph-primary" id="newPerio">Nueva versión</button>' : ''}</header><p class="ph-perio-help">Registro periodontal de seis sitios por diente: tres vestibulares y tres linguales o palatinos. Los campos sin medición pueden dejarse vacíos.</p><div class="ph-perio-status">${state.periodontogram ? `${escapeHtml(state.periodontogram.estado)} · ${formatDate(state.periodontogram.creadoAt)}` : 'Se creará al guardar'} · Placa <b id="plaquePct">0%</b> · Sangrado <b id="bleedPct">0%</b> · Profundidad media <b id="depthAvg">—</b></div><label class="ph-perio-notes">Observaciones <textarea id="perioNotes" rows="2" maxlength="4000" ${locked ? 'disabled' : ''}>${escapeHtml(state.perioNotes)}</textarea></label><fieldset ${locked ? 'disabled' : ''}><div class="ph-perio-scroll">${perioTable(adultUpper.slice(0,8))}${perioTable(adultUpper.slice(8))}<div class="ph-perio-group-scroll ph-perio-graph-scroll" tabindex="0" aria-label="Gráfica periodontal superior"><div class="ph-perio-chart"><svg viewBox="0 0 1000 220" preserveAspectRatio="none" aria-label="Gráfica periodontal superior"><g class="grid">${[30,60,90,120,150,180].map((y) => `<line x1="0" y1="${y}" x2="1000" y2="${y}"/>`).join('')}</g><path id="upperMarginLine" class="margin-line"/><path id="upperDepthLine" class="depth-line"/></svg>${perioTeeth(adultUpper, 'upper')}</div></div>${perioTable(adultLower.slice(0,8))}${perioTable(adultLower.slice(8))}<div class="ph-perio-group-scroll ph-perio-graph-scroll" tabindex="0" aria-label="Gráfica periodontal inferior"><div class="ph-perio-chart lower"><svg viewBox="0 0 1000 220" preserveAspectRatio="none" aria-label="Gráfica periodontal inferior"><g class="grid">${[30,60,90,120,150,180].map((y) => `<line x1="0" y1="${y}" x2="1000" y2="${y}"/>`).join('')}</g><path id="lowerMarginLine" class="margin-line"/><path id="lowerDepthLine" class="depth-line"/></svg>${perioTeeth(adultLower, 'lower')}</div></div></div></fieldset></section>`;
     document.getElementById('perioFace').value = state.perioFace;
     document.getElementById('perioFace').onchange = (event) => {
       collectPerioInputs();
@@ -668,7 +728,7 @@
       state.findingCatalog = catalog.items || [];
       shell();
       window.dispatchEvent(new Event('ssl:ready'));
-      await loadOdontograms();
+      await renderFiliation();
     } catch (error) {
       app.innerHTML = `<main class="ph-fatal"><h1>No se pudo abrir el expediente</h1><p>${escapeHtml(error.message)}</p><a href="pacientes.html">Volver a pacientes</a></main>`;
     }

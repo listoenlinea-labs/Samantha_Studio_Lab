@@ -34,6 +34,13 @@
     permissions: ['Administrador', 'Asistente', 'Recepcionista']
   },
   {
+    id: 'recordatorios',
+    label: 'Recordatorios',
+    href: 'recordatorios.html',
+    icon: '✉',
+    permissions: ['Administrador', 'Asistente', 'Recepcionista']
+  },
+  {
     id: 'pacientes',
     label: 'Pacientes',
     href: 'pacientes.html',
@@ -169,7 +176,7 @@
       id: 'clinica',
       label: 'Clínica',
       icon: '✦',
-      items: ['operacion', 'tratamientos', 'seguimientos', 'radiografias']
+      items: ['operacion', 'tratamientos', 'seguimientos', 'radiografias', 'recordatorios']
     }, {
       id: 'administracion',
       label: 'Administración',

@@ -273,6 +273,12 @@ router.get('/:id/filiacion', async (req, res, next) => {
                     p.linea_negocio AS lineaNegocio,
                     p.antecedentes_medicos AS antecedentesMedicos,
                     p.notas_alerta AS notasAlerta,
+                    p.domicilio, p.ocupacion, p.tutor_responsable AS tutorResponsable,
+                    p.contacto_emergencia AS contactoEmergencia,
+                    p.telefono_emergencia AS telefonoEmergencia,
+                    p.observaciones_filiacion AS observacionesFiliacion,
+                    p.recordatorio_correo_consentido AS recordatorioCorreoConsentido,
+                    p.recordatorio_whatsapp_consentido AS recordatorioWhatsappConsentido,
                     ep.numero_expediente AS numeroExpediente
              FROM pacientes p
              LEFT JOIN expedientes_paciente ep ON ep.id_paciente = p.id_paciente
@@ -303,12 +309,21 @@ router.patch('/:id/filiacion', async (req, res, next) => {
         if (birthDate && !/^\d{4}-\d{2}-\d{2}$/.test(birthDate)) {
             return res.status(400).json({ ok: false, mensaje: 'La fecha debe tener formato AAAA-MM-DD.' });
         }
+        const extras=[
+            ['domicilio',255],['ocupacion',160],['tutorResponsable',160],
+            ['contactoEmergencia',160],['telefonoEmergencia',35],['observacionesFiliacion',4000]
+        ];
+        if(extras.some(([key,max])=>String(req.body[key]||'').trim().length>max))
+            return res.status(400).json({ok:false,mensaje:'Revisa la longitud de los datos complementarios.'});
         await connection.beginTransaction();
         const [result] = await connection.query(
             `UPDATE pacientes SET nombres = ?, apellido_paterno = ?, apellido_materno = ?,
                     fecha_nacimiento = ?, sexo = ?, telefono = ?, correo = ?,
                     como_nos_conocio = ?, adicional = ?, grupo = ?, linea_negocio = ?,
-                    antecedentes_medicos = ?, notas_alerta = ?
+                    antecedentes_medicos = ?, notas_alerta = ?,
+                    domicilio = ?, ocupacion = ?, tutor_responsable = ?,
+                    contacto_emergencia = ?, telefono_emergencia = ?, observaciones_filiacion = ?,
+                    recordatorio_correo_consentido = ?, recordatorio_whatsapp_consentido = ?
              WHERE id_paciente = ?`,
             [names, String(req.body.apellidoPaterno || '').trim() || null,
                 String(req.body.apellidoMaterno || '').trim() || null, birthDate, sex,
@@ -319,7 +334,11 @@ router.patch('/:id/filiacion', async (req, res, next) => {
                 String(req.body.grupo || '').trim() || null,
                 String(req.body.lineaNegocio || '').trim() || null,
                 String(req.body.antecedentesMedicos || '').trim() || null,
-                String(req.body.notasAlerta || '').trim() || null, patientId]
+                String(req.body.notasAlerta || '').trim() || null,
+                ...extras.map(([key])=>String(req.body[key]||'').trim()||null),
+                req.body.recordatorioCorreoConsentido===true||req.body.recordatorioCorreoConsentido==='on'?1:0,
+                req.body.recordatorioWhatsappConsentido===true||req.body.recordatorioWhatsappConsentido==='on'?1:0,
+                patientId]
         );
         if (!result.affectedRows) {
             await connection.rollback();
