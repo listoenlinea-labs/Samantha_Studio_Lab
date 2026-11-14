@@ -226,10 +226,10 @@
     const meta = pageMeta[page] || pageMeta.dashboard;
     const allowed = nav.find((item) => item.id === page)?.permissions?.includes(role) ?? true;
     document.getElementById('app').innerHTML = `
-      <div class="app-shell">
+      <div class="app-shell samantha-sidebar-layout">
         <header class="dc-header">
           <a class="brand" href="index.html"><img src="assets/img/logo-ssl.svg" alt="Logo Samantha's Studio Lab"><div><strong>samantha's studio lab</strong><span>odontopediatría</span></div></a>
-          <button class="dc-menu-button" id="menuButton" aria-label="Abrir navegación" aria-controls="appSidebar">☰</button>
+          <button class="dc-menu-button" id="menuButton" aria-label="Abrir navegación" aria-controls="appSidebar" aria-expanded="false">☰</button>
           <nav class="app-nav" id="appSidebar" aria-label="Navegación principal">${navigation(role)}</nav>
           <div class="dc-header-tools">
             <button class="dc-search" id="globalSearchToggle" type="button" aria-label="Buscar en la aplicación" aria-haspopup="dialog" aria-expanded="false" aria-controls="globalSearchPanel">⌕ <span>Buscar</span></button>
@@ -1214,16 +1214,59 @@
   function renderLiveDashboard() {
     if (!clinicalData) return liveUnavailable();
     const m = clinicalData.metricas;
-    shell(hero('Panel general · datos de MySQL', 'La clínica, sin perder ningún detalle.',
-      'Pacientes, citas y seguimiento conectados al expediente.',
-      '<a class="button primary" href="pacientes.html">Ver pacientes y registrar uno nuevo</a>', 'assets/img/logo-ssl.svg') +
-      `<section class="grid kpis">
-        ${kpi('Pacientes activos', number.format(m.pacientes), `${m.pacientesFicticios} de prueba`, 'var(--lilac-200)')}
-        ${kpi('Citas de hoy', number.format(m.citas), `${m.confirmadas} confirmadas`, 'var(--peach-200)')}
-        ${kpi('Tareas pendientes', number.format(m.tareas), 'Seguimientos por atender', 'var(--gold-400)')}
-        ${kpi('Historias clínicas', number.format(m.historias), 'Versiones vigentes', 'var(--sage-500)')}
+    const dayLabel = new Intl.DateTimeFormat('es-MX', {
+      timeZone:'America/Mexico_City', weekday:'long',day:'numeric',month:'long'
+    }).format(new Date());
+    const initial=(value)=>esc(String(value).charAt(0).toUpperCase()+String(value).slice(1));
+    const dashboardKpi=(label,value,kind)=>`<article class="ssl-home-kpi ${kind}">
+      <span class="ssl-home-kpi-label">${label}</span><strong class="ssl-home-kpi-value">${value}</strong>
+    </article>`;
+    const shortcuts=[
+      ['agenda.html','▦','Agendar nueva cita','Reserva un espacio para tu paciente'],
+      ['pacientes.html','♡','Registrar paciente','Crea un expediente clínico'],
+      ['seguimientos.html','☷','Revisar seguimientos','Consulta las tareas pendientes'],
+      ['recordatorios.html','♧','Configurar recordatorios','Correo y WhatsApp con consentimiento']
+    ];
+    shell(`<div class="ssl-home">
+      <section class="ssl-home-hero" aria-label="Bienvenida al consultorio">
+        <div class="ssl-home-hero-copy">
+          <p class="ssl-home-eyebrow">TU ESPACIO, TU CONSULTORIO</p>
+          <h1>¡Qué bonito día para <em>sonreír!</em></h1>
+          <p>Pacientes, citas y seguimiento en un solo lugar.</p>
+        </div>
+        <img class="ssl-home-hero-art" src="assets/img/logo-ssl.svg" alt="" loading="lazy">
       </section>
-      <section class="card"><div class="card-head"><div><h2>Agenda de hoy</h2><p>Las citas de la base de datos para el día actual.</p></div><a class="button soft" href="agenda.html">Abrir agenda</a></div>${liveAppointments(clinicalData.citas)}</section>`);
+      <section class="ssl-home-overview" aria-labelledby="sslHomeTitle">
+        <div class="ssl-home-overview-heading">
+          <div><p class="ssl-home-eyebrow">RESUMEN DEL CONSULTORIO</p>
+            <h2 id="sslHomeTitle">Tu día de un vistazo</h2>
+            <p>Hoy es ${initial(dayLabel)}.</p>
+          </div>
+          <a href="agenda.html" class="ssl-home-new-appointment">+ Nueva cita</a>
+        </div>
+        <div class="ssl-home-kpis">
+          ${dashboardKpi('Citas programadas hoy',number.format(m.citas),'sky')}
+          ${dashboardKpi('Pacientes registrados',number.format(m.pacientes),'mint')}
+          ${dashboardKpi('Citas confirmadas',number.format(m.confirmadas),'peach')}
+          ${dashboardKpi('Por atender',number.format(m.tareas),'orchid')}
+        </div>
+      </section>
+      <section class="ssl-home-panels" aria-label="Agenda y accesos rápidos">
+        <article class="ssl-home-panel">
+          <div class="ssl-home-panel-head"><h2>Próximas citas de hoy</h2><a href="agenda.html">Ver agenda →</a></div>
+          ${liveAppointments(clinicalData.citas)}
+        </article>
+        <article class="ssl-home-panel ssl-home-shortcuts">
+          <div class="ssl-home-panel-head"><h2>Accesos rápidos</h2><span>Todo en orden ✦</span></div>
+          <div class="ssl-home-shortcut-list">
+            ${shortcuts.map(([url,symbol,title,description])=>`<a href="${url}" class="ssl-home-shortcut">
+              <span class="ssl-home-shortcut-icon" aria-hidden="true">${symbol}</span>
+              <span class="ssl-home-shortcut-copy"><strong>${title}</strong><small>${description}</small></span>
+              <span class="ssl-home-shortcut-arrow" aria-hidden="true">→</span></a>`).join('')}
+          </div>
+        </article>
+      </section>
+    </div>`);
   }
 
   function renderLiveAgenda() {
@@ -1777,9 +1820,13 @@
   function bindCommon() {
     const body = document.body;
     const menu = document.getElementById('menuButton');
-    const closeMenu = () => body.classList.remove('nav-open');
-    menu?.addEventListener('click', () => body.classList.toggle('nav-open'));
+    const closeMenu = () => { body.classList.remove('nav-open'); menu?.setAttribute('aria-expanded','false'); };
+    menu?.addEventListener('click', () => {
+      const expanded=body.classList.toggle('nav-open');
+      menu.setAttribute('aria-expanded',String(expanded));
+    });
     document.getElementById('sidebarScrim')?.addEventListener('click', closeMenu);
+    document.addEventListener('keydown',(event)=>{if(event.key==='Escape')closeMenu();});
     document.querySelectorAll('.nav-group-trigger').forEach((trigger) => {
       trigger.addEventListener('click', (event) => {
         event.stopPropagation();
