@@ -49,9 +49,12 @@ function sniff(buffer){
  if(/^ply\r?\nformat (?:ascii|binary_little_endian) 1\.0(?:\r?\n)/.test(textStart)&&
     /\nelement vertex [1-9]\d*/.test(textStart)&&/\nend_header\r?\n/.test(textStart))
   return 'model/ply';
- if(/^(?:#[^\r\n]*\r?\n|(?:o|g|mtllib|usemtl|s) [^\r\n]*\r?\n|\s*\r?\n)*v\s+-?\d/.test(textStart)&&
-    /(?:^|\n)f\s+(?:[-\d]+(?:\/[-\d]*){0,2}\s+){2,}/m.test(textStart))
-  return 'model/obj';
+ // En OBJ grandes todas las caras siguen a miles de líneas de vértices.
+ // Inspeccionar la cabecera y el final; no exigir caras dentro de los primeros 8 KB.
+ const textEnd=buffer.toString('utf8',Math.max(0,buffer.length-256*1024));
+ const hasVertices=/(?:^|\n)v\s+[-+]?\d+(?:\.\d+)?\s+[-+]?\d+(?:\.\d+)?\s+[-+]?\d+/m.test(textStart);
+ const hasFaces=/(?:^|\n)f\s+(?:[-\d]+(?:\/[-\d]*){0,2}\s+){2,}/m.test(textEnd);
+ if(hasVertices&&hasFaces)return 'model/obj';
  return null;
 }
 const allowedImages=new Set(['image/jpeg','image/png','image/webp','image/tiff','image/bmp','image/gif']);
