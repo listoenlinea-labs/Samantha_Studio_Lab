@@ -271,6 +271,7 @@
     if (id === 'history') return renderHistory();
     if (id === 'odontogram') return loadOdontograms();
     if (id === 'perio') return loadPeriodontogram();
+    if(id === 'prescriptions') return window.SamanthaPrescriptions.render({api,patientId,escapeHtml,notify,formatDate,API_URL});
     renderGeneric(id);
   }
 
