@@ -176,7 +176,7 @@
       id: 'clinica',
       label: 'Clínica',
       icon: '✦',
-      items: ['operacion', 'tratamientos', 'seguimientos', 'radiografias']
+      items: ['operacion', 'tratamientos', 'seguimientos', 'radiografias', 'recordatorios']
     }, {
       id: 'administracion',
       label: 'Administración',
