@@ -175,8 +175,9 @@
   if(status)status.textContent=selection.length===1?selection[0].name:
    selection.length?selection.length+' archivos seleccionados':'Todavía no has seleccionado un estudio.';
   const valid=selection.length>0;
-  if($('sslCbctPreview'))$('sslCbctPreview').disabled=!valid;
-  if($('sslCbctPersist'))$('sslCbctPersist').disabled=!valid;
+  if($('sslCbctPreview'))$('sslCbctPreview').disabled=processing||!valid;
+  if($('sslCbctPersist'))$('sslCbctPersist').disabled=processing||!valid;
+  const bar=$('sslCbctProgress');if(bar)bar.hidden=true;
  }
  const isSTLName=name=>/\.stl$/i.test(String(name||''));
  function showProgress(n,total,label){
@@ -246,6 +247,18 @@
  }
  async function persistSeries(){
   if(!selection.length)throw Error('Selecciona un estudio.');
+  const stl=await stlFromSelection(selection);
+  if(stl){
+   if(selection[0].size>14*1024*1024)
+    throw Error('El STL o ZIP de modelo supera 14 MB para MySQL. Puedes visualizarlo localmente o reducirlo.');
+   if(!confirm('¿Guardar este modelo STL en el expediente de este paciente?'))return;
+   await uploadFile(selection[0],'Modelo STL 3D','RADIOGRAFIA');
+   finishProgress('Modelo STL guardado en el expediente.');
+   message('Modelo STL guardado correctamente.');
+   await refresh();
+   return;
+  }
+  if(selection.some(f=>isSTLName(f.name)))throw Error('Selecciona un solo STL, sin mezclar modelos con DICOM.');
   const {volume,loaded}=await volumeFromFiles(selection);
   const zip=loaded.kind==='zip';
   const unit=zip?selection:[...loaded.records.map(r=>r.file)];
@@ -292,17 +305,24 @@
   if(category()!=='RADIOGRAFIA')return;
   $('sslCbctFiles').addEventListener('change',e=>setSelection(e.target.files));
   $('sslCbctFolder').addEventListener('change',e=>setSelection(Array.from(e.target.files).filter(f=>/\.(dcm|dicom|ima)$/i.test(f.name))));
-  $('sslCbctPreview').addEventListener('click',async e=>{
-   e.currentTarget.disabled=true;try{await openVolume(selection,'CBCT local')}catch(err){message(err.message,true)}
-   finally{e.currentTarget.disabled=false}
+  $('sslCbctPreview').addEventListener('click',async ()=>{
+   if(processing||!selection.length)return;
+   setBusy(true,'Preparando estudio');
+   try{await openSelectedStudy([...selection],selection[0].name||'Estudio local')}
+   catch(err){finishProgress('No se pudo visualizar el estudio.');message(err.message,true)}
+   finally{setBusy(false)}
   });
-  $('sslCbctPersist').addEventListener('click',async e=>{
-   e.currentTarget.disabled=true;try{await persistSeries()}catch(err){message(err.message,true)}
-   finally{e.currentTarget.disabled=false}
+  $('sslCbctPersist').addEventListener('click',async ()=>{
+   if(processing||!selection.length)return;
+   setBusy(true,'Validando estudio para guardar');
+   try{await persistSeries()}
+   catch(err){finishProgress('No se pudo guardar el estudio.');message(err.message,true)}
+   finally{setBusy(false)}
   });
  }
  async function render(config){
   dispose();
+  processing=false;
   current={...config,items:[]};
   const element=$('phView');if(!element)return;
   element.innerHTML=mainHtml(config.mode);
