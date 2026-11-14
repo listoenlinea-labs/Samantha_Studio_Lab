@@ -658,6 +658,12 @@ router.put('/:id/historia-clinica', async (req, res, next) => {
                 fields.antecedentesOdontologicos, fields.medicamentosActuales,
                 fields.diagnosticoGeneral, fields.observaciones]
         );
+        // La historia completa sí crea una versión. Mantener sincronizado el
+        // resumen del paciente únicamente después de completar el INSERT.
+        await connection.query(
+            'UPDATE pacientes SET alergias = ? WHERE id_paciente = ?',
+            [fields.alergias, patientId]
+        );
         await connection.query(
             `INSERT INTO auditoria (entidad, id_entidad, accion, detalle)
              VALUES ('historias_clinicas', ?, 'VERSIONAR', ?)`,
