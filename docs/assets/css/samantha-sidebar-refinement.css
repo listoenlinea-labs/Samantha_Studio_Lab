@@ -1,0 +1,234 @@
+/* Samantha · navegación consistente inspirada en Misión Jardines
+   Capa final sobre estilos previos, sin cambios en datos ni permisos. */
+@media (min-width:761px){
+ body.samantha-app-page .samantha-sidebar-layout>.dc-header{
+  background:linear-gradient(175deg,#fbf8fc 0%,#fff 80%)!important;
+  padding:17px 12px 14px!important;
+  border-right:1px solid #e9e0ed!important;
+  scrollbar-width:thin;scrollbar-color:#d9cbe2 transparent;
+ }
+ body.samantha-app-page .dc-header>.brand{
+  padding:6px 8px 20px!important;margin-bottom:13px!important;
+  align-items:center!important;border-bottom:1px solid #eee6f1!important;
+ }
+ body.samantha-app-page .dc-header>.brand img{width:54px!important;height:54px!important;object-fit:contain}
+ body.samantha-app-page .dc-header>.brand strong{font:400 17px/1.2 Georgia,serif!important;color:#745488!important}
+ body.samantha-app-page .dc-header>.brand span{font-size:9px!important;color:#9e87aa!important}
+ body.samantha-app-page .dc-header>.app-nav{
+  gap:2px!important;padding:1px 0 15px!important
+ }
+ body.samantha-app-page .dc-header .app-nav>a,
+ body.samantha-app-page .dc-header .app-nav>.nav-group>.nav-group-trigger{
+  width:100%!important;min-height:45px!important;border:1px solid transparent!important;
+  margin:0!important;padding:11px 14px!important;border-radius:12px!important;
+  color:#625170!important;font-size:13px!important;font-weight:650!important;
+  text-decoration:none!important;transition:background .14s ease,color .14s ease
+ }
+ body.samantha-app-page .dc-header .app-nav>a.active{
+  background:#ecdef4!important;color:#654781!important;
+  border-color:#e9d8f0!important;box-shadow:inset 3px 0 #a985bf!important
+ }
+ body.samantha-app-page .dc-header .app-nav>.nav-group>.nav-group-trigger:hover,
+ body.samantha-app-page .dc-header .app-nav>a:hover{
+  background:#f2eaf7!important;color:#5d4672!important
+ }
+ body.samantha-app-page .dc-header .app-nav .nav-group.active>.nav-group-trigger{
+  background:#f2eaf7!important;color:#644a7f!important;
+  border-color:transparent!important;
+ }
+ body.samantha-app-page .dc-header .app-nav .nav-group-trigger::after,
+ body.samantha-app-page .dc-header .nav-group.active>.nav-group-trigger::after,
+ body.samantha-app-page .dc-header .app-nav>a.active::after{
+  display:none!important;content:none!important;
+ }
+ body.samantha-app-page .dc-header .app-nav .nav-chevron{
+  display:grid!important;place-items:center!important;width:25px!important;height:25px!important;
+  margin-left:auto!important;flex:none!important;border-radius:9px!important;
+  background:#f0e9f5!important;color:#866aa0!important;
+  transition:transform .16s ease,background .16s ease!important
+ }
+ body.samantha-app-page .dc-header .app-nav .nav-chevron svg{
+  display:block!important;width:13px!important;height:9px!important;
+  stroke:#795e91!important;stroke-width:1.8!important;fill:none!important;
+ }
+ body.samantha-app-page .dc-header .app-nav .nav-group.open .nav-chevron{
+  background:#e8d7f1!important;transform:rotate(180deg)!important
+ }
+ body.samantha-app-page .dc-header .nav-group-menu{
+  margin:3px 0 9px 17px!important;border-left:2px solid #e1d3ea!important;
+  padding:2px 0 2px 10px!important
+ }
+ body.samantha-app-page .dc-header .nav-group-menu a{
+  border-radius:9px!important;min-height:39px!important;font-size:12px!important;
+  color:#766587!important;padding:9px 11px!important
+ }
+ body.samantha-app-page .dc-header .nav-group-menu a:hover,
+ body.samantha-app-page .dc-header .nav-group-menu a.active{
+  background:#f3eaf8!important;color:#604677!important
+ }
+ body.samantha-app-page .dc-header>.dc-header-tools{
+  margin-top:auto!important;padding-top:15px!important;border-top:1px solid #e9dfea!important
+ }
+ body.samantha-app-page .sidebar-collapse-toggle{
+  top:19px!important;left:241px!important;
+  width:41px!important;height:47px!important;
+  border:1px solid #d3c4e0!important;
+  border-radius:0 13px 13px 0!important;
+  background:#e9dcf1!important;color:#6e5188!important;
+  box-shadow:2px 4px 12px #3b2b4b20!important;
+  display:grid!important;place-items:center!important
+ }
+ body.samantha-app-page .sidebar-collapse-toggle .arrow{
+  display:block;width:20px;height:20px;stroke:currentColor;fill:none;
+  stroke-width:2.7;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s ease
+ }
+ body.samantha-app-page.sidebar-is-collapsed .sidebar-collapse-toggle{left:0!important}
+ body.samantha-app-page.sidebar-is-collapsed .sidebar-collapse-toggle .arrow{
+  transform:rotate(180deg)!important
+ }
+}
+@media (min-width:761px) and (max-width:1160px){
+ body.samantha-app-page .sidebar-collapse-toggle{left:201px!important}
+ body.samantha-app-page.sidebar-is-collapsed .sidebar-collapse-toggle{left:0!important}
+}
+/* Menú móvil con tirador lateral pegado al borde, sin hamburguesa central. */
+@media (max-width:760px){
+ body.samantha-app-page .dc-header .dc-menu-button{display:none!important}
+ body.samantha-app-page .dc-header{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  min-height:62px!important;height:62px!important;padding:8px 12px 8px 52px!important;
+  background:#e9def0!important
+ }
+ body.samantha-app-page .dc-header .brand{margin:0!important;padding:0!important;flex:0 1 auto!important}
+ body.samantha-app-page .dc-header .brand img{width:43px!important;height:43px!important}
+ body.samantha-app-page .dc-header .dc-header-tools{display:flex!important;margin-left:auto!important}
+ body.samantha-app-page .dc-header .dc-header-tools .dc-notification,
+ body.samantha-app-page .dc-header .dc-header-tools .dc-search{
+  display:grid!important;place-items:center!important;width:34px!important;height:38px!important;
+  min-width:34px!important;background:#fbf8fe!important;border:1px solid #d9c9e5!important;
+  border-radius:11px!important;color:#68517f!important
+ }
+ body.samantha-app-page .dc-header .dc-header-tools .dc-search span{display:none!important}
+ body.samantha-app-page .sidebar-collapse-toggle{
+  display:grid!important;position:fixed!important;top:16px!important;left:0!important;
+  width:42px!important;height:43px!important;z-index:1102!important;
+  place-items:center!important;padding:0!important;
+  border:1px solid #d4c2e2!important;border-left:0!important;border-radius:0 13px 13px 0!important;
+  background:#e9ddf2!important;color:#64477c!important;
+  box-shadow:3px 4px 13px #49335a1b!important;cursor:pointer
+ }
+ body.samantha-app-page .sidebar-collapse-toggle .arrow{
+  display:block!important;width:20px!important;height:20px!important;
+  fill:none!important;stroke:currentColor!important;stroke-width:2.7!important;
+  stroke-linecap:round!important;stroke-linejoin:round!important;
+  transform:rotate(180deg)!important;transition:transform .2s ease!important
+ }
+ body.samantha-app-page.nav-open .sidebar-collapse-toggle{
+  left:calc(min(84vw, 330px) - 1px)!important;
+  background:#e2d3ec!important;border-color:#d4c1e0!important
+ }
+ body.samantha-app-page.nav-open .sidebar-collapse-toggle .arrow{transform:rotate(0deg)!important}
+ body.samantha-app-page #appSidebar.app-nav{
+  width:min(84vw,330px)!important;max-width:calc(100vw - 42px)!important;
+  background:#fff!important;box-shadow:10px 0 36px #3625412b!important
+ }
+ body.samantha-app-page .ssl-mobile-drawer-brand{
+  background:#f9f3fc!important;min-height:104px!important;
+  padding:17px 13px!important;border-bottom:1px solid #eee4f2!important
+ }
+ body.samantha-app-page .ssl-mobile-drawer-brand strong{color:#684a7e!important}
+ body.samantha-app-page .ssl-mobile-drawer-brand button{display:none!important}
+ body.samantha-app-page #appSidebar.app-nav>a{
+  background:transparent!important;color:#634f72!important;
+  border:1px solid transparent!important;border-radius:11px!important
+ }
+ body.samantha-app-page #appSidebar.app-nav>a.active{
+  background:#f0e3f7!important;color:#674b82!important;border-color:#e6d6ef!important;
+  box-shadow:inset 3px 0 #a483b9!important
+ }
+ body.samantha-app-page #appSidebar.app-nav>.nav-group .nav-group-trigger{
+  background:transparent!important;border:1px solid transparent!important;
+  color:#604e6c!important;border-radius:11px!important;display:flex!important;
+  align-items:center!important;justify-content:space-between!important;box-shadow:none!important
+ }
+ body.samantha-app-page #appSidebar.app-nav>.nav-group .nav-group-trigger::after{
+  display:none!important;content:none!important
+ }
+ body.samantha-app-page #appSidebar.app-nav>.nav-group.open .nav-group-trigger{
+  background:#f1e8f7!important;color:#684f80!important
+ }
+ body.samantha-app-page #appSidebar.app-nav .nav-chevron{
+  width:26px!important;height:26px!important;display:grid!important;place-items:center!important;
+  margin-left:auto!important;border-radius:9px!important;background:#f4edf8!important
+ }
+ body.samantha-app-page #appSidebar.app-nav .nav-chevron svg{
+  width:14px!important;height:10px!important;stroke:#7b6291!important;fill:none!important;stroke-width:1.7!important
+ }
+ body.samantha-app-page #appSidebar.app-nav .nav-group.open .nav-chevron{
+  transform:rotate(180deg)!important;background:#e7d8f0!important
+ }
+ body.samantha-app-page #appSidebar.app-nav>.nav-group .nav-group-menu{
+  border:0!important;border-left:2px solid #e7d9ee!important;background:#fff!important;
+  margin:2px 0 5px 14px!important;padding:2px 0 2px 8px!important;
+  box-shadow:none!important
+ }
+ body.samantha-app-page .ssl-mobile-drawer-bottom{
+  background:#fff!important;border-top:1px solid #eee3f1!important
+ }
+ body.samantha-app-page.nav-open #sidebarScrim.sidebar-scrim{
+  background:#33303b55!important;backdrop-filter:blur(1.5px)!important
+ }
+}
+/* La cabecera compacta de Jornada clínica replica la jerarquía de Inicio,
+   respetando la gama lavanda de Samantha. */
+body[data-page="operacion"] .content{max-width:1600px!important;padding:25px clamp(15px,2.6vw,36px) 50px!important}
+body[data-page="operacion"] .ssl-operation-layout{display:grid;gap:17px}
+body[data-page="operacion"] .ssl-operation-hero{
+ position:relative;display:flex;align-items:center;justify-content:space-between;overflow:hidden;
+ min-height:164px;padding:26px clamp(20px,3vw,40px);border:1px solid #e6ddea;border-radius:23px;
+ background:linear-gradient(110deg,#ebe1f2,#f6eff8 58%,#fff6f6)
+}
+body[data-page="operacion"] .ssl-operation-hero:after{
+ content:"";position:absolute;right:-38px;top:-40px;width:225px;height:225px;
+ background:#fff0ec;border-radius:50%;opacity:.8
+}
+body[data-page="operacion"] .ssl-operation-hero-copy{z-index:1;position:relative;max-width:78%;min-width:0}
+body[data-page="operacion"] .ssl-operation-hero .ssl-home-eyebrow{
+ margin:0 0 10px;font-size:11px;font-weight:850;letter-spacing:.16em;color:#9679ac
+}
+body[data-page="operacion"] .ssl-operation-hero h1{
+ font:400 clamp(28px,3vw,44px)/1.2 Georgia,serif;color:#674f7c;margin:0 0 10px
+}
+body[data-page="operacion"] .ssl-operation-hero h1 em{font-style:italic;color:#aa80b7}
+body[data-page="operacion"] .ssl-operation-hero-copy>p:last-child{font-size:13px;color:#8b7b97;margin:0}
+body[data-page="operacion"] .ssl-operation-hero>img{
+ position:relative;z-index:1;width:118px;height:118px;object-fit:contain;opacity:.67
+}
+body[data-page="operacion"] .ssl-operation-panel{
+ min-height:230px;padding:23px;background:white;border:1px solid #e9e1ed;border-radius:21px
+}
+body[data-page="operacion"] .ssl-operation-panel-head{
+ display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px
+}
+body[data-page="operacion"] .ssl-operation-panel-head h2{font:400 24px Georgia,serif;color:#715885;margin:0}
+body[data-page="operacion"] .ssl-operation-panel-head p{margin:7px 0 0;color:#94879e;font-size:12px}
+body[data-page="operacion"] .ssl-operation-date{
+ display:inline-flex;align-items:center;justify-content:center;min-height:39px;
+ padding:9px 14px;border:1px solid #ddcbea;border-radius:11px;background:#f4eaf9;
+ color:#6c4f83;text-decoration:none;font-size:12px;font-weight:750
+}
+body[data-page="operacion"] .ssl-operation-panel .live-empty{
+ display:grid;place-items:center;min-height:130px;text-align:center;color:#9a8da2;font-size:12px
+}
+@media(max-width:760px){
+ body[data-page="operacion"] .content{padding:15px 12px 35px!important}
+ body[data-page="operacion"] .ssl-operation-hero{min-height:135px;padding:20px 17px}
+ body[data-page="operacion"] .ssl-operation-hero-copy{max-width:85%}
+ body[data-page="operacion"] .ssl-operation-hero h1{font-size:clamp(24px,6vw,31px)}
+ body[data-page="operacion"] .ssl-operation-hero>img{position:absolute;bottom:5px;right:8px;width:68px;height:68px;opacity:.29}
+ body[data-page="operacion"] .ssl-operation-panel{min-height:0;padding:17px}
+ body[data-page="operacion"] .ssl-operation-panel-head h2{font-size:20px}
+}
+@media(prefers-reduced-motion:reduce){
+ body.samantha-app-page .sidebar-collapse-toggle .arrow{transition:none!important}
+}
