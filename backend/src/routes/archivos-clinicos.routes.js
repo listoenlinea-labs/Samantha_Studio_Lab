@@ -19,7 +19,7 @@ router.get('/:id/archivos',async(req,res,next)=>{
   const categoria=String(req.query.categoria||'').toUpperCase();
   if(categoria&&!['PDF','RADIOGRAFIA'].includes(categoria))return res.status(400).json({ok:false,mensaje:'Categoría inválida.'});
   const sql="SELECT id_archivo AS idArchivo, categoria, nombre_original AS nombre, descripcion, tipo_mime AS tipoMime, bytes, created_at AS creadoAt FROM archivos_clinicos_ssl WHERE id_paciente=?"+
-   (categoria?" AND categoria=?":"")+" ORDER BY id_archivo DESC LIMIT 200";
+   (categoria?" AND categoria=?":"")+" ORDER BY id_archivo DESC LIMIT 800";
   const [items]=await pool.query(sql,categoria?[req.params.id,categoria]:[req.params.id]);
   res.json({ok:true,items,canDelete:process.env.CLINICAL_FILE_DELETE_ENABLED==='true'});
  }catch(error){next(error)}
