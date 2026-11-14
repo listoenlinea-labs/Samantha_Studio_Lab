@@ -295,3 +295,46 @@ body.ph-sidebar-open .ph-sidebar{transform:translateX(0)}
 .ph-log-fallido{background:#fff0f3;color:#a84f65}
 .ph-log-enviando{background:#fff4e3;color:#90723e}
 @media(max-width:820px){.ph-reminder-grid{grid-template-columns:1fr}.ph-reminders-main{padding:15px 12px}.ph-reminder-log table{min-width:620px}}
+
+/* Odontograma: distribución y jerarquía alineadas con Yerena, misma lógica SSL. */
+.ph-card-tabs{border-bottom:1px solid #efe6f3;padding-bottom:13px}
+.ph-card-tabs>div:first-child{min-width:0}
+.ph-card-tabs>div:first-child button{font-size:13px;color:#796888;font-weight:750}
+.ph-card-tabs>div:first-child button.active{color:#6f5286;border-bottom-color:#a48db8}
+.ph-odontogram-help{font-size:12px;color:#8c8192;line-height:1.7}
+.ph-tooth>span.ph-tooth-number{background:transparent;color:#7a668b;font-size:11px;border:0}
+.ph-tooth>span.ph-tooth-overflow{background:transparent;color:#76568c}
+.ph-tooth-row{padding:5px 0}
+.ph-odo-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:16px 3px;border-top:1px solid #f1eaf4}
+.ph-odo-selected{border-radius:99px;padding:8px 12px;background:#f1e8f8;color:#73548c;font-size:12px;font-weight:800}
+.ph-odo-legend{color:#9a8da3;font-size:11px}
+.ph-odo-actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.ph-odo-actions button{min-height:39px;border-radius:10px;border:1px solid #e0d3e8;padding:0 13px;background:#f6eff9;color:#695080;font-weight:750}
+.ph-odo-actions .ph-finalize{background:#fff1f4;color:#a75068;border-color:#f0d4df}
+.ph-finding-dialog{border-color:#e4d7e9;box-shadow:0 16px 46px #523b6728}
+.ph-finding-dialog header{background:#f7f1fa;color:#674a80}
+.ph-finding-option{border-color:#eee3f3}
+/* Bloques periodontales independientes: deslizamiento por bloque, nunca por toda la página. */
+.ph-perio-scroll{overflow:visible!important;min-width:0;width:100%}
+.ph-perio-group-scroll{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-color:#c6aed8 transparent;border:1px solid #e8dfed;border-radius:14px;margin:13px 0;background:#fff}
+.ph-perio-group-scroll:focus-visible{outline:3px solid #b4a1c9}
+.ph-perio-group-scroll .ph-perio-table{width:845px;min-width:845px;margin:0;padding:8px}
+.ph-perio-labels,.ph-perio-col{grid-template-rows:25px repeat(7,31px)!important}
+.ph-perio-labels>*{font-size:10px;color:#6f5a80;border-bottom-color:#e5daeb}
+.ph-perio-col>*{border-bottom-color:#e5daeb}
+.ph-perio-col>input{min-height:0;border-radius:0}
+.ph-perio-col input[type=checkbox]{accent-color:#84659e}
+.ph-perio-graph-scroll .ph-perio-chart{width:845px;min-width:845px;margin:0}
+.ph-perio-status{padding:12px;line-height:1.6;font-size:12px}
+.ph-simple-tabs{border-bottom:1px solid #eee5f3;padding-bottom:14px}
+.ph-simple-tabs label{display:flex;align-items:center;gap:7px;color:#6f5c7d;font-size:12px}
+.ph-simple-tabs select{padding:10px;border:1px solid #e2d7e9;border-radius:10px;color:#73578a;background:#fff}
+@media(max-width:760px){
+ .ph-odo-footer{align-items:stretch}
+ .ph-odo-actions{width:100%}
+ .ph-odo-actions button{flex:1 1 132px}
+ .ph-odo-selected{font-size:11px}
+ .ph-perio-group-scroll{margin-inline:0}
+ .ph-perio .ph-simple-tabs{flex-direction:column;align-items:stretch}
+ .ph-perio .ph-simple-tabs button{width:100%}
+}
