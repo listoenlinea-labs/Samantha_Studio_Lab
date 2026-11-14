@@ -133,13 +133,18 @@ router.patch('/:id/resumen', async (req, res, next) => {
         connection = await pool.getConnection();
         const patientId = parsePositiveId(req.params.id);
         if (!patientId) return invalidId(res);
-        const hasAllergies = Object.prototype.hasOwnProperty.call(req.body, 'alergias');
-        const hasNote = Object.prototype.hasOwnProperty.call(req.body, 'notaGeneral');
+        const body = req.body && typeof req.body === 'object' && !Array.isArray(req.body) ? req.body : {};
+        const hasAllergies = Object.prototype.hasOwnProperty.call(body, 'alergias');
+        const hasNote = Object.prototype.hasOwnProperty.call(body, 'notaGeneral');
         if (!hasAllergies && !hasNote) {
             return res.status(400).json({ ok: false, mensaje: 'Envía alergias o notaGeneral para actualizar.' });
         }
-        const allergies = String(req.body.alergias || '').trim() || null;
-        const note = String(req.body.notaGeneral || '').trim() || null;
+        if ((hasAllergies && typeof body.alergias !== 'string') ||
+            (hasNote && typeof body.notaGeneral !== 'string')) {
+            return res.status(400).json({ ok: false, mensaje: 'Las alergias y la nota deben enviarse como texto.' });
+        }
+        const allergies = hasAllergies ? body.alergias.trim() || null : null;
+        const note = hasNote ? body.notaGeneral.trim() || null : null;
         if ((allergies && allergies.length > 4000) || (note && note.length > 4000)) {
             return res.status(400).json({ ok: false, mensaje: 'El texto no puede superar 4000 caracteres.' });
         }
