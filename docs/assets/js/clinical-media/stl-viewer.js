@@ -284,25 +284,104 @@
    }
   }
   const repaint=()=>{if(!disposed&&frame===null)frame=requestAnimationFrame(draw)};
-  function reset(){yaw=.28;pitch=-.4;zoom=1;panX=0;panY=0;repaint()}
+  const clampPan=value=>Math.max(-4,Math.min(4,value));
+  function shiftModel(dx,dy){
+   const rect=canvas.getBoundingClientRect();
+   if(!rect.width||!rect.height)return;
+   // Convertir movimiento en píxeles a coordenadas de pantalla sin alterar zoom/rotación.
+   panX=clampPan(panX+2*dx/rect.width);
+   panY=clampPan(panY-2*dy/rect.height);
+   repaint();
+  }
+  function centerModel(){panX=0;panY=0;repaint()}
+  function reset(){yaw=.28;pitch=-.4;zoom=1;centerModel()}
+  function updateHint(text){hint.textContent=text}
+  function setMode(next){
+   interactionMode=next;
+   navigation.querySelectorAll('[data-stl-mode]').forEach(button=>{
+    button.setAttribute('aria-pressed',String(button.dataset.stlMode===next));
+   });
+   stage.dataset.interaction=next;
+   updateHint(next==='pan'
+    ?'Arrastra con el mouse o un dedo para mover el modelo horizontal o verticalmente.'
+    :next==='center'
+     ?'Haz clic o toca un diente del modelo para llevar ese punto al centro de la pantalla.'
+     :'Arrastra para girar · Mayús + arrastrar para mover · dos dedos para desplazar');
+  }
+  function centerAt(clientX,clientY){
+   const rect=canvas.getBoundingClientRect();
+   if(!rect.width||!rect.height)return;
+   // Seleccionar píxel de superficie visible; el fondo tiene alpha=0.
+   const x=Math.max(0,Math.min(canvas.width-1,Math.floor((clientX-rect.left)/rect.width*canvas.width)));
+   const y=Math.max(0,Math.min(canvas.height-1,Math.floor((rect.bottom-clientY)/rect.height*canvas.height)));
+   const pixel=new Uint8Array(4);
+   gl.readPixels(x,y,1,1,gl.RGBA,gl.UNSIGNED_BYTE,pixel);
+   if(pixel[3]===0){
+    updateHint('Selecciona un punto de la superficie dental y no el fondo.');
+    return;
+   }
+   const ndcX=2*(clientX-rect.left)/rect.width-1;
+   const ndcY=1-2*(clientY-rect.top)/rect.height;
+   panX=clampPan(panX-ndcX);
+   panY=clampPan(panY-ndcY);
+   setMode('rotate');
+   repaint();
+  }
+  canvas.addEventListener('contextmenu',event=>event.preventDefault());
   canvas.addEventListener('pointerdown',event=>{
-   drag=[event.clientX,event.clientY,event.pointerId];
+   pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
+   drag={x:event.clientX,y:event.clientY,startX:event.clientX,startY:event.clientY,
+      pointerId:event.pointerId,mode:event.shiftKey||event.button===2?'pan':interactionMode};
    canvas.setPointerCapture?.(event.pointerId);
   });
   canvas.addEventListener('pointermove',event=>{
-   if(!drag||event.pointerId!==drag[2])return;
-   yaw+=(event.clientX-drag[0])*.009;
-   pitch=Math.max(-1.57,Math.min(1.57,pitch+(event.clientY-drag[1])*.009));
-   drag=[event.clientX,event.clientY,event.pointerId];repaint();
+   const previous=pointers.get(event.pointerId);
+   if(!previous)return;
+   if(event.pointerType==='touch'&&pointers.size>=2){
+    const entries=[...pointers.values()];
+    const oldX=entries.reduce((sum,point)=>sum+point.x,0)/entries.length;
+    const oldY=entries.reduce((sum,point)=>sum+point.y,0)/entries.length;
+    pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
+    const points=[...pointers.values()];
+    shiftModel(points.reduce((sum,point)=>sum+point.x,0)/points.length-oldX,
+      points.reduce((sum,point)=>sum+point.y,0)/points.length-oldY);
+    drag=null;
+    return;
+   }
+   pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
+   if(!drag||event.pointerId!==drag.pointerId){
+    drag={x:event.clientX,y:event.clientY,startX:event.clientX,startY:event.clientY,
+      pointerId:event.pointerId,mode:interactionMode};
+    return;
+   }
+   const dx=event.clientX-drag.x,dy=event.clientY-drag.y;
+   if(interactionMode==='center')return;
+   if(drag.mode==='pan')shiftModel(dx,dy);
+   else{
+    yaw+=dx*.009;
+    pitch=Math.max(-1.57,Math.min(1.57,pitch+dy*.009));
+    repaint();
+   }
+   drag.x=event.clientX;drag.y=event.clientY;
   });
-  canvas.addEventListener('pointerup',()=>{drag=null});
-  canvas.addEventListener('pointercancel',()=>{drag=null});
-  canvas.addEventListener('dblclick',reset);
+  canvas.addEventListener('pointerup',event=>{
+   if(interactionMode==='center'&&drag?.pointerId===event.pointerId
+      &&Math.hypot(event.clientX-drag.startX,event.clientY-drag.startY)<9
+      &&pointers.size===1)centerAt(event.clientX,event.clientY);
+   pointers.delete(event.pointerId);
+   drag=null;
+  });
+  canvas.addEventListener('pointercancel',event=>{pointers.delete(event.pointerId);drag=null});
+  canvas.addEventListener('dblclick',()=>{if(interactionMode!=='center')reset()});
   canvas.addEventListener('wheel',event=>{
    event.preventDefault();zoom=Math.max(.35,Math.min(3,zoom*(event.deltaY<0?1.1:.9)));repaint();
   },{passive:false});
   canvas.addEventListener('keydown',event=>{
-   if(event.key==='ArrowLeft')yaw-=.12;
+   if(event.shiftKey&&event.key==='ArrowLeft')shiftModel(-28,0);
+   else if(event.shiftKey&&event.key==='ArrowRight')shiftModel(28,0);
+   else if(event.shiftKey&&event.key==='ArrowUp')shiftModel(0,-28);
+   else if(event.shiftKey&&event.key==='ArrowDown')shiftModel(0,28);
+   else if(event.key==='ArrowLeft')yaw-=.12;
    else if(event.key==='ArrowRight')yaw+=.12;
    else if(event.key==='ArrowUp')pitch-=.12;
    else if(event.key==='ArrowDown')pitch+=.12;
@@ -311,6 +390,16 @@
    else return;
    event.preventDefault();repaint();
   });
+  navigation.addEventListener('click',event=>{
+   const mode=event.target.closest('[data-stl-mode]')?.dataset.stlMode;
+   if(mode){setMode(mode);return}
+   const direction=event.target.closest('[data-stl-pan]')?.dataset.stlPan;
+   if(direction==='left')shiftModel(-45,0);
+   else if(direction==='right')shiftModel(45,0);
+   else if(direction==='up')shiftModel(0,-45);
+   else if(direction==='down')shiftModel(0,45);
+  });
+  setMode('rotate');
   toolbar.addEventListener('input',event=>{
    const target=event.target,setting=target?.dataset.stlSetting;
    if(setting==='material')material=target.value;
