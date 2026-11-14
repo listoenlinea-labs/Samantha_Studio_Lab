@@ -128,8 +128,9 @@ router.get('/:id/resumen', async (req, res, next) => {
 });
 
 router.patch('/:id/resumen', async (req, res, next) => {
-    const connection = await pool.getConnection();
+    let connection;
     try {
+        connection = await pool.getConnection();
         const patientId = parsePositiveId(req.params.id);
         if (!patientId) return invalidId(res);
         const hasAllergies = Object.prototype.hasOwnProperty.call(req.body, 'alergias');
@@ -175,20 +176,29 @@ router.patch('/:id/resumen', async (req, res, next) => {
             );
         }
         if (hasNote) {
-            await connection.query('UPDATE expedientes_paciente SET nota_general = ? WHERE id_paciente = ?', [note, patientId]);
+            // Garantizar que la nota quede guardada aunque el expediente sea de una importación antigua.
+            const numeroExpediente = `EXP-${new Date().getFullYear()}-${String(patientId).padStart(6, '0')}`;
+            await connection.query(
+                `INSERT INTO expedientes_paciente (id_paciente, numero_expediente, nota_general, estado)
+                 VALUES (?, ?, ?, 'ACTIVO')
+                 ON DUPLICATE KEY UPDATE nota_general = VALUES(nota_general)`,
+                [patientId, numeroExpediente, note]
+            );
         }
         await connection.query(
             `INSERT INTO auditoria (entidad, id_entidad, accion, detalle)
-             VALUES ('pacientes', ?, 'ACTUALIZAR_RESUMEN_CLINICO', ?)`,
-            [patientId, JSON.stringify({ alergias: hasAllergies, notaGeneral: hasNote })]
+             VALUES ('pacientes', ?, 'ACTUALIZAR', ?)`,
+            [patientId, JSON.stringify({ apartado: 'RESUMEN_CLINICO', alergias: hasAllergies, notaGeneral: hasNote })]
         );
         await connection.commit();
         return res.json({ ok: true, alergias: allergies, notaGeneral: note });
     } catch (error) {
-        await connection.rollback();
+        if (connection) {
+            try { await connection.rollback(); } catch (_) { /* connection already lost */ }
+        }
         next(error);
     } finally {
-        connection.release();
+        connection?.release();
     }
 });
 
