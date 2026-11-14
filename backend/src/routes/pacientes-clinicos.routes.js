@@ -129,6 +129,7 @@ router.get('/:id/resumen', async (req, res, next) => {
 
 router.patch('/:id/resumen', async (req, res, next) => {
     let connection;
+    let stage = 'preparar';
     try {
         connection = await pool.getConnection();
         const patientId = parsePositiveId(req.params.id);
@@ -148,39 +149,32 @@ router.patch('/:id/resumen', async (req, res, next) => {
         if ((allergies && allergies.length > 4000) || (note && note.length > 4000)) {
             return res.status(400).json({ ok: false, mensaje: 'El texto no puede superar 4000 caracteres.' });
         }
+        stage = 'abrir_transaccion';
         await connection.beginTransaction();
-        if (!(await patientExists(connection, patientId))) {
+        // Bloquea exclusivamente este paciente durante el cambio de resumen.
+        // No crear una versión de historia clínica al editar un resumen pequeño:
+        // algunas bases existentes mantienen índices UNIQUE legados sobre
+        // historias_clinicas.id_paciente y el INSERT devolvía ER_DUP_ENTRY (409).
+        stage = 'bloquear_paciente';
+        const [patientRows] = await connection.query(
+            'SELECT id_paciente FROM pacientes WHERE id_paciente = ? LIMIT 1 FOR UPDATE',
+            [patientId]
+        );
+        if (!patientRows.length) {
             await connection.rollback();
             return res.status(404).json({ ok: false, mensaje: 'Paciente no encontrado.' });
         }
         if (hasAllergies) {
-            await connection.query('UPDATE pacientes SET alergias = ? WHERE id_paciente = ?', [allergies, patientId]);
-            const [historyRows] = await connection.query(
-                `SELECT motivo_consulta, antecedentes_medicos, antecedentes_odontologicos,
-                        medicamentos_actuales, diagnostico_general, observaciones
-                 FROM historias_clinicas
-                 WHERE id_paciente = ? AND vigente = 1
-                 ORDER BY id_historia DESC LIMIT 1 FOR UPDATE`,
-                [patientId]
-            );
+            stage = 'actualizar_alergias';
+            // pacientes.alergias es la fuente actual; las versiones clínicas
+            // anteriores permanecen intactas para conservar la trazabilidad.
             await connection.query(
-                'UPDATE historias_clinicas SET vigente = 0 WHERE id_paciente = ? AND vigente = 1',
-                [patientId]
-            );
-            const history = historyRows[0] || {};
-            await connection.query(
-                `INSERT INTO historias_clinicas
-                    (id_paciente, motivo_consulta, alergias, antecedentes_medicos,
-                     antecedentes_odontologicos, medicamentos_actuales,
-                     diagnostico_general, observaciones, vigente)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)`,
-                [patientId, history.motivo_consulta || null, allergies,
-                    history.antecedentes_medicos || null, history.antecedentes_odontologicos || null,
-                    history.medicamentos_actuales || null, history.diagnostico_general || null,
-                    history.observaciones || null]
+                'UPDATE pacientes SET alergias = ? WHERE id_paciente = ?',
+                [allergies, patientId]
             );
         }
         if (hasNote) {
+            stage = 'actualizar_nota_general';
             // Actualizar el expediente propio, nunca otra vivienda/paciente por coincidencia de un índice UNIQUE.
             const [existing] = await connection.query(
                 'SELECT id_paciente FROM expedientes_paciente WHERE id_paciente = ? LIMIT 1 FOR UPDATE',
@@ -200,14 +194,26 @@ router.patch('/:id/resumen', async (req, res, next) => {
                 );
             }
         }
+        stage = 'registrar_auditoria';
         await connection.query(
             `INSERT INTO auditoria (entidad, id_entidad, accion, detalle)
              VALUES ('pacientes', ?, 'ACTUALIZAR', ?)`,
             [patientId, JSON.stringify({ apartado: 'RESUMEN_CLINICO', alergias: hasAllergies, notaGeneral: hasNote })]
         );
+        stage = 'confirmar_transaccion';
         await connection.commit();
         return res.json({ ok: true, alergias: allergies, notaGeneral: note });
     } catch (error) {
+        // Diagnóstico mínimo en Hostinger; nunca registrar alergias, nombres ni
+        // contenido clínico. La referencia permite distinguir un índice UNIQUE
+        // legado de otro posible error de MySQL.
+        console.error('[PATIENT_SUMMARY_SAVE_FAILURE]', JSON.stringify({
+            requestId: req.requestId || null,
+            stage,
+            code: error?.code || 'UNKNOWN',
+            errno: Number(error?.errno) || null,
+            sqlState: error?.sqlState || null
+        }));
         if (connection) {
             try { await connection.rollback(); } catch (_) { /* connection already lost */ }
         }
@@ -598,24 +604,32 @@ router.get('/:id/historia-clinica', async (req, res, next) => {
         const patientId = parsePositiveId(req.params.id);
         if (!patientId) return invalidId(res);
 
-        if (!(await patientExists(pool, patientId))) {
-            return res.status(404).json({ ok: false, mensaje: 'Paciente no encontrado.' });
-        }
-
+        // La alergia actual se consulta en pacientes; las versiones clínicas
+        // anteriores se conservan sin modificaciones al usar el editor rápido.
+        // LEFT JOIN funciona también cuando todavía no existe historia clínica.
         const [rows] = await pool.query(
-            `SELECT id_historia AS idHistoria, motivo_consulta AS motivoConsulta,
-                    alergias, antecedentes_medicos AS antecedentesMedicos,
-                    antecedentes_odontologicos AS antecedentesOdontologicos,
-                    medicamentos_actuales AS medicamentosActuales,
-                    diagnostico_general AS diagnosticoGeneral, observaciones,
-                    vigente, created_at AS creadoAt, updated_at AS actualizadoAt
-             FROM historias_clinicas
-             WHERE id_paciente = ? AND vigente = 1
-             ORDER BY id_historia DESC LIMIT 1`,
+            `SELECT h.id_historia AS idHistoria, h.motivo_consulta AS motivoConsulta,
+                    h.antecedentes_medicos AS antecedentesMedicos,
+                    h.antecedentes_odontologicos AS antecedentesOdontologicos,
+                    h.medicamentos_actuales AS medicamentosActuales,
+                    h.diagnostico_general AS diagnosticoGeneral, h.observaciones,
+                    h.vigente, h.created_at AS creadoAt, h.updated_at AS actualizadoAt,
+                    p.alergias AS alergiasActuales
+             FROM pacientes p
+             LEFT JOIN historias_clinicas h ON h.id_paciente = p.id_paciente AND h.vigente = 1
+             WHERE p.id_paciente = ?
+             ORDER BY h.id_historia DESC LIMIT 1`,
             [patientId]
         );
+        if (!rows.length) {
+            return res.status(404).json({ ok: false, mensaje: 'Paciente no encontrado.' });
+        }
+        const { alergiasActuales, ...record } = rows[0];
+        const historia = record.idHistoria !== null
+            ? { ...record, alergias: alergiasActuales }
+            : (alergiasActuales ? { alergias: alergiasActuales } : null);
 
-        return res.json({ idPaciente: patientId, historia: rows[0] || null });
+        return res.json({ idPaciente: patientId, historia });
     } catch (error) {
         next(error);
     }
@@ -641,6 +655,12 @@ router.put('/:id/historia-clinica', async (req, res, next) => {
         };
 
         await connection.beginTransaction();
+        // Serializar cambios de alergias en ambos editores para evitar carreras:
+        // el editor breve y la historia completa actualizan el mismo paciente.
+        await connection.query(
+            'SELECT id_paciente FROM pacientes WHERE id_paciente = ? LIMIT 1 FOR UPDATE',
+            [patientId]
+        );
         await connection.query(
             'UPDATE historias_clinicas SET vigente = 0 WHERE id_paciente = ? AND vigente = 1',
             [patientId]
@@ -654,6 +674,12 @@ router.put('/:id/historia-clinica', async (req, res, next) => {
             [patientId, fields.motivoConsulta, fields.alergias, fields.antecedentesMedicos,
                 fields.antecedentesOdontologicos, fields.medicamentosActuales,
                 fields.diagnosticoGeneral, fields.observaciones]
+        );
+        // La historia completa sí crea una versión. Mantener sincronizado el
+        // resumen del paciente únicamente después de completar el INSERT.
+        await connection.query(
+            'UPDATE pacientes SET alergias = ? WHERE id_paciente = ?',
+            [fields.alergias, patientId]
         );
         await connection.query(
             `INSERT INTO auditoria (entidad, id_entidad, accion, detalle)

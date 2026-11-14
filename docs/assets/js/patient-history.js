@@ -264,10 +264,13 @@
           }
         } catch (error) {
           // Conservar formulario y contenido: nunca cerrar un editor cuyo guardado falló.
-          notify('No se confirmó el guardado: ' + error.message, true);
+          // Mostrar un único mensaje en el editor y conservar todo lo escrito.
+          // La API nunca debe aparentar un guardado exitoso cuando hubo rollback.
           if (inlineError && form.isConnected) {
             inlineError.hidden = false;
             inlineError.textContent = 'No se confirmó el guardado. ' + error.message;
+          } else {
+            notify('No se confirmó el guardado: ' + error.message, true);
           }
           if (form.isConnected && button) { button.disabled = false; button.textContent = 'Guardar'; }
         }
