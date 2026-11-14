@@ -10,7 +10,7 @@
  const fail=message=>{throw Error(message)};
  const normal=(a,b,c)=>{
   const u=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],v=[c[0]-a[0],c[1]-a[1],c[2]-a[2]];
-  const n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2]];
+  const n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
   const length=Math.hypot(...n)||1;return n.map(x=>x/length);
  };
  function buildMesh(vertices,faces,format){
