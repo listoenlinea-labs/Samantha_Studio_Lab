@@ -8,8 +8,12 @@ const catalog = require('../src/config/odontogram-catalog');
 const frontendPath = path.join(__dirname, '../../docs/assets/js/patient-history.js');
 const artPath = path.join(__dirname, '../../docs/assets/js/dental-art.js');
 const periodontogramRoutePath = path.join(__dirname, '../src/routes/periodontogramas.routes.js');
+const clinicalPolishPath = path.join(__dirname, '../../docs/assets/css/samantha-clinical-polish.css');
+const patientHistoryHtmlPath = path.join(__dirname, '../../docs/historial-paciente.html');
 const frontend = fs.readFileSync(frontendPath, 'utf8');
 const routeSource = fs.readFileSync(periodontogramRoutePath, 'utf8');
+const clinicalPolish = fs.readFileSync(clinicalPolishPath, 'utf8');
+const patientHistoryHtml = fs.readFileSync(patientHistoryHtmlPath, 'utf8');
 
 function loadDentalArt() {
     const context = { window: {} };
@@ -37,6 +41,17 @@ test('el odontograma muestra tres símbolos, excedente y detalle completo', () =
     assert.match(frontend, /function selectedToothDetails/);
     assert.match(frontend, /normalize\('NFD'\)/);
     assert.match(frontend, /aria-modal="true"/);
+});
+
+test('los indicadores sobre los dientes no dibujan fondos ni sombras', () => {
+    assert.match(
+        clinicalPolish,
+        /\.ph-odontogram \.ph-tooth-marker \.ph-symbol\s*\{[^}]*background:transparent!important;[^}]*box-shadow:none!important/s
+    );
+    assert.doesNotMatch(clinicalPolish, /\.ph-odontogram \.ph-tooth-marker \.ph-symbol\s*\{[^}]*#fff(?:fff)?[0-9a-f]*/is);
+    assert.match(clinicalPolish, /\.ph-odontogram \.ph-tooth-visual>\.ph-tooth-art path:not\(\.crown\)/);
+    assert.doesNotMatch(clinicalPolish, /\.ph-odontogram \.ph-tooth svg path:not\(\.crown\)/);
+    assert.match(patientHistoryHtml, /samantha-clinical-polish\.css\?v=20261114-transparent-dental-markers/);
 });
 
 test('el periodontograma modela seis sitios por diente sin ceros artificiales', () => {
