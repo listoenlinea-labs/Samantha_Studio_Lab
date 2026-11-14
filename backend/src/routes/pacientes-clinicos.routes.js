@@ -149,35 +149,24 @@ router.patch('/:id/resumen', async (req, res, next) => {
             return res.status(400).json({ ok: false, mensaje: 'El texto no puede superar 4000 caracteres.' });
         }
         await connection.beginTransaction();
-        if (!(await patientExists(connection, patientId))) {
+        // Bloquea exclusivamente este paciente durante el cambio de resumen.
+        // No crear una versión de historia clínica al editar un resumen pequeño:
+        // algunas bases existentes mantienen índices UNIQUE legados sobre
+        // historias_clinicas.id_paciente y el INSERT devolvía ER_DUP_ENTRY (409).
+        const [patientRows] = await connection.query(
+            'SELECT id_paciente FROM pacientes WHERE id_paciente = ? LIMIT 1 FOR UPDATE',
+            [patientId]
+        );
+        if (!patientRows.length) {
             await connection.rollback();
             return res.status(404).json({ ok: false, mensaje: 'Paciente no encontrado.' });
         }
         if (hasAllergies) {
-            await connection.query('UPDATE pacientes SET alergias = ? WHERE id_paciente = ?', [allergies, patientId]);
-            const [historyRows] = await connection.query(
-                `SELECT motivo_consulta, antecedentes_medicos, antecedentes_odontologicos,
-                        medicamentos_actuales, diagnostico_general, observaciones
-                 FROM historias_clinicas
-                 WHERE id_paciente = ? AND vigente = 1
-                 ORDER BY id_historia DESC LIMIT 1 FOR UPDATE`,
-                [patientId]
-            );
+            // pacientes.alergias es la fuente actual; las versiones clínicas
+            // anteriores permanecen intactas para conservar la trazabilidad.
             await connection.query(
-                'UPDATE historias_clinicas SET vigente = 0 WHERE id_paciente = ? AND vigente = 1',
-                [patientId]
-            );
-            const history = historyRows[0] || {};
-            await connection.query(
-                `INSERT INTO historias_clinicas
-                    (id_paciente, motivo_consulta, alergias, antecedentes_medicos,
-                     antecedentes_odontologicos, medicamentos_actuales,
-                     diagnostico_general, observaciones, vigente)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)`,
-                [patientId, history.motivo_consulta || null, allergies,
-                    history.antecedentes_medicos || null, history.antecedentes_odontologicos || null,
-                    history.medicamentos_actuales || null, history.diagnostico_general || null,
-                    history.observaciones || null]
+                'UPDATE pacientes SET alergias = ? WHERE id_paciente = ?',
+                [allergies, patientId]
             );
         }
         if (hasNote) {
