@@ -178,5 +178,5 @@
   }
   return {width,height,values:image};
  }
- return {MIN_SLICES,MAX_SLICES,validateSeries,assemble,fromFiles,sample,sliceImage,panoramic};
+ return {MIN_SLICES,MAX_SLICES,validateSeries,assemble,assembleResponsive,fromFiles,sample,sliceImage,panoramic};
 });
