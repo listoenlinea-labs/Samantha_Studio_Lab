@@ -97,6 +97,29 @@ async function asegurarEsquema(pool) {
         CONSTRAINT fk_recetas_paciente FOREIGN KEY (id_paciente) REFERENCES pacientes(id_paciente) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
 
+    // Los archivos se guardan ligados al paciente sin alterar su PK existente.
+    const [pacienteKey] = await pool.query(
+        "SELECT COLUMN_TYPE AS tipo FROM information_schema.COLUMNS " +
+        "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='pacientes' AND COLUMN_NAME='id_paciente' LIMIT 1"
+    );
+    const pacienteKeyType = String(pacienteKey[0]?.tipo || '').toUpperCase().trim();
+    if (!/^(?:TINYINT|SMALLINT|MEDIUMINT|INT|INTEGER|BIGINT)(?:\([0-9]+\))?(?: UNSIGNED)?$/.test(pacienteKeyType)) {
+        throw new Error('No se pudo validar pacientes.id_paciente para archivos clínicos.');
+    }
+    await pool.query(`CREATE TABLE IF NOT EXISTS archivos_clinicos_ssl (
+        id_archivo BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        id_paciente ${pacienteKeyType} NOT NULL,
+        categoria ENUM('PDF','RADIOGRAFIA') NOT NULL,
+        nombre_original VARCHAR(180) NOT NULL,
+        descripcion VARCHAR(500) NULL,
+        tipo_mime VARCHAR(80) NOT NULL,
+        bytes INT UNSIGNED NOT NULL,
+        contenido MEDIUMBLOB NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_archivos_ssl_paciente (id_paciente, categoria, id_archivo),
+        CONSTRAINT fk_archivos_ssl_paciente FOREIGN KEY (id_paciente)
+            REFERENCES pacientes (id_paciente) ON DELETE CASCADE ON UPDATE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
     // Recordatorios: configuración clínica y bitácora idempotente por cita/canal/ventana.
     await pool.query(`CREATE TABLE IF NOT EXISTS recordatorios_config (
         id TINYINT UNSIGNED NOT NULL PRIMARY KEY,

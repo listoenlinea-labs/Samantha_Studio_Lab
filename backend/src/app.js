@@ -123,6 +123,7 @@ const pacientesRoutes = require('./routes/pacientes.routes');
 const odontogramasRoutes = require('./routes/odontogramas.routes');
 const periodontogramasRoutes = require('./routes/periodontogramas.routes');
 const archivosRoutes = require('./routes/archivos.routes');
+const archivosClinicosRoutes = require('./routes/archivos-clinicos.routes');
 const tratamientosRoutes = require('./routes/tratamientos.routes');
 const clinicaRoutes = require('./routes/clinica.routes');
 const asistenciasRoutes = require('./routes/asistencias.routes');
@@ -134,6 +135,8 @@ app.use('/api/clinica/asistencias', asistenciasRoutes);
 app.use('/api/busqueda', busquedaRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/pacientes', pacientesClinicosRoutes);
+// Antes del router antiguo, que contiene stubs /:id/archivos con error 501.
+app.use('/api/pacientes', archivosClinicosRoutes);
 app.use('/api/pacientes', pacientesRoutes);
 app.use('/api/odontogramas', odontogramasRoutes);
 app.use('/api/periodontogramas', periodontogramasRoutes);

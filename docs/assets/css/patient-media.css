@@ -1,0 +1,70 @@
+/* Módulos de Archivos PDF y Radiografías/Tomografías de Samantha.
+   Inspirado en Yerena; contraste lavanda y comportamiento móvil. */
+.ssl-media-root{display:grid;gap:18px;min-width:0;padding-bottom:30px}
+.ssl-media-columns{display:grid;grid-template-columns:minmax(280px,.94fr) minmax(320px,1.06fr);gap:16px;align-items:start}
+.ssl-media-card{min-width:0;padding:clamp(17px,2.4vw,28px);background:#fff;border:1px solid #e6dfeb;border-radius:20px;box-shadow:0 10px 24px #72598d0a}
+.ssl-media-card h3{color:#72568b;font:400 clamp(21px,2vw,27px)/1.25 Georgia,serif;margin:0 0 15px}
+.ssl-media-card>p:not(.ssl-media-note){color:#80728c;font-size:13px;line-height:1.6}
+.ssl-media-form{display:grid;gap:14px}
+.ssl-media-form label,.ssl-cbct-controls label{display:grid;gap:9px;font-size:12px;font-weight:750;color:#665573}
+.ssl-media-form input:not([type=file]),.ssl-media-form input[type=file],.ssl-cbct-controls input{
+ width:100%;min-width:0;max-width:100%;border:1px solid #dfd2e9;border-radius:11px;padding:12px;
+ font-size:12px;color:#69567b;background:#fffdff
+}
+.ssl-media-form input[type=file]::file-selector-button,.ssl-cbct-controls input::file-selector-button{
+ margin-right:11px;border:1px solid #d6c3e4;background:#f1e8f7;color:#70568a;border-radius:9px;padding:9px 10px;font-weight:700
+}
+.ssl-media-primary,.ssl-media-secondary{min-height:43px;padding:10px 15px;border:1px solid #d6c5e3;border-radius:11px;font-size:12px;font-weight:750;cursor:pointer}
+.ssl-media-primary{background:#8d73a3;color:#fff;border-color:#8d73a3}
+.ssl-media-primary:hover{background:#765a91}
+.ssl-media-secondary{background:#eff6fc;color:#4b6f89;border-color:#cfe1f0}
+.ssl-media-primary:disabled,.ssl-media-secondary:disabled{cursor:not-allowed;opacity:.45}
+.ssl-media-note{font-size:11px;color:#9a8aa5;line-height:1.7;margin:14px 0 0}
+.ssl-media-message{padding:12px 15px;border-radius:12px;color:#52765d;background:#eef8f1;border:1px solid #d1ead6;font-size:12px}
+.ssl-media-message.error{background:#fff0f3;color:#a04860;border-color:#f1d3da}
+.ssl-media-list{display:grid;gap:10px;max-height:460px;overflow-y:auto;scrollbar-color:#d7c8e4 transparent}
+.ssl-media-entry{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px;background:#fcf9fd;border:1px solid #ede5f1;border-radius:13px}
+.ssl-media-entry>div:first-child{display:grid;gap:5px;min-width:0}
+.ssl-media-entry strong{font-size:12px;color:#5d4870;overflow-wrap:anywhere}
+.ssl-media-entry small{font-size:10px;color:#9b8ca7;line-height:1.5;overflow-wrap:anywhere}
+.ssl-media-entry-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.ssl-media-entry-actions button{border:1px solid #dfd1e9;color:#6d5680;background:#fff;border-radius:9px;min-height:36px;padding:8px 10px;font-size:11px;cursor:pointer}
+.ssl-media-entry-actions button:first-child{background:#e8f3fb;border-color:#cee4f1;color:#4f748f}
+.ssl-media-entry-actions .ssl-media-delete{color:#a45a6a;background:#fff8f9;border-color:#f0d9df}
+.ssl-media-entry-actions button:disabled{opacity:.5}
+.ssl-media-empty,.ssl-media-placeholder{padding:30px 15px;text-align:center;color:#9689a0;font-size:12px;border:1px dashed #e1d5e9;border-radius:12px;background:#fcfafd}
+.ssl-media-viewer{min-height:220px;max-width:100%;overflow-x:auto;border:1px solid #e9e2ef;border-radius:13px;background:#f9f7fb}
+.ssl-media-pdf{display:block;width:100%;height:560px;border:0;background:#fff}
+.ssl-media-image-canvas{min-height:330px;background:#1b2529;border-radius:13px;position:relative;display:flex;justify-content:center;align-items:center;overflow:hidden}
+.ssl-media-image-canvas img{display:block;max-width:100%;max-height:560px;object-fit:contain;transition:transform .2s ease}
+.ssl-media-image-canvas .clinical-rx-controls{position:absolute;z-index:2;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:4px;max-width:calc(100% - 20px);padding:6px;border-radius:12px;background:#26323bdd;overflow-x:auto}
+.ssl-media-image-canvas .clinical-rx-control-group{display:flex;gap:4px}
+.ssl-media-image-canvas .clinical-rx-control{border:1px solid #ffffff55;background:#ffffff18;color:#fff;border-radius:9px;padding:9px;min-width:38px;cursor:pointer}
+.ssl-media-dicom-host{min-width:0;max-width:100%;overflow-x:auto}
+.ssl-media-dicom-host .dicom-workspace{color:#f0f4fb;background:#15222d;border-radius:13px;overflow:hidden}
+.ssl-media-dicom-host .dicom-toolbar{display:flex;gap:5px;flex-wrap:wrap;padding:10px}
+.ssl-media-dicom-host .dicom-control{border:1px solid #aec2d370;background:#223749;color:#f0f6fa;border-radius:8px;padding:8px;min-height:33px}
+.ssl-media-dicom-host .dicom-stage{max-width:100%;min-height:280px;overflow:hidden;display:grid;place-items:center;touch-action:none}
+.ssl-media-dicom-host canvas{max-width:100%;object-fit:contain}
+.ssl-media-dicom-host .dicom-info{font-size:11px;color:#b2c7d5;padding:10px}
+.ssl-media-cbct{background:linear-gradient(135deg,#fff,#f9f5fb)}
+.ssl-cbct-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.ssl-cbct-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}
+.ssl-cbct-actions button{flex:1 1 170px}
+#sslCbctSelected{font-size:12px;color:#856f94;margin:12px 0}
+.ssl-media-viewer .cbct-shell{max-width:100%;overflow:hidden}
+@media(max-width:1050px){
+ .ssl-media-columns{grid-template-columns:1fr}
+ .ssl-media-entry{align-items:flex-start}
+}
+@media(max-width:760px){
+ .ssl-media-root{gap:13px}
+ .ssl-media-card{padding:15px;border-radius:16px}
+ .ssl-media-entry{flex-direction:column;align-items:stretch}
+ .ssl-media-entry-actions{justify-content:flex-start}
+ .ssl-media-entry-actions button{flex:1 1 100px}
+ .ssl-cbct-controls{grid-template-columns:1fr}
+ .ssl-media-pdf{height:420px}
+ .ssl-media-image-canvas{min-height:260px}
+ .ssl-media-image-canvas .clinical-rx-controls{bottom:6px;width:calc(100% - 12px);justify-content:start}
+}
