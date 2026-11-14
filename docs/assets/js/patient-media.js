@@ -90,7 +90,7 @@
     '<button type="button" data-media-series="'+escape(uid)+'">Ver tomografía 2D / 3D / Panorámica</button></article>').join('');
   return '<div class="ssl-media-list">'+series+items.map(item=>{
    const mime=item.tipoMime||'',id=Number(item.idArchivo),isZip=mime==='application/zip',isDicom=mime==='application/dicom';
-   const action=isZip?'Ver tomografía':isDicom?'Ver DICOM':mime.startsWith('image/')?'Ver imagen':mime==='application/pdf'?'Ver PDF':'Descargar';
+   const action=isZip?'Ver tomografía':isDicom?'Ver DICOM':mime==='image/tiff'||mime==='image/bmp'?'Descargar':mime.startsWith('image/')?'Ver imagen':mime==='application/pdf'?'Ver PDF':'Descargar';
    return '<article class="ssl-media-entry" data-file-id="'+id+'"><div><strong>'+escape(item.nombre)+'</strong>'+
     '<small>'+escape(item.descripcion||'Sin descripción')+' · '+bytes(item.bytes)+' · '+escape(new Date(item.creadoAt).toLocaleDateString('es-MX'))+'</small></div>'+
     '<div class="ssl-media-entry-actions"><button type="button" data-media-view="'+id+'">'+action+'</button>'+
@@ -115,6 +115,7 @@
   const blob=await blobRequest(id),host=$('sslMediaViewer');
   if(!host)return;
   if(viewer){viewer.dispose?.();viewer=null}
+  objectUrls.forEach(saved=>URL.revokeObjectURL(saved));objectUrls=[];
   const mime=item.tipoMime;
   if(mime==='application/zip'){
    const file=new File([blob],item.nombre,{type:mime});
