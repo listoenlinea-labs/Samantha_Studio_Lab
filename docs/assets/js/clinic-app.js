@@ -40,6 +40,13 @@
     permissions: ['Administrador', 'Asistente', 'Recepcionista']
   },
   {
+    id: 'recetas',
+    label: 'Recetas PDF',
+    href: 'recetas.html',
+    icon: '▤',
+    permissions: ['Administrador', 'Asistente', 'Recepcionista']
+  },
+  {
     id: 'recordatorios',
     label: 'Recordatorios',
     href: 'recordatorios.html',
@@ -126,6 +133,7 @@
     finanzas: ['Acceso administrador', 'Finanzas y cuentas por cobrar'],
     reportes: ['Metas configurables', 'Reportes operativos'],
     configuracion: ['Seguridad', 'Usuarios y permisos'],
+    recetas: ['Prescripciones', 'Recetas médicas PDF'],
   };
 
   let demoAppointments = [];
@@ -182,7 +190,7 @@
       id: 'clinica',
       label: 'Clínica',
       icon: '✦',
-      items: ['operacion', 'tratamientos', 'seguimientos', 'radiografias', 'recordatorios']
+      items: ['operacion', 'tratamientos', 'seguimientos', 'radiografias', 'recetas', 'recordatorios']
     }, {
       id: 'administracion',
       label: 'Administración',
@@ -235,7 +243,11 @@
         <header class="dc-header">
           <a class="brand" href="index.html"><img src="assets/img/logo-ssl.svg" alt="Logo Samantha's Studio Lab"><div><strong>samantha's studio lab</strong><span>odontopediatría</span></div></a>
           <button class="dc-menu-button" id="menuButton" aria-label="Abrir navegación" aria-controls="appSidebar" aria-expanded="false">☰</button>
-          <nav class="app-nav" id="appSidebar" aria-label="Navegación principal">${navigation(role)}</nav>
+          <nav class="app-nav" id="appSidebar" aria-label="Navegación principal">
+            <div class="ssl-mobile-drawer-brand"><img src="assets/img/logo-ssl.svg" alt=""><div><strong>samantha's studio lab</strong><small>ODONTOPEDIATRÍA</small></div><button type="button" id="mobileNavClose" aria-label="Cerrar navegación">×</button></div>
+            ${navigation(role)}
+            <div class="ssl-mobile-drawer-bottom"><div class="ssl-mobile-drawer-account"><span>SS</span><div><strong>Samantha Studio</strong><small>${esc(role)}</small></div></div><a href="recetas.html">Crear receta PDF →</a></div>
+          </nav>
           <div class="dc-header-tools">
             <button class="dc-search" id="globalSearchToggle" type="button" aria-label="Buscar en la aplicación" aria-haspopup="dialog" aria-expanded="false" aria-controls="globalSearchPanel">⌕ <span>Buscar</span></button>
             <button class="dc-notification" data-toast="No tienes alertas críticas nuevas." aria-label="Notificaciones">♧<span></span></button>
@@ -1332,10 +1344,49 @@
       ${kpi('Seguimientos', number.format(m.tareas), 'Pendientes', 'var(--sage-500)')}</section>`);
   }
 
+  function renderRecipes() {
+    shell(`<section class="ssl-recipes-page">
+      <header class="ssl-recipes-intro"><p class="ssl-home-eyebrow">EXPEDIENTE CLÍNICO · PRESCRIPCIONES</p>
+        <h1>Recetas médicas PDF</h1>
+        <p>Busca un paciente para escribir su receta, guardarla en MySQL, generar PDF o consultar recetas anteriores.</p>
+      </header>
+      <section class="ssl-recipes-card">
+        <label for="sslRecipePatientSearch">Buscar paciente por nombre, teléfono o expediente</label>
+        <div class="ssl-recipes-search"><input id="sslRecipePatientSearch" type="search" autocomplete="off" placeholder="Buscar paciente…"><button id="sslRecipeSearchButton" type="button">Buscar</button></div>
+        <div id="sslRecipePatients" role="status" aria-live="polite">Consultando pacientes…</div>
+      </section>
+      <p class="ssl-recipes-disclaimer">Las recetas pertenecen al expediente privado del paciente. Revisa su contenido antes de entregarlas.</p>
+    </section>`);
+    const search=document.getElementById('sslRecipePatientSearch'),button=document.getElementById('sslRecipeSearchButton'),target=document.getElementById('sslRecipePatients');
+    let sequence=0;
+    async function load(){
+      const ticket=++sequence;
+      target.textContent='Consultando pacientes…';button.disabled=true;
+      try{
+        const result=await fetch(clinicApi+'/pacientes?buscar='+encodeURIComponent(search.value.trim())+'&pagina=1&limite=30',{headers:{Accept:'application/json'}});
+        const data=await result.json().catch(()=>({}));
+        if(!result.ok)throw Error(data.mensaje||'No se pudo consultar el directorio de pacientes.');
+        if(ticket!==sequence)return;
+        const items=Array.isArray(data.items)?data.items:[];
+        target.innerHTML=items.length?items.map(p=>{
+          const id=Number(p.idPaciente);
+          if(!Number.isSafeInteger(id)||id<1)return '';
+          return '<div class="ssl-recipes-patient"><span><strong>'+esc(p.nombreCompleto||'Paciente')+'</strong><small>'+esc(p.numeroExpediente||'Sin expediente')+'</small></span>'+
+          '<a href="historial-paciente.html?id='+id+'&view=prescriptions">Redactar o consultar recetas →</a></div>';
+        }).join(''):'<p>No se encontraron pacientes con ese criterio.</p>';
+      }catch(e){if(ticket===sequence)target.textContent=e.message;}
+      finally{if(ticket===sequence)button.disabled=false}
+    }
+    button.addEventListener('click',load);
+    search.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();load();}});
+    load();
+  }
+
   const renderers = {
     dashboard: renderLiveDashboard,
     agenda: renderAgenda,
     pacientes: renderPatients,
+    recetas: renderRecipes,
     operacion: renderLiveOperation,
     tratamientos: renderTreatments,
     seguimientos: renderLiveFollowups,
@@ -1837,12 +1888,28 @@
   function bindCommon() {
     const body = document.body;
     const menu = document.getElementById('menuButton');
+    const navPanel=document.getElementById('appSidebar');
+    const header=document.querySelector('.samantha-sidebar-layout > .dc-header');
+    const mobileNavQuery=window.matchMedia('(max-width:760px)');
+    const positionNav=()=>{
+      if(!navPanel||!header)return;
+      if(mobileNavQuery.matches && navPanel.parentElement!==document.body){
+        document.body.appendChild(navPanel); // Escapa el contexto z-index del encabezado; queda delante del overlay.
+      }else if(!mobileNavQuery.matches && navPanel.parentElement!==header){
+        header.insertBefore(navPanel,header.querySelector('.dc-header-tools'));
+        body.classList.remove('nav-open');
+      }
+    };
+    positionNav();
+    mobileNavQuery.addEventListener?.('change',positionNav);
     const closeMenu = () => { body.classList.remove('nav-open'); menu?.setAttribute('aria-expanded','false'); };
     menu?.addEventListener('click', () => {
       const expanded=body.classList.toggle('nav-open');
       menu.setAttribute('aria-expanded',String(expanded));
     });
     document.getElementById('sidebarScrim')?.addEventListener('click', closeMenu);
+    document.getElementById('mobileNavClose')?.addEventListener('click',closeMenu);
+    document.querySelectorAll('#appSidebar a').forEach(a=>a.addEventListener('click',closeMenu));
     const collapseToggle=document.getElementById('sidebarCollapseToggle');
     const syncCollapse=()=>{
       const shown=!body.classList.contains('sidebar-is-collapsed');

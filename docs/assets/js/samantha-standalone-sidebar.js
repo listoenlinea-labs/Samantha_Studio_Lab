@@ -5,7 +5,7 @@
  if(!document.body.classList.contains('recordatorios-body'))return;
  const links=[
   ['index.html','Inicio'],['agenda.html','Agenda'],['pacientes.html','Pacientes'],
-  ['operacion.html','Operación clínica'],['tratamientos.html','Tratamientos'],
+  ['recetas.html','Recetas PDF'],['operacion.html','Operación clínica'],['tratamientos.html','Tratamientos'],
   ['seguimientos.html','Seguimientos'],['radiografias.html','Radiografías'],
   ['recordatorios.html','Recordatorios'],['finanzas.html','Finanzas'],
   ['reportes.html','Reportes'],['configuracion.html','Configuración'],['inventario.html','Inventario']

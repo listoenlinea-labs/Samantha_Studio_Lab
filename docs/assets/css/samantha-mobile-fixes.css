@@ -1,0 +1,143 @@
+/* Refinamiento compartido Samantha: azul hielo y menú lateral real en móvil. */
+.ssl-mobile-drawer-brand,.ssl-mobile-drawer-bottom{display:none}
+body[data-page="pacientes"] .px-patient-header{
+ grid-template-columns:112px minmax(0,1fr)!important;
+ align-items:center!important;justify-content:start!important;
+ padding:34px 54px 24px 38px!important;
+}
+body[data-page="pacientes"] .px-patient-header::before{
+ top:15px!important;left:173px!important
+}
+body[data-page="pacientes"] .px-patient-header .px-avatar-edit{grid-row:1 / span 2;align-self:center}
+body[data-page="pacientes"] .px-patient-header>div{display:flex;flex-direction:column;justify-content:center;gap:7px}
+body[data-page="pacientes"] .px-name-line{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+body[data-page="pacientes"] .px-name-line h2{margin:0!important;line-height:1.15}
+body[data-page="pacientes"] .px-patient-buttons{display:flex;gap:10px;align-items:center;justify-content:flex-start;flex-wrap:wrap}
+body[data-page="pacientes"] .px-patient-buttons :is(.px-history-button,.px-prescription-button){
+ display:inline-flex;align-items:center;justify-content:center;min-height:40px;
+ border-radius:11px;padding:9px 14px;font-size:12px;font-weight:800;white-space:nowrap;text-decoration:none
+}
+body[data-page="pacientes"] .px-patient-header>small{grid-column:2!important}
+body[data-page="pacientes"] .px-patient-table th{background:#e6f2fb!important;color:#46667e!important;border-color:#d4e5f3!important}
+body[data-page="pacientes"] .px-patient-table tbody tr:nth-child(even){background:#f7fbff!important}
+body[data-page="pacientes"] .px-patient-table tbody tr:hover{background:#eaf5fc!important}
+body[data-page="pacientes"] .px-patient-table td{border-color:#dfeaf3!important}
+body[data-page="pacientes"] .px-patients-header .px-primary,
+body[data-page="pacientes"] button.px-primary,
+body[data-page="pacientes"] .px-drawer .px-primary,
+body[data-page="pacientes"] .px-patient-buttons .px-history-button{
+ color:#294e68!important;background:#c9e5f8!important;border:1px solid #a9d3ef!important;
+ box-shadow:none!important
+}
+body[data-page="pacientes"] button.px-primary:hover,
+body[data-page="pacientes"] .px-patient-buttons .px-history-button:hover{background:#b3dbf5!important}
+body[data-page="pacientes"] .px-name-line .px-prescription-button{
+ background:#f1e8f8!important;color:#705089!important;border:1px solid #dac6e8!important
+}
+body[data-page="pacientes"] .px-drawer .px-mini-table .head{background:#e7f2fb!important;color:#47677e!important}
+body[data-page="pacientes"] .px-drawer .px-empty-illustration{background:#e8f5fc!important;color:#5688a7!important}
+@media(max-width:760px){
+ /* Drawer independiente del encabezado para quedar delante del velo y no detrás de él. */
+ body.samantha-app-page #appSidebar.app-nav{
+  position:fixed!important;inset:0 auto 0 0!important;top:0!important;bottom:0!important;
+  z-index:1000!important;width:min(84vw,330px)!important;max-width:calc(100vw - 42px)!important;
+  height:100dvh!important;max-height:none!important;
+  padding:0!important;margin:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain;
+  display:flex!important;flex-direction:column!important;gap:0!important;
+  background:#fffafd!important;border:0!important;border-right:1px solid #e3d5ed!important;
+  border-radius:0!important;box-shadow:18px 0 45px #34203d35!important;
+  transform:translateX(-105%)!important;transition:transform .23s ease!important
+ }
+ body.samantha-app-page.nav-open #appSidebar.app-nav{transform:translateX(0)!important}
+ body.samantha-app-page .ssl-mobile-drawer-brand{
+  position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:10px;flex:none;
+  padding:19px 12px 17px!important;min-height:100px;border-bottom:1px solid #e9deef;background:#f4ebf8
+ }
+ body.samantha-app-page .ssl-mobile-drawer-brand img{display:block;width:51px;height:51px;flex:none}
+ body.samantha-app-page .ssl-mobile-drawer-brand>div{display:grid;gap:5px;min-width:0}
+ body.samantha-app-page .ssl-mobile-drawer-brand strong{
+  font:400 18px/1.1 Georgia,serif;color:#695080;white-space:normal
+ }
+ body.samantha-app-page .ssl-mobile-drawer-brand small{font-size:9px;letter-spacing:.12em;color:#9a80ab}
+ body.samantha-app-page .ssl-mobile-drawer-brand button{
+  margin-left:auto;align-self:flex-start;flex:none;width:33px;height:33px;display:grid;place-items:center;
+  border:1px solid #d9c5e5;border-radius:10px;background:#fff;color:#75558e;font-size:23px
+ }
+ body.samantha-app-page #appSidebar.app-nav>a,
+ body.samantha-app-page #appSidebar.app-nav>.nav-group{
+  flex:none!important;width:calc(100% - 22px)!important;margin:2px 11px!important
+ }
+ body.samantha-app-page #appSidebar.app-nav>a{
+  min-height:44px!important;padding:10px 13px!important;color:#65516f!important;
+  font-size:13px!important;border-radius:11px!important
+ }
+ body.samantha-app-page #appSidebar.app-nav>a.active{
+  background:#eadcf3!important;color:#694c82!important;box-shadow:inset 3px 0 #9c7aaf!important
+ }
+ body.samantha-app-page #appSidebar.app-nav>.nav-group .nav-group-trigger{
+  min-height:44px!important;padding:9px 13px!important;color:#65516f!important;font-size:13px!important
+ }
+ body.samantha-app-page #appSidebar.app-nav>.nav-group .nav-group-menu{
+  max-height:34dvh;overflow-y:auto!important;margin:0 0 5px 10px!important
+ }
+ body.samantha-app-page #appSidebar.app-nav>.nav-group .nav-group-menu a{
+  min-height:39px!important;padding:8px 11px!important;color:#775f87!important;font-size:12px!important
+ }
+ body.samantha-app-page .ssl-mobile-drawer-bottom{
+  position:sticky;bottom:0;z-index:1;display:grid;gap:10px;flex:none;margin-top:auto;padding:13px 14px calc(18px + env(safe-area-inset-bottom));
+  background:#fffafd;border-top:1px solid #e9dff0
+ }
+ body.samantha-app-page .ssl-mobile-drawer-account{display:flex;align-items:center;gap:10px;color:#6a517c}
+ body.samantha-app-page .ssl-mobile-drawer-account>span{
+  display:grid;place-items:center;width:36px;height:36px;border-radius:50%;
+  background:#edddea;color:#695083;font-weight:800;font-size:12px
+ }
+ body.samantha-app-page .ssl-mobile-drawer-account>div{display:grid;gap:3px}
+ body.samantha-app-page .ssl-mobile-drawer-account strong{font-size:12px}
+ body.samantha-app-page .ssl-mobile-drawer-account small{font-size:10px;color:#9b8ca7}
+ body.samantha-app-page .ssl-mobile-drawer-bottom>a{
+  display:flex;justify-content:center;align-items:center;min-height:43px;border-radius:12px;
+  border:1px solid #d7c4e5;text-decoration:none;background:#f5eef9;color:#72538a;
+  font-size:12px;font-weight:800
+ }
+ body.samantha-app-page.nav-open #sidebarScrim.sidebar-scrim{
+  display:block!important;position:fixed!important;inset:0!important;z-index:900!important;
+  background:rgba(36,26,43,.4)!important;backdrop-filter:blur(2px)
+ }
+ body.samantha-app-page .dc-header{z-index:50!important}
+ body[data-page="pacientes"] .px-patient-header{grid-template-columns:72px minmax(0,1fr)!important;padding:52px 17px 20px!important}
+ body[data-page="pacientes"] .px-patient-header::before{left:105px!important;top:24px!important}
+ body[data-page="pacientes"] .px-patient-header .px-avatar-edit{width:72px;height:72px}
+ body[data-page="pacientes"] .px-name-line{gap:8px!important}
+ body[data-page="pacientes"] .px-patient-buttons{gap:8px}
+ body[data-page="pacientes"] .px-patient-buttons :is(.px-history-button,.px-prescription-button){
+  min-height:40px;flex:1 1 130px!important;font-size:11px!important;padding:8px!important;white-space:normal
+ }
+ body[data-page="pacientes"] .px-patient-header>small{grid-column:1/-1!important}
+}
+@media(prefers-reduced-motion:reduce){
+ body.samantha-app-page #appSidebar.app-nav{transition:none!important}
+}
+
+/* Recetas PDF: selección de paciente y acceso al editor privado existente. */
+body[data-page="recetas"] .ssl-recipes-page{max-width:1060px;margin:0 auto;display:grid;gap:20px}
+body[data-page="recetas"] .ssl-recipes-intro{padding:28px clamp(20px,3vw,40px);border:1px solid #e3d6eb;border-radius:22px;
+ background:linear-gradient(115deg,#eee4f5 0%,#f8f1fa 70%,#fff6f7)}
+body[data-page="recetas"] .ssl-recipes-intro h1{margin:4px 0 12px;color:#70548b;font:400 clamp(28px,3.4vw,43px) Georgia,serif}
+body[data-page="recetas"] .ssl-recipes-intro>p:last-child{font-size:13px;color:#83718d;line-height:1.7}
+body[data-page="recetas"] .ssl-recipes-card{padding:clamp(18px,3vw,30px);border:1px solid #e6daee;border-radius:20px;background:#fff}
+body[data-page="recetas"] .ssl-recipes-card>label{display:block;color:#705782;font-size:13px;font-weight:750;margin-bottom:12px}
+body[data-page="recetas"] .ssl-recipes-search{display:flex;gap:10px;margin-bottom:18px}
+body[data-page="recetas"] .ssl-recipes-search input{min-width:0;flex:1;min-height:44px;border:1px solid #d9c9e6;padding:10px 14px;border-radius:10px;color:#614f72}
+body[data-page="recetas"] .ssl-recipes-search button{border:1px solid #a8d1ef;background:#cbe6f8;color:#31576f;font-weight:800;padding:10px 19px;border-radius:11px;cursor:pointer}
+body[data-page="recetas"] .ssl-recipes-patient{display:flex;align-items:center;justify-content:space-between;gap:13px;border-bottom:1px solid #ede5f0;padding:15px 4px}
+body[data-page="recetas"] .ssl-recipes-patient>span{display:grid;gap:5px;min-width:0}
+body[data-page="recetas"] .ssl-recipes-patient strong{color:#675078;font-size:13px}
+body[data-page="recetas"] .ssl-recipes-patient small{color:#9685a0;font-size:11px}
+body[data-page="recetas"] .ssl-recipes-patient a{display:inline-flex;text-decoration:none;padding:10px 13px;border-radius:10px;background:#f0e6f7;color:#6c5083;font-size:12px;font-weight:750}
+body[data-page="recetas"] .ssl-recipes-disclaimer{font-size:12px;color:#867b8b;line-height:1.6}
+@media(max-width:760px){
+ body[data-page="recetas"] .ssl-recipes-patient{align-items:stretch;flex-direction:column}
+ body[data-page="recetas"] .ssl-recipes-patient a{justify-content:center}
+ body[data-page="recetas"] .ssl-recipes-search{flex-direction:column}
+}

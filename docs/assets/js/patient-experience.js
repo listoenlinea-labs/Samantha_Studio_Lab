@@ -309,8 +309,10 @@
         <div>
           <div class="px-name-line">
             <h2>${escapeHtml(patient.nombreCompleto)}</h2>
-            <a class="px-history-button" href="historial-paciente.html?id=${patient.idPaciente}" target="_blank" rel="noopener">Abrir historial ↗</a>
-            <a class="px-prescription-button" href="historial-paciente.html?id=${patient.idPaciente}&view=prescriptions" target="_blank" rel="noopener">Crear receta PDF ↗</a>
+            <div class="px-patient-buttons">
+              <a class="px-history-button" href="historial-paciente.html?id=${patient.idPaciente}" target="_blank" rel="noopener">Abrir historial ↗</a>
+              <a class="px-prescription-button" href="historial-paciente.html?id=${patient.idPaciente}&view=prescriptions" target="_blank" rel="noopener">Crear receta PDF ↗</a>
+            </div>
           </div>
           <p>${patient.edad ?? 'Edad no registrada'} años <i></i> ☎ ${escapeHtml(patient.telefono || 'Sin teléfono')}</p>
           <div>${renderTags(patient.etiquetas)}</div>
