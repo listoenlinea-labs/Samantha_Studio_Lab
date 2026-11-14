@@ -1111,8 +1111,20 @@
       return acc;
     }, {});
     shell(
-      hero('Mayor oportunidad operativa', 'Inventario descontado desde cada procedimiento.', 'Cada material conserva unidad, mínimo, óptimo, proveedor y punto de reposición. El 25% es el valor inicial y puede ajustarse por insumo.', `${button('Registrar conteo semanal', 'primary', 'data-toast="Conteo semanal guardado localmente en modo demostración."')}${button('Generar orden de compra', 'secondary', 'data-toast="Orden preparada con insumos críticos y bajos."')}`) +
-      `<section class="grid kpis">${kpi('Insumos importados', number.format(seed.inventory?.length || 0), '6 categorías del Excel', 'var(--lilac-200)')}${kpi('Compra inmediata', counts.danger || 0, 'Cantidad en cero o marcada comprar', 'var(--peach-200)')}${kpi('Nivel bajo', counts.warning || 0, 'En o debajo del mínimo', 'var(--gold-400)')}${kpi('Unidad por validar', counts.info || 0, 'Texto como ¼ o mezcla de piezas', 'var(--sage-500)')}</section>
+      `<div class="ssl-inventory-home">
+      <section class="ssl-home-hero" aria-label="Resumen del inventario"><div class="ssl-home-hero-copy">
+        <p class="ssl-home-eyebrow">CONTROL DE INSUMOS</p>
+        <h1>Todo listo para cada <em>sonrisa.</em></h1>
+        <p>Materiales, existencias y reposición organizados en un solo lugar.</p>
+        <div class="ssl-inventory-actions">${button('Registrar conteo semanal', 'primary', 'data-toast="Conteo semanal guardado localmente en modo demostración."')}${button('Generar orden de compra', 'secondary', 'data-toast="Orden preparada con insumos críticos y bajos."')}</div>
+      </div><img class="ssl-home-hero-art" src="assets/img/logo-ssl.svg" alt="" loading="lazy"></section>
+      <section class="ssl-home-overview"><p class="ssl-home-eyebrow">RESUMEN DEL INVENTARIO</p><h2 class="ssl-inventory-heading">Tus insumos de un vistazo</h2>
+      <div class="ssl-home-kpis">
+        <article class="ssl-home-kpi sky"><span class="ssl-home-kpi-label">Insumos importados</span><strong class="ssl-home-kpi-value">${number.format(seed.inventory?.length || 0)}</strong></article>
+        <article class="ssl-home-kpi mint"><span class="ssl-home-kpi-label">Compra inmediata</span><strong class="ssl-home-kpi-value">${number.format(counts.danger || 0)}</strong></article>
+        <article class="ssl-home-kpi peach"><span class="ssl-home-kpi-label">Nivel bajo</span><strong class="ssl-home-kpi-value">${number.format(counts.warning || 0)}</strong></article>
+        <article class="ssl-home-kpi orchid"><span class="ssl-home-kpi-label">Unidad por validar</span><strong class="ssl-home-kpi-value">${number.format(counts.info || 0)}</strong></article>
+      </div></section></div>
       <div class="callout" style="margin-bottom:16px"><strong>Automatización propuesta:</strong> al cerrar un procedimiento, el sistema descuenta la receta de materiales (por pieza, cartucho, caja, frasco o fracción). El conteo físico semanal corrige diferencias. Si el remanente llega al mínimo configurado o al 25% del óptimo, genera alerta y borrador de compra.</div>
       <article class="card"><div class="card-head"><div><h2>Inventario maestro</h2><p>Importado de la pestaña “Inventario”; los valores ambiguos se conservan para revisión humana.</p></div></div><div class="toolbar"><input class="input search" id="inventorySearch" placeholder="Producto, categoría o proveedor"><select class="select" id="inventoryFilter" style="width:auto"><option value="">Todos los estados</option><option value="danger">Comprar</option><option value="warning">Bajo</option><option value="info">Revisar unidad</option><option value="success">OK</option></select></div><div class="table-wrap" style="max-height:680px"><table><thead><tr><th>Producto</th><th>Actual</th><th>Mínimo</th><th>Óptimo</th><th>Proveedor</th><th>Costo</th><th>Estado</th><th></th></tr></thead><tbody id="inventoryTable">${rows}</tbody></table></div></article>`
     );
