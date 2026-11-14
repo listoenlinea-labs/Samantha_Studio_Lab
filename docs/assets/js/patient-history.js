@@ -153,14 +153,35 @@
     const patient = state.patient;
     const tags = patient.etiquetas?.length ? patient.etiquetas.map((tag) => tag.nombre).join(', ') : 'Paciente activo';
     app.innerHTML = `
-      <header class="ph-header"><a href="pacientes.html" class="ph-brand"><img src="assets/img/logo-ssl.svg" alt=""><strong>samantha's studio lab</strong></a><nav><a href="agenda.html">Agenda</a><a class="active" href="pacientes.html">Pacientes</a><a href="finanzas.html">Finanzas</a><a href="inventario.html">Inventario</a></nav><div><button type="button" id="globalSearchToggle" aria-label="Buscar en la aplicación" aria-haspopup="dialog" aria-expanded="false" aria-controls="globalSearchPanel">⌕ Buscar</button><button data-notify="Nueva cita preparada">＋ Crear</button><span>Administrador</span></div></header>
+      <header class="ph-header">
+        <button type="button" id="phSidebarToggle" class="ph-menu-toggle" aria-controls="phClinicalSidebar" aria-expanded="true" aria-label="Mostrar u ocultar menú del expediente">‹</button>
+        <a href="pacientes.html" class="ph-brand"><img src="assets/img/logo-ssl.svg" alt=""><span><strong>samantha's studio lab</strong><small>CONSULTORIO DENTAL</small></span></a>
+        <div class="ph-top-actions"><button type="button" id="globalSearchToggle" class="ph-menu-toggle" aria-label="Buscar" aria-haspopup="dialog" aria-expanded="false" aria-controls="globalSearchPanel">⌕</button><a class="ph-return" href="pacientes.html">← Volver a pacientes</a></div>
+      </header>
       <main class="ph-layout">
-        <aside class="ph-sidebar"><section class="ph-profile"><div class="ph-profile-cover"></div>${avatar(patient)}<h1>${escapeHtml(patient.nombreCompleto)}</h1><p>${patient.edad ?? 'Edad no registrada'}${patient.edad !== null ? ' años' : ''}</p><small>Creado el ${formatDate(patient.creadoAt)}</small><div class="ph-contact"><a href="${patient.telefono ? `tel:${escapeHtml(patient.telefono)}` : '#'}">☎</a><a href="${patient.correo ? `mailto:${escapeHtml(patient.correo)}` : '#'}">✉</a><button id="phMoreButton">⋮</button></div><div class="ph-more-menu" id="phMoreMenu" hidden><a href="pacientes.html">Editar datos y foto</a><button data-notify="La descarga del expediente se habilitará en Archivos">Descargar expediente</button></div></section>
-          <nav class="ph-record-nav">${navigation.map(([id,label]) => `<button class="${id === 'odontogram' ? 'active' : ''}" data-record-view="${id}"><i>${icons[id]}</i>${label}</button>`).join('')}</nav></aside>
-        <section class="ph-workspace"><div class="ph-info-strip"><article><b>▮ Etiquetas</b><button data-summary-edit="tags">＋ Editar</button><span>${escapeHtml(tags)}</span></article><article><b>▰ Nota general</b><button data-summary-edit="note">Editar</button><span>${escapeHtml(patient.notaGeneral || 'Sin notas')}</span></article><article><b>● Alergias</b><button data-summary-edit="allergies">Editar</button><span>${escapeHtml(patient.alergias || 'Sin alergias registradas')}</span></article></div><div id="phView"></div></section>
+        <aside class="ph-sidebar" id="phClinicalSidebar"><section class="ph-profile"><div class="ph-profile-cover"></div>${avatar(patient)}<h1>${escapeHtml(patient.nombreCompleto)}</h1><p>${patient.edad ?? 'Edad no registrada'}${patient.edad !== null ? ' años' : ''}</p><small>Creado el ${formatDate(patient.creadoAt)}</small><div class="ph-contact"><a href="${patient.telefono ? `tel:${escapeHtml(patient.telefono)}` : '#'}">☎</a><a href="${patient.correo ? `mailto:${escapeHtml(patient.correo)}` : '#'}">✉</a><button id="phMoreButton">⋮</button></div><div class="ph-more-menu" id="phMoreMenu" hidden><a href="pacientes.html">Editar datos y foto</a><button data-notify="La descarga del expediente se habilitará en Archivos">Descargar expediente</button></div></section>
+          <nav class="ph-record-nav">${navigation.map(([id,label]) => `<button class="${id === 'filiation' ? 'active' : ''}" data-record-view="${id}"><i>${icons[id]}</i>${label}</button>`).join('')}</nav></aside>
+        <section class="ph-workspace"><div class="ph-clinical-heading"><span class="ph-eyebrow">HISTORIA CLÍNICA DIGITAL</span><h2 id="phViewTitle">Filiación</h2><p id="phViewSubtitle">Datos personales y medios de contacto del paciente.</p></div><div class="ph-info-strip"><article><b>▮ Etiquetas</b><button data-summary-edit="tags">＋ Editar</button><span>${escapeHtml(tags)}</span></article><article><b>▰ Nota general</b><button data-summary-edit="note">Editar</button><span>${escapeHtml(patient.notaGeneral || 'Sin notas')}</span></article><article><b>● Alergias</b><button data-summary-edit="allergies">Editar</button><span>${escapeHtml(patient.alergias || 'Sin alergias registradas')}</span></article></div><div id="phView"></div></section>
         <aside class="ph-clinical-rail"><section><h3>Expediente</h3><div class="ph-illustration">◔</div><strong>${escapeHtml(patient.numeroExpediente || '—')}</strong></section><section><div class="ph-rail-title"><h3>Notas de evolución</h3></div><div class="ph-illustration note">▤</div><button data-record-view-shortcut="history">＋ Registrar evolución</button></section></aside>
-      </main><div class="ph-modal-backdrop" id="phModal" hidden></div><div class="ph-toast" id="phToast" role="status"></div>`;
+      </main><div class="ph-sidebar-backdrop" id="phSidebarBackdrop" hidden></div><div class="ph-modal-backdrop" id="phModal" hidden></div><div class="ph-toast" id="phToast" role="status"></div>`;
     document.querySelector('.ph-record-nav').addEventListener('click', onNavigation);
+    const menu = document.getElementById('phSidebarToggle');
+    const backdrop = document.getElementById('phSidebarBackdrop');
+    const mobile = window.matchMedia('(max-width:760px)');
+    function syncSidebar(){
+      const expanded=mobile.matches?document.body.classList.contains('ph-sidebar-open'):!document.body.classList.contains('ph-sidebar-collapsed');
+      menu.setAttribute('aria-expanded',String(expanded));
+      menu.textContent=expanded?'‹':'›';
+      backdrop.hidden=!mobile.matches||!expanded;
+    }
+    menu.onclick=()=>{
+      if(mobile.matches)document.body.classList.toggle('ph-sidebar-open');
+      else document.body.classList.toggle('ph-sidebar-collapsed');
+      syncSidebar();
+    };
+    backdrop.onclick=()=>{document.body.classList.remove('ph-sidebar-open');syncSidebar();};
+    mobile.addEventListener('change',()=>{document.body.classList.remove('ph-sidebar-open');syncSidebar();});
+    syncSidebar();
     document.getElementById('phMoreButton').addEventListener('click', () => {
       const menu = document.getElementById('phMoreMenu'); menu.hidden = !menu.hidden;
     });
@@ -227,6 +248,24 @@
   }
 
   function activateView(id) {
+    const meta={
+      filiation:['Filiación','Datos personales y de contacto del paciente.'],
+      history:['Historia clínica','Antecedentes médicos y odontológicos del paciente.'],
+      odontogram:['Odontograma','Piezas dentales FDI y hallazgos por etapa clínica.'],
+      perio:['Periodontograma','Profundidades y sangrado por sitio dental.'],
+      prescriptions:['Prescripciones','Redacta, guarda y genera recetas PDF.'],
+      files:['Archivos PDF','Documentos privados del paciente.'],
+      ortho:['Ortodoncia','Diagnósticos, análisis y controles.'],
+      account:['Estado de cuenta','Cargos, abonos y planes de pago.']
+    }[id]||['Expediente clínico','Información del paciente'];
+    const title=document.getElementById('phViewTitle'),subtitle=document.getElementById('phViewSubtitle');
+    if(title)title.textContent=meta[0];
+    if(subtitle)subtitle.textContent=meta[1];
+    document.body.classList.remove('ph-sidebar-open');
+    const overlay=document.getElementById('phSidebarBackdrop');
+    if(overlay)overlay.hidden=true;
+    const toggle=document.getElementById('phSidebarToggle');
+    if(toggle)toggle.setAttribute('aria-expanded',String(!window.matchMedia('(max-width:760px)').matches));
     document.querySelectorAll('[data-record-view]').forEach((button) => button.classList.toggle('active', button.dataset.recordView === id));
     if (id === 'filiation') return renderFiliation();
     if (id === 'history') return renderHistory();
@@ -668,7 +707,7 @@
       state.findingCatalog = catalog.items || [];
       shell();
       window.dispatchEvent(new Event('ssl:ready'));
-      await loadOdontograms();
+      await renderFiliation();
     } catch (error) {
       app.innerHTML = `<main class="ph-fatal"><h1>No se pudo abrir el expediente</h1><p>${escapeHtml(error.message)}</p><a href="pacientes.html">Volver a pacientes</a></main>`;
     }
