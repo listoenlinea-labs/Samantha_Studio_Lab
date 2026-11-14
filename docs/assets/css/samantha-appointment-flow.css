@@ -1,0 +1,23 @@
+/* Agenda real: búsqueda por paciente y alta rápida, lavanda pastel. */
+.ssl-appointment-patient{position:relative}
+.ssl-appointment-hint{font-size:12px;color:#806d95;margin:5px 0 0}
+.ssl-appointment-matches{display:grid;gap:6px;max-height:214px;overflow-y:auto;background:#fbf8fe;border:1px solid #e5d8ed;border-radius:12px;padding:9px;color:#786a88;font-size:12px}
+.ssl-appointment-match,.ssl-appointment-new{min-height:45px;text-align:left;padding:9px 12px;border-radius:9px;background:white;border:1px solid #e4d9ea;color:#604d75;cursor:pointer;display:grid;gap:2px}
+.ssl-appointment-match:hover,.ssl-appointment-match:focus-visible{background:#efe5f6;border-color:#bdabd0}
+.ssl-appointment-match strong{font-size:13px}
+.ssl-appointment-match small{font-size:11px;color:#9a89a7}
+.ssl-appointment-new{background:#f1e9f8;color:#72588e;font-weight:700;border-color:#dbc9e7;align-items:center}
+.ssl-appointment-new-fields{border:1px solid #dcd0e6;border-radius:15px;padding:14px;background:linear-gradient(145deg,#fbf8fe,#f4f8fd);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ssl-appointment-new-fields[hidden]{display:none!important}
+.ssl-appointment-new-fields strong{grid-column:1/-1;font-size:14px;color:#73598c}
+.ssl-appointment-new-fields label{font-size:12px;align-self:end}
+.ssl-appointment-new-fields input{min-width:0;width:100%;box-sizing:border-box}
+.ssl-appointment-no-matches{margin:5px 0;color:#856e98;font-size:12px}
+.ssl-appointment-error{padding:12px;border:1px solid #e8bec7;border-radius:10px;background:#fff5f6;color:#984357;font-size:12px;line-height:1.5}
+.ssl-appointment-error[hidden]{display:none!important}
+#demoForm[data-flow="appointment"] button[type="submit"]:disabled{opacity:.66;cursor:wait}
+@media(max-width:720px){
+ .ssl-appointment-new-fields{grid-template-columns:1fr}
+ #modal:has(#demoForm[data-flow="appointment"]){max-width:calc(100vw - 24px)}
+ .ssl-appointment-matches{max-height:190px}
+}
