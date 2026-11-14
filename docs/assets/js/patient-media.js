@@ -6,7 +6,21 @@
  const $=id=>document.getElementById(id);
  const escape=x=>String(x==null?'':x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const bytes=x=>(Number(x||0)/1024/1024).toFixed(1)+' MB';
- const category=()=>current?.mode==='radiographs'?'RADIOGRAFIA':'PDF';
+ const category=()=>current?.mode==='radiographs'?'RADIOGRAFIA':current?.mode==='media'?'':'PDF';
+ const uploadCategory=file=>current?.mode==='media'&&/\.pdf$/i.test(file?.name||'')?'PDF':category()||'RADIOGRAFIA';
+ const classify=item=>{
+  const mime=String(item.tipoMime||'').toLowerCase(),name=String(item.nombre||'').toLowerCase();
+  if(mime==='application/pdf'||/\.pdf$/.test(name))return 'pdf';
+  if(mime.startsWith('video/')||/\.(mp4|webm)$/.test(name))return 'video';
+  if(mime.startsWith('audio/')||/\.(mp3|wav|ogg)$/.test(name))return 'audio';
+  if(mime.startsWith('image/')||/\.(jpg|jpeg|png|webp|gif|tiff|tif|bmp)$/.test(name))return 'image';
+  if(mime==='model/stl'||mime==='model/obj'||mime==='model/ply'||/\.(stl|obj|ply)$/.test(name))return '3d';
+  if(mime==='application/dicom'||/\.(dcm|dicom|ima)$/.test(name))return 'dicom';
+  if(mime==='application/zip'||/\.zip$/.test(name))return 'cbct';
+  return 'other';
+ };
+ const kinds={pdf:'PDF',image:'Fotografía / RX',video:'Video',audio:'Audio', '3d':'Modelo 3D',dicom:'DICOM',cbct:'Tomografía ZIP',other:'Archivo'};
+ const supportedPreview=item=>!(/\.(tif|tiff|bmp)$/.test(String(item.nombre||'').toLowerCase()));
  const apiUrl=()=>current.apiBase.replace(/\/$/,'')+'/pacientes/'+current.patientId+'/archivos';
  function message(s,err=false){
   const el=$('sslMediaMessage');if(el){el.textContent=s;el.classList.toggle('error',err);el.hidden=false}
@@ -34,11 +48,11 @@
   let res;
   try{res=await fetch(apiUrl()+'/'+fileId,{credentials:'same-origin',cache:'no-store'})}
   catch(_){throw errors.networkError()}
-  return errors.expectBlob(res,['application/pdf','application/dicom','application/zip','model/stl','application/octet-stream','image/*']);
+  return errors.expectBlob(res,['application/pdf','application/dicom','application/zip','model/stl','model/obj','model/ply','video/*','audio/*','application/octet-stream','image/*']);
  }
  async function uploadFile(file,description,cat,progress){
   const errors=window.SamanthaRequestErrors;
-  const limit=/\.(stl|dcm|dicom|ima|zip)$/i.test(file.name)?14:5;
+  const limit=/\.(stl|obj|ply|dcm|dicom|ima|zip|mp4|webm|mp3|wav|ogg)$/i.test(file.name)?14:5;
   if(file.size>limit*1024*1024)
    throw Error('El archivo pesa '+bytes(file.size)+'; el máximo de almacenamiento para este formato es '+limit+' MB.');
   const query=new URLSearchParams({categoria:cat,nombre:file.name,descripcion:description||''});
@@ -60,13 +74,18 @@
    ?window.YerenaRadiographControls.toolbarMarkup():'';
  }
  function formHtml(mode){
-  const radio=mode==='radiographs';
-  const inputAccept=radio?'.dcm,.dicom,.ima,.stl,.pdf,.jpg,.jpeg,.png,.webp,.tif,.tiff,.bmp,application/dicom,model/stl':'application/pdf,.pdf';
-  return '<section class="ssl-media-card"><h3>'+(radio?'Agregar radiografía 2D o modelo STL':'Agregar documento PDF')+'</h3>'+
+  const radio=mode==='radiographs',all=mode==='media',isMedia=radio||all;
+  const inputAccept=all?'.pdf,.jpg,.jpeg,.png,.webp,.gif,.tif,.tiff,.bmp,.mp4,.webm,.mp3,.wav,.ogg,.dcm,.dicom,.ima,.stl,.obj,.ply,.zip':
+   radio?'.dcm,.dicom,.ima,.stl,.pdf,.jpg,.jpeg,.png,.webp,.tif,.tiff,.bmp,application/dicom,model/stl':'application/pdf,.pdf';
+  return '<section class="ssl-media-card"><h3>'+(all?'Agregar estudio o documento':radio?'Agregar radiografía 2D o modelo STL':'Agregar documento PDF')+'</h3>'+
   '<form id="sslMediaUpload" class="ssl-media-form"><label>Seleccionar archivo<input id="sslMediaFile" type="file" accept="'+inputAccept+'" required></label>'+
   '<label>Descripción (opcional)<input id="sslMediaDescription" maxlength="500" placeholder="Tipo de estudio, fecha o anotación"></label>'+
+  (all?'<button type="button" id="sslLocalPreview" class="ssl-media-secondary">Vista previa local, sin guardar</button>':'')+
   '<button class="ssl-media-primary" type="submit">Guardar en expediente</button></form>'+
-  '<p class="ssl-media-note">Guardado privado en MySQL · PDF e imágenes hasta 5 MB'+(radio?'; DICOM y STL hasta 14 MB.':' · Solo PDF.')+'</p></section>';
+  '<p class="ssl-media-note">Guardado privado en MySQL · PDF e imágenes hasta 5 MB'+
+   (isMedia?'; DICOM, ZIP, modelos 3D, video y audio hasta 14 MB por archivo. Los archivos grandes pueden previsualizarse localmente sin subirlos.':
+     ' · Solo PDF.')+'</p>'+
+  (all?'<p class="ssl-media-note">Reproducción de MP4/WebM y MP3/WAV/OGG sujeta al códec del navegador. TIFF/BMP: descarga original.</p>':'')+'</section>';
  }
  function cbctHtml(){
   return '<section class="ssl-media-card ssl-media-cbct" id="sslCbctPanel"><h3>Tomografías CBCT y modelos STL 3D</h3>'+
@@ -80,15 +99,28 @@
    '<p class="ssl-media-note">Visualización local: ZIP DICOM hasta 256 MB, STL hasta 40 MB. Para guardar un ZIP, STL o DICOM en MySQL: máximo 14 MB por archivo. Visor exploratorio, no diagnóstico.</p></section>';
  }
  function mainHtml(mode){
-  const radio=mode==='radiographs';
+  const radio=mode==='radiographs'||mode==='media',all=mode==='media';
+  const filters=all?'<section class="ssl-media-library-tools" aria-label="Buscar y filtrar estudios">'+
+   '<label>Buscar en el expediente<input id="sslMediaSearch" type="search" autocomplete="off" placeholder="Nombre, descripción o tipo de estudio"></label>'+
+   '<label>Tipo<select id="sslMediaKind"><option value="">Todos los formatos</option>'+
+   '<option value="pdf">PDF</option><option value="image">Fotografías / RX</option>'+
+   '<option value="video">Videos</option><option value="audio">Audio</option>'+
+   '<option value="3d">Modelos 3D</option><option value="dicom">DICOM</option>'+
+   '<option value="cbct">Tomografías ZIP</option></select></label>'+
+   '<span id="sslMediaCount" aria-live="polite"></span></section>':'';
   return '<div class="ssl-media-root"><div id="sslMediaMessage" role="status" class="ssl-media-message" hidden></div>'+
+   (all?'<div class="ssl-media-intro"><span>BIBLIOTECA MULTIMEDIA CLÍNICA</span><h3>Todos los estudios, una sola vista.</h3>'+
+      '<p>Filtra archivos privados, visualiza documentos y videos, explora modelos 3D y compara fotografías sin abandonar el expediente.</p></div>':'')+
    '<div class="ssl-media-columns">'+formHtml(mode)+
-   '<section class="ssl-media-card"><h3>'+(radio?'Radiografías y tomografías del paciente':'Archivos PDF del paciente')+
-   '</h3><div id="sslMediaList" aria-live="polite">Cargando archivos…</div></section></div>'+
+   '<section class="ssl-media-card"><h3>'+(all?'Estudios del paciente':radio?'Radiografías y tomografías del paciente':'Archivos PDF del paciente')+
+   '</h3>'+filters+'<div id="sslMediaList" aria-live="polite">Cargando archivos…</div>'+
+   (all?'<div id="sslMediaCompareBar" class="ssl-media-compare-bar" hidden><span id="sslMediaCompareCount">Selecciona dos fotografías</span>'+
+      '<button type="button" id="sslMediaCompareStart" class="ssl-media-secondary" disabled>Comparar fotografías</button>'+
+      '<button type="button" id="sslMediaCompareClear">Limpiar</button></div>':'')+'</section></div>'+
    (radio?cbctHtml():'')+
-   '<section class="ssl-media-card ssl-media-viewer-card"><h3>'+(radio?'Visor de radiografías y tomografías':'Vista previa del documento')+
+   '<section class="ssl-media-card ssl-media-viewer-card"><h3>'+(all?'Visor multimedia clínico':radio?'Visor de radiografías y tomografías':'Vista previa del documento')+
    '</h3><div id="sslMediaViewer" class="ssl-media-viewer"><div class="ssl-media-placeholder">Selecciona un archivo guardado para consultarlo.</div></div>'+
-   (radio?'<p class="ssl-media-note">Visor para consulta y orientación, no certificado para diagnóstico. No convierte radiografías 2D en tomografías 3D. Los códecs DICOM no compatibles requieren PACS.</p>':'')+'</section></div>';
+   (radio?'<p class="ssl-media-note">Visor orientativo, no certificado para diagnóstico. STL/OBJ/PLY son superficies 3D, no tomografías de volumen. DICOM con códecs no compatibles requiere PACS profesional.</p>':'')+'</section></div>';
  }
  function listRows(items,cat){
   if(!items.length)return '<p class="ssl-media-empty">Todavía no hay archivos en este apartado.</p>';
