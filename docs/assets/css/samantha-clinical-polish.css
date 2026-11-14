@@ -110,8 +110,10 @@ body.samantha-app-page:has(.px-drawer.open) .sidebar-collapse-toggle{visibility:
 .ph-odontogram .ph-tooth svg path:not(.crown){fill:#f4e9d6;stroke:#e1d3bf;stroke-width:1.25}
 .ph-odontogram .ph-tooth svg .root-groove{fill:none!important;stroke:#e6dac6!important}
 .ph-odontogram .ph-tooth svg .crown{fill:white;stroke:#d5dfe2;stroke-width:1.65}
-.ph-odontogram .ph-tooth.bad svg .crown{fill:#fde8ec;stroke:#e36c84}
-.ph-odontogram .ph-tooth.good svg .crown{fill:#e7f1ff;stroke:#5e9cc5}
+/* Como Yerena: dientes blancos neutros; el diagnóstico se expresa en los símbolos,
+   no coloreando toda la corona (evita confundir un hallazgo con el estado del diente). */
+.ph-odontogram .ph-tooth:is(.bad,.good) svg .crown{fill:#fff;stroke:#d5dfe2}
+.ph-odontogram .ph-dentition-block::after{display:none}
 .ph-odontogram .ph-tooth-markers{inset:9px 0!important;display:flex!important;flex-direction:column!important;
  align-items:center!important;justify-content:space-evenly!important;pointer-events:none}
 .ph-odontogram .ph-tooth-marker{position:static!important;display:flex!important;align-items:center!important;
