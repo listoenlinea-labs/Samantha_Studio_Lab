@@ -51,7 +51,7 @@
   }catch(_){throw errors.networkError()}
   const data=await errors.parseJson(res);
   if(!res.ok||data.ok!==true||!(res.headers.get('Content-Type')||'').toLowerCase().includes('application/json'))
-   throw errors.errorFrom(res,data,{mensaje:'No se recibió confirmación del almacenamiento. Comprueba el expediente antes de repetir la subida.'});
+   throw errors.errorFrom(res,data,'No se recibió confirmación del almacenamiento. Comprueba el expediente antes de repetir la subida.');
   progress?.();
   return data;
  }
