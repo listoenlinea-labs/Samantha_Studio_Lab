@@ -15,7 +15,7 @@
   // GitHub Pages no ejecuta Node.js. Utiliza una API externa explícita si el
   // frontend se hospeda allí; nunca interpreta /api de GitHub Pages como backend.
   const isGithubPages = location.hostname.endsWith('.github.io');
-  const explicitApi = window.SSL_API_BASE_URL || window.APP_CONFIG?.API_URL || '';
+  const explicitApi = window.SSL_API_BASE_URL || (window.APP_CONFIG?.IS_CONFIGURED ? window.APP_CONFIG.API_URL : '') || '';
   const clinicApi = String(explicitApi || (
     ['localhost','127.0.0.1'].includes(location.hostname)
       ? 'http://localhost:3000/api' : location.origin + '/api'
