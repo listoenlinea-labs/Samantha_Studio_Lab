@@ -1,0 +1,233 @@
+/* Samantha's Studio Lab — paleta lavanda tomada del logotipo aportado.
+   Hoja final de tema: conserva la estructura de las pantallas y las API existentes. */
+:root{
+ --brand-lavender:#dacce6;--brand-lilac-soft:#f2eaf7;--brand-lavender-ink:#68517d;
+ --brand-charcoal:#342b40;--brand-sage:#c6d8d2;--brand-peach:#f3c9a9;
+ --brand-peach-soft:#ffebdd;--brand-cream:#fff9f4;--brand-gold:#eddea9;
+ --lilac-900:#342b40;--lilac-700:#67517b;--lilac-500:#dacce6;--lilac-200:#eee3f4;--lilac-100:#faf6fc;
+ --sage-500:#badbd1;--sage-100:#eff8f4;--ink:#342b40;--muted:#7d7387;
+ --line:#e8deed;--canvas:#fcf9fd;--dc-navy:#342b40;--dc-navy-2:#59466d;
+ --dc-teal:#80649b;--dc-teal-dark:#705589;--dc-teal-soft:#f5eef9;
+ --dc-line:#e9ddef;--dc-canvas:#fcf9fd;--ssl-ink:#342b40;--ssl-muted:#7d7387;
+ --ssl-outline:#e8deed;--ph-navy:#342b40;--ph-navy-2:#59466d;
+ --ph-teal:#dacce6;--ph-teal-dark:#705589;--ph-canvas:#fcf9fd;
+ --ph-line:#e8deed;--ph-muted:#807489;
+}
+html{max-width:100%;overflow-x:clip}
+body:not(.login-page),.ph-body{color:#342b40;background:linear-gradient(125deg,#fffdfd,#faf6fc 60%,#f5eff9)}
+:where(button,input,select,textarea,a):focus-visible{outline:3px solid #b4a1c9!important;outline-offset:2px}
+:where(input,select,textarea){max-width:100%;min-width:0}
+:where(.card,.ph-card,.ph-profile,.ph-info-strip article){border-color:#e9dfef!important;box-shadow:0 12px 32px rgba(83,55,106,.06)}
+:where(.button.primary,.btn-primary,.ph-primary,.ph-save,.dc-create,.dc-header button.primary,.ph-header button.ph-primary){background:#705589!important;color:white!important;border-color:#705589!important}
+:where(.button.primary,.btn-primary,.ph-primary,.ph-save,.dc-create):hover{background:#5c4274!important}
+:where(.button.secondary,.button.soft,.btn-secondary){background:#f5eef9;color:#654d7b;border-color:#e3d6ee}
+:where(.button,.btn,.ph-primary,.ph-save){border-radius:11px}
+:where(.hero,.page-hero,.content>.hero){background:linear-gradient(110deg,#f5ecfa,#fffaf6)!important;color:#473552;border:1px solid #e8deed}
+:where(.hero h1,.page-identity strong,.card-head h2,.card-head h3){color:#473552}
+.dc-header{
+ min-height:72px;height:auto;
+ background:linear-gradient(105deg,#e1d4ec,#dacce6 58%,#e9deef)!important;
+ border-top:0!important;border-bottom:1px solid #cebcd9!important;
+ color:#483651!important;box-shadow:0 5px 18px rgba(86,63,104,.08)
+}
+.dc-header .brand,.dc-header .brand strong,.dc-header .app-nav a,.dc-header .nav-group-trigger,.dc-header .dc-profile-copy strong{color:#473552!important}
+.dc-header .app-nav a.active,.dc-header .nav-group.active .nav-group-trigger{color:#4e3269!important}
+.dc-header .app-nav a.active::after,.dc-header .nav-group.active .nav-group-trigger::after{background:#80649b!important}
+.dc-header :where(.dc-search,.dc-notification,.dc-create,.dc-menu-button){border-radius:11px}
+.dc-header .dc-search,.dc-header .dc-notification{color:#574169!important;background:rgba(255,255,255,.7)!important;border:1px solid #cdbbd8!important}
+.dc-header .brand img{filter:none!important}
+:where(.app-sidebar,.app-nav .nav-group-menu){scrollbar-color:#b9a6c9 transparent}
+:where(.status.info,.badge,.dc-month-chip){border-color:#e5d9ed}
+/* Expediente clínico: dos columnas como la vista de Yerena. */
+.ph-body{min-width:0!important;font-family:Inter,"Segoe UI",system-ui,sans-serif;overflow-x:clip}
+.ph-header{
+ position:sticky;top:0;z-index:60;
+ min-height:77px;height:auto;padding:10px clamp(14px,3vw,46px);
+ background:rgba(255,255,255,.97)!important;color:#514065!important;
+ border-bottom:1px solid #e7deed;box-shadow:0 3px 14px #5d49700e;
+ display:flex;align-items:center;gap:16px
+}
+.ph-header .ph-brand{min-width:0;display:flex;align-items:center;gap:10px;color:#755b89}
+.ph-header .ph-brand img{width:46px;height:46px;filter:none}
+.ph-header .ph-brand strong{font:400 clamp(18px,2.1vw,24px) Georgia,serif;color:#755b89;white-space:normal}
+.ph-header .ph-brand small{display:block;margin-top:3px;font-size:9px;letter-spacing:1.9px;color:#a18eb3;font-weight:800}
+.ph-header .ph-top-actions{margin-left:auto;display:flex;gap:10px;align-items:center}
+.ph-header .ph-return{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:8px 15px;border-radius:12px;border:1px solid #dfd2e8;background:#f7f0fa;color:#67517b;font-size:12px;font-weight:750;text-decoration:none}
+.ph-header .ph-return:hover{background:#ede1f5}
+.ph-header .ph-menu-toggle{flex:none;display:grid;place-items:center;width:43px;height:43px;min-height:43px;border:1px solid #d9c8e6;background:#f4ebf9;color:#634779;border-radius:12px;font-size:25px;cursor:pointer}
+.ph-header .ph-menu-toggle:hover{background:#e7d8f0}
+.ph-layout{
+ display:grid;grid-template-columns:286px minmax(0,1fr)!important;
+ max-width:1800px;min-width:0;margin-inline:auto;min-height:calc(100dvh - 77px)
+}
+.ph-sidebar{
+ min-width:0;padding:26px 17px;background:linear-gradient(165deg,#f7f1fb,#fffafc);
+ border-right:1px solid #e9dfee;overflow-y:auto
+}
+.ph-profile{border-radius:21px!important;padding:23px 14px!important;text-align:center;background:#fff;border:1px solid #ece3f1}
+.ph-profile-cover{display:none!important}
+.ph-profile>img,.ph-profile-initials{
+ display:inline-grid;place-items:center;width:108px!important;height:108px!important;
+ margin:0 auto 15px!important;border-radius:50%!important;border:6px solid #fff!important;
+ box-shadow:0 0 0 1px #e1d5e9;background:linear-gradient(135deg,#eee7f3,#f6e9ed);color:#735889
+}
+.ph-profile h1{font:400 23px Georgia,serif;color:#735889;margin:7px 0 8px;overflow-wrap:anywhere}
+.ph-profile p{margin:0 0 8px;color:#86758f;font-size:13px}
+.ph-profile small{color:#9d8da9;font-size:11px;overflow-wrap:anywhere}
+.ph-contact{margin-top:13px;gap:9px}
+.ph-contact :where(a,button){min-width:40px;min-height:40px;display:grid;place-items:center;background:#faf6fc;border:1px solid #e5dbee;border-radius:10px;color:#6b5382;text-decoration:none}
+.ph-record-nav{display:grid;gap:7px;margin-top:18px;overflow:visible}
+.ph-record-nav button{
+ display:flex;gap:11px;align-items:center;min-height:48px;padding:11px 14px!important;
+ text-align:left;background:transparent;color:#79658b;border:1px solid transparent;
+ border-radius:12px;font-size:12px;font-weight:750;white-space:normal
+}
+.ph-record-nav i{font-style:normal;min-width:17px;text-align:center}
+.ph-record-nav button:hover{background:#f3eaf8}
+.ph-record-nav button.active{background:#e9dbf1!important;color:#65477f!important;border:1px solid #dac7e7!important;box-shadow:0 6px 15px #74538f12}
+.ph-workspace{min-width:0;padding:clamp(18px,3vw,48px)!important;background:transparent}
+.ph-clinical-rail{display:none!important}
+.ph-clinical-heading{margin:0 0 20px}
+.ph-eyebrow{font-size:10px;font-weight:800;letter-spacing:2px;color:#a589b8}
+.ph-clinical-heading h2{font:400 clamp(30px,3vw,40px) Georgia,serif;color:#765b8b;margin:7px 0}
+.ph-clinical-heading p{color:#9889a0;font-size:12px;margin:0}
+.ph-info-strip{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:20px}
+.ph-info-strip article{min-width:0;background:#fff;border:1px solid #e9dfee;border-radius:17px;padding:15px}
+.ph-info-strip article b{color:#735988}
+.ph-info-strip article button{color:#755a8b}
+.ph-card{min-width:0;border-radius:20px!important;padding:clamp(15px,2.4vw,26px)!important;background:#fff}
+.ph-card h2,.ph-card h3{color:#755988}
+.ph-history header h2,.ph-treatment-plan h2,.ph-generic h2{font:400 clamp(23px,2.4vw,30px) Georgia,serif;color:#765a89}
+.ph-history-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}
+.ph-history-form label{display:grid;gap:8px;min-width:0;color:#695576;font-size:12px;font-weight:700}
+.ph-history-form :where(input,select,textarea),.ph-prescription-editor textarea{
+ width:100%;min-height:46px;padding:12px 14px;border-radius:13px;
+ border:1px solid #e5ddec;background:#fff;color:#3d3347
+}
+.ph-history-form textarea{min-height:99px}
+.ph-history-form :where(input,select,textarea):focus,.ph-prescription-editor textarea:focus{border-color:#b59bc9;outline:3px solid #f2eafa}
+.ph-record-status,.ph-perio-status{background:#faf7fc;border:1px solid #ebe0f0;border-radius:11px;color:#705e7c}
+.ph-card-tabs,.ph-simple-tabs{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.ph-card-tabs>div{display:flex;gap:7px;flex-wrap:wrap;min-width:0}
+.ph-card-tabs button.active,.ph-simple-tabs button.active{color:#694a80;border-color:#a78dbe}
+.ph-state-key{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.ph-odo-controls{
+ display:flex;align-items:center;justify-content:center;flex-wrap:wrap;
+ gap:12px;padding:18px 10px;margin:7px 0 9px;border-bottom:1px solid #f0e9f4
+}
+.ph-odo-controls label{display:grid;gap:5px;color:#7b6689;font-size:11px;font-weight:750}
+.ph-odo-controls select{min-width:152px;padding:10px;border:1px solid #e1d5e9;background:#fff;color:#675078;border-radius:12px}
+.ph-odo-controls .ph-multi{display:flex;align-items:center;gap:8px}
+.ph-odo-controls .ph-multi input{accent-color:#8967a1}
+.ph-odontogram-help,.ph-perio-help{font-size:12px;line-height:1.7;color:#8c7c95;margin:16px 0}
+.ph-teeth-chart{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-color:#cab5da transparent}
+.ph-dentition-block{min-width:790px}
+.ph-tooth-row{min-width:790px;grid-template-columns:repeat(var(--tooth-count),minmax(42px,1fr));padding:7px 2px;gap:2px}
+.ph-tooth{min-height:120px;border:1px solid transparent;background:transparent;border-radius:9px;color:#79658a}
+.ph-tooth:hover,.ph-tooth.selected{background:#f5edf9;border-color:#cbb4dc}
+.ph-tooth svg .crown{fill:#fff;stroke:#d3dfd7}
+.ph-tooth.selected svg .crown{stroke:#ab8bbe}
+.ph-treatment-plan{overflow-x:auto}
+.ph-plan-table{min-width:550px}
+.ph-finding-popover{z-index:90}
+.ph-perio-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain}
+.ph-perio-table{min-width:740px}
+.ph-perio-chart{min-width:740px}
+.ph-prescription-workspace{display:grid;grid-template-columns:minmax(220px,.34fr) minmax(0,.66fr);gap:16px}
+.ph-prescription-editor textarea{min-height:260px;line-height:1.7;resize:vertical}
+.ph-prescription-history{display:grid;gap:10px;align-content:start}
+.ph-prescription-history article{border:1px solid #ece3f1;border-radius:13px;padding:12px;background:#fcf9fd}
+.ph-prescription-history small{display:block;color:#9383a0;margin:5px 0 9px}
+.ph-prescription-history .actions{display:flex;gap:7px;flex-wrap:wrap}
+.ph-prescription-history button{padding:8px 11px;border-radius:9px;border:1px solid #decfe9;background:#f7f0fa;color:#684f81;font-weight:750}
+.ph-prescription-preview{position:fixed;inset:0;z-index:95;display:grid;place-items:center;padding:16px;background:#281c3299}
+.ph-prescription-preview[hidden],.ph-sidebar-backdrop[hidden]{display:none!important}
+.ph-prescription-preview section{width:min(820px,96vw);height:min(92dvh,860px);display:flex;flex-direction:column;gap:10px;background:white;border-radius:17px;padding:15px}
+.ph-prescription-preview iframe{flex:1;width:100%;min-height:0;border:1px solid #eadfec;border-radius:10px}
+.ph-prescription-preview .preview-actions{display:flex;justify-content:flex-end;gap:9px;flex-wrap:wrap}
+.ph-sidebar-backdrop{position:fixed;inset:0;background:#2c1e3c70;z-index:67}
+body.ph-sidebar-open{overflow:hidden}
+body.ph-sidebar-open .ph-sidebar{transform:translateX(0)}
+/* Pantallas de agenda, pacientes, finanzas y administración. */
+.card{border-radius:19px}
+.grid{min-width:0}
+.dc-agenda-layout,.dc-agenda-view,.dc-calendar,.dc-day-view,.dc-month-view{min-width:0}
+.dc-agenda-view :where(.dc-calendar,.dc-day-view,.dc-month-view){max-width:100%}
+.dc-header .nav-group-menu{border:1px solid #e1d4e9;background:#fff}
+.app-nav .nav-group-menu a:hover{background:#f4eafa!important}
+@media(max-width:1150px){
+ .ph-layout{grid-template-columns:245px minmax(0,1fr)!important}
+ .ph-sidebar{padding:18px 12px}
+ .ph-workspace{padding:24px!important}
+ .ph-info-strip{grid-template-columns:1fr 1fr}
+ .ph-info-strip article:last-child{grid-column:1/-1}
+}
+@media(max-width:760px){
+ .ph-header{min-height:65px;padding:8px 12px;gap:9px}
+ .ph-header .ph-brand img{width:34px;height:34px}
+ .ph-header .ph-brand strong{font-size:15px}
+ .ph-header .ph-brand small{font-size:7px;letter-spacing:.5px}
+ .ph-header .ph-return{min-height:36px;padding:7px 9px;font-size:10px;max-width:125px;text-align:center}
+ .ph-header .ph-menu-toggle{width:35px;height:37px;min-height:37px;font-size:22px}
+ .ph-layout{display:block!important}
+ .ph-sidebar{position:fixed;z-index:69;top:0;bottom:0;left:0;width:min(300px,86vw);
+   transform:translateX(-105%);transition:transform .22s ease;overflow-y:auto;overscroll-behavior:contain;
+   border-right:1px solid #dac8e4;background:#faf5fc;padding:18px!important}
+ .ph-sidebar .ph-profile{display:block!important;text-align:center!important;padding:20px 11px!important}
+ .ph-sidebar .ph-profile>img,.ph-sidebar .ph-profile-initials{width:88px!important;height:88px!important;margin:0 auto 12px!important}
+ .ph-sidebar .ph-profile h1{font-size:21px;margin:6px 0}
+ .ph-sidebar .ph-contact{justify-content:center;gap:9px}
+ .ph-sidebar .ph-record-nav{display:grid;overflow:visible}
+ .ph-sidebar .ph-record-nav button{width:100%;white-space:normal}
+ .ph-workspace{padding:16px 12px 30px!important}
+ .ph-clinical-heading h2{font-size:32px}
+ .ph-info-strip{grid-template-columns:1fr;gap:9px}
+ .ph-info-strip article:last-child{grid-column:auto}
+ .ph-info-strip article{padding:11px}
+ .ph-card{min-height:0!important;padding:15px!important}
+ .ph-history header{align-items:flex-start;flex-direction:column;gap:11px}
+ .ph-history-form{grid-template-columns:1fr;gap:12px}
+ .ph-odo-controls{display:grid;grid-template-columns:1fr 1fr;justify-content:stretch;gap:10px;padding:12px 0}
+ .ph-odo-controls label{min-width:0}
+ .ph-odo-controls select{min-width:0;width:100%}
+ .ph-odo-controls .ph-multi{grid-column:1/-1}
+ .ph-card-tabs,.ph-simple-tabs{align-items:stretch}
+ .ph-card-tabs>div{display:flex;overflow-x:auto;flex-wrap:nowrap;width:100%;scrollbar-width:thin}
+ .ph-card-tabs>div button{flex:none;white-space:nowrap}
+ .ph-state-key{width:100%;justify-content:space-between}
+ .ph-teeth-chart{overflow-x:auto}
+ .ph-tooth-row{min-width:790px}
+ .ph-finding-popover{inset:0!important;padding:8px;overflow-y:auto}
+ .ph-prescription-workspace{grid-template-columns:1fr}
+ .ph-clinical-columns{grid-template-columns:1fr}
+ .ph-plan-table{overflow-x:auto}
+ .ph-perio .ph-simple-tabs{gap:10px}
+ .ph-perio .ph-simple-tabs>*{min-height:40px}
+ .dc-header{padding:9px 12px;gap:8px}
+ .dc-header .brand{min-width:0}
+ .dc-header-tools{margin-left:auto;gap:7px}
+ .app-nav{max-width:100%;overflow-x:auto;scrollbar-width:thin}
+ .content{min-width:0;padding:15px 12px}
+ .grid.kpis,.grid.three,.grid.two{grid-template-columns:1fr!important}
+ .card,.dc-calendar{min-width:0}
+ .agenda-appointment-footer{flex-wrap:wrap}
+ .agenda-appointment-footer .button{flex:1 1 140px}
+ .modal-content,#modal:has(.agenda-appointment-details){width:min(100%,calc(100vw - 24px))}
+}
+@media(max-width:390px){
+ .ph-header .ph-brand strong{font-size:12px}
+ .ph-header .ph-brand small{display:none}
+ .ph-header .ph-return{max-width:90px}
+ .ph-odo-controls{grid-template-columns:1fr}
+ .ph-odo-controls .ph-multi{grid-column:auto}
+}
+@media(min-width:761px){
+ .ph-sidebar-backdrop{display:none!important}
+ body.ph-sidebar-collapsed .ph-sidebar{display:none}
+ body.ph-sidebar-collapsed .ph-layout{grid-template-columns:minmax(0,1fr)!important}
+}
+@media(prefers-reduced-motion:reduce){.ph-sidebar{transition:none}}
+@media print{
+ .ph-header,.ph-sidebar,.ph-sidebar-backdrop,.ph-info-strip,.ph-clinical-heading,.ph-prescription-history,.ph-prescription-preview{display:none!important}
+ .ph-layout{display:block!important}.ph-workspace{padding:0!important}
+}
