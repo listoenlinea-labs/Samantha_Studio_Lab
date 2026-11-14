@@ -120,7 +120,7 @@ async function asegurarEsquema(pool) {
          LIMIT 1`
     );
     const citaIdType = String(citaColumns[0]?.tipo || '').trim().toUpperCase();
-    if (!/^(?:TINYINT|SMALLINT|MEDIUMINT|INT|INTEGER|BIGINT)(?:\\([0-9]+\\))?(?: UNSIGNED)?$/.test(citaIdType)) {
+    if (!/^(?:TINYINT|SMALLINT|MEDIUMINT|INT|INTEGER|BIGINT)(?:\([0-9]+\))?(?: UNSIGNED)?$/.test(citaIdType)) {
         throw new Error('No se pudo validar el tipo de citas.id_cita para crear recordatorios_envios.');
     }
     await pool.query(`CREATE TABLE IF NOT EXISTS recordatorios_envios (
