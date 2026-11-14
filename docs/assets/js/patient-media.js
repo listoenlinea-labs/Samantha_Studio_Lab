@@ -19,7 +19,7 @@
   if(mime==='application/zip'||/\.zip$/.test(name))return 'cbct';
   return 'other';
  };
- const kinds={pdf:'PDF',image:'Fotografía / RX',video:'Video',audio:'Audio', '3d':'Modelo 3D',dicom:'DICOM',cbct:'Tomografía ZIP',other:'Archivo'};
+ const kinds={pdf:'PDF',image:'Fotografía / RX',video:'Video',audio:'Audio', '3d':'Modelo 3D',dicom:'DICOM',cbct:'Estudio ZIP',other:'Archivo'};
  const supportedPreview=item=>!(/\.(tif|tiff|bmp)$/.test(String(item.nombre||'').toLowerCase()));
  const apiUrl=()=>current.apiBase.replace(/\/$/,'')+'/pacientes/'+current.patientId+'/archivos';
  function message(s,err=false){
@@ -106,7 +106,7 @@
    '<option value="pdf">PDF</option><option value="image">Fotografías / RX</option>'+
    '<option value="video">Videos</option><option value="audio">Audio</option>'+
    '<option value="3d">Modelos 3D</option><option value="dicom">DICOM</option>'+
-   '<option value="cbct">Tomografías ZIP</option></select></label>'+
+   '<option value="cbct">Estudios ZIP</option></select></label>'+
    '<span id="sslMediaCount" aria-live="polite"></span></section>':'';
   return '<div class="ssl-media-root"><div id="sslMediaMessage" role="status" class="ssl-media-message" hidden></div>'+
    (all?'<div class="ssl-media-intro"><span>BIBLIOTECA MULTIMEDIA CLÍNICA</span><h3>Todos los estudios, una sola vista.</h3>'+
@@ -136,7 +136,7 @@
   return '<div class="ssl-media-list">'+series+items.map(item=>{
    const id=Number(item.idArchivo),kind=classify(item),mime=String(item.tipoMime||''),name=String(item.nombre||'');
    const action={pdf:'Ver PDF',image:'Ver imagen',video:'Reproducir',audio:'Escuchar',
-    '3d':'Visualizar 3D',dicom:'Ver DICOM',cbct:'Ver tomografía'}[kind]||'';
+    '3d':'Visualizar 3D',dicom:'Ver DICOM',cbct:'Ver estudio ZIP'}[kind]||'';
    const preview=!!action&&supportedPreview(item);
    const isCompare=current?.mode==='media'&&kind==='image'&&
     !/\.(tif|tiff|bmp)$/i.test(name);
