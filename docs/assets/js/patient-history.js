@@ -15,12 +15,12 @@
     VESTIBULAR: 'Vestibular', BUCCAL: 'Vestibular', PALATINA: 'Palatina', LINGUAL: 'Lingual / palatina',
     MESIAL: 'Mesial', DISTAL: 'Distal'
   };
-  const icons = { filiation: '♙', history: '▤', odontogram: '♧', perio: '♧', ortho: '♜', account: '▱', prescriptions: '▧', files: '▭' };
+  const icons = { filiation: '♙', history: '▤', odontogram: '♧', perio: '♧', ortho: '♜', account: '▱', prescriptions: '▧', files: '▭', radiographs:'◫' };
   const navigation = [
     ['filiation','Filiación'], ['history','Historia clínica'],
     ['odontogram','Odontograma'], ['perio','Periodontograma'],
     ['ortho','Ortodoncia'], ['account','Estado de cuenta'],
-    ['prescriptions','Prescripciones'], ['files','Archivos']
+    ['files','Archivos PDF'], ['prescriptions','Prescripciones'], ['radiographs','Radiografías y tomografías']
   ];
   const state = {
     patient: null,
@@ -254,7 +254,8 @@
       odontogram:['Odontograma','Piezas dentales FDI y hallazgos por etapa clínica.'],
       perio:['Periodontograma','Profundidades y sangrado por sitio dental.'],
       prescriptions:['Prescripciones','Redacta, guarda y genera recetas PDF.'],
-      files:['Archivos PDF','Documentos privados del paciente.'],
+      files:['Archivos PDF','Documentos PDF privados del expediente.'],
+      radiographs:['Radiografías y tomografías','Imágenes, DICOM 2D y tomografías CBCT en consulta.'],
       ortho:['Ortodoncia','Diagnósticos, análisis y controles.'],
       account:['Estado de cuenta','Cargos, abonos y planes de pago.']
     }[id]||['Expediente clínico','Información del paciente'];
@@ -267,11 +268,13 @@
     const toggle=document.getElementById('phSidebarToggle');
     if(toggle)toggle.setAttribute('aria-expanded',String(!window.matchMedia('(max-width:760px)').matches));
     document.querySelectorAll('[data-record-view]').forEach((button) => button.classList.toggle('active', button.dataset.recordView === id));
+    window.SamanthaClinicalMedia?.dispose();
     if (id === 'filiation') return renderFiliation();
     if (id === 'history') return renderHistory();
     if (id === 'odontogram') return loadOdontograms();
     if (id === 'perio') return loadPeriodontogram();
     if(id === 'prescriptions') return window.SamanthaPrescriptions.render({api,patientId,escapeHtml,notify,formatDate,API_URL});
+    if (id === 'files' || id === 'radiographs') return window.SamanthaClinicalMedia.render({patientId,apiBase:API_URL,mode:id,notify});
     renderGeneric(id);
   }
 
@@ -730,7 +733,7 @@
       window.dispatchEvent(new Event('ssl:ready'));
       // Enlace directo a Prescripciones: editor y PDFs privados por paciente.
       const requestedView=new URLSearchParams(window.location.search).get('view');
-      if(requestedView==='prescriptions') await activateView('prescriptions');
+      if(['prescriptions','files','radiographs'].includes(requestedView)) await activateView(requestedView);
       else await renderFiliation();
     } catch (error) {
       app.innerHTML = `<main class="ph-fatal"><h1>No se pudo abrir el expediente</h1><p>${escapeHtml(error.message)}</p><a href="pacientes.html">Volver a pacientes</a></main>`;
