@@ -638,6 +638,12 @@ router.put('/:id/historia-clinica', async (req, res, next) => {
         };
 
         await connection.beginTransaction();
+        // Serializar cambios de alergias en ambos editores para evitar carreras:
+        // el editor breve y la historia completa actualizan el mismo paciente.
+        await connection.query(
+            'SELECT id_paciente FROM pacientes WHERE id_paciente = ? LIMIT 1 FOR UPDATE',
+            [patientId]
+        );
         await connection.query(
             'UPDATE historias_clinicas SET vigente = 0 WHERE id_paciente = ? AND vigente = 1',
             [patientId]
