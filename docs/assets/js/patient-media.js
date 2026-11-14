@@ -86,7 +86,7 @@
     '<small>'+escape(item.descripcion||'Sin descripción')+' · '+bytes(item.bytes)+' · '+escape(new Date(item.creadoAt).toLocaleDateString('es-MX'))+'</small></div>'+
     '<div class="ssl-media-entry-actions"><button type="button" data-media-view="'+id+'">'+action+'</button>'+
     '<button type="button" data-media-download="'+id+'" data-name="'+escape(item.nombre)+'">Descargar</button>'+
-    '<button type="button" class="ssl-media-delete" data-media-delete="'+id+'">Eliminar</button></div></article>';
+    (current.canDelete?'<button type="button" class="ssl-media-delete" data-media-delete="'+id+'">Eliminar</button>':'')+'</div></article>';
   }).join('')+'</div>';
  }
  async function refresh(){
@@ -96,7 +96,7 @@
   try{
    const data=await jsonRequest(apiUrl()+'?'+new URLSearchParams({categoria:cat}));
    if(t!==modeToken)return;
-   current.items=data.items||[];
+   current.items=data.items||[];current.canDelete=!!data.canDelete;
    container.innerHTML=listRows(current.items,cat);
   }catch(e){if(t===modeToken)container.textContent=e.message}
  }
