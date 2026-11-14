@@ -1,8 +1,8 @@
-/* Inicio Samantha — estructura inspirada en Yerena, paleta propia lavanda.
-   Alcance limitado al dashboard; conserva navegación/API del resto del sistema. */
+/* Navegación lateral compartida de Samantha; mismo diseño en todas las secciones.
+   Las reglas de tarjetas del dashboard permanecen exclusivas de Inicio. */
 @media (min-width:761px){
- body[data-page="dashboard"] .samantha-sidebar-layout{display:block!important;min-height:100vh}
- body[data-page="dashboard"] .samantha-sidebar-layout>.dc-header{
+ body.samantha-app-page .samantha-sidebar-layout{display:block!important;min-height:100vh}
+ body.samantha-app-page .samantha-sidebar-layout>.dc-header{
   position:fixed!important;inset:0 auto 0 0!important;z-index:52;
   display:flex!important;flex-direction:column!important;align-items:stretch!important;
   width:260px!important;height:100dvh!important;min-height:0!important;
@@ -11,27 +11,27 @@
   color:#624d75!important;border:0!important;border-right:1px solid #e8dced!important;
   border-radius:0!important;box-shadow:none!important;
  }
- body[data-page="dashboard"] .dc-header>.brand{
+ body.samantha-app-page .dc-header>.brand{
   flex:none!important;display:flex!important;align-items:center!important;
   gap:10px!important;min-width:0!important;width:100%;margin:0 0 19px!important;
   padding:0 3px 20px!important;border-bottom:1px solid #eadff0!important;
   text-decoration:none!important;
  }
- body[data-page="dashboard"] .dc-header>.brand img{width:43px!important;height:43px!important;flex:none}
- body[data-page="dashboard"] .dc-header>.brand strong{
+ body.samantha-app-page .dc-header>.brand img{width:43px!important;height:43px!important;flex:none}
+ body.samantha-app-page .dc-header>.brand strong{
   display:block!important;color:#74588a!important;white-space:normal!important;
   font:400 18px/1.2 Georgia,serif!important;
  }
- body[data-page="dashboard"] .dc-header>.brand span{display:block!important;color:#9a82aa!important;letter-spacing:.12em!important}
- body[data-page="dashboard"] .dc-header>.app-nav{
+ body.samantha-app-page .dc-header>.brand span{display:block!important;color:#9a82aa!important;letter-spacing:.12em!important}
+ body.samantha-app-page .dc-header>.app-nav{
   position:static!important;display:flex!important;flex-direction:column!important;align-self:stretch!important;
   flex:none!important;width:100%!important;max-width:none!important;min-width:0!important;
   max-height:none!important;height:auto!important;overflow:visible!important;
   gap:5px!important;padding:0 0 17px!important;background:transparent!important;
   border:0!important;box-shadow:none!important;transform:none!important;
  }
- body[data-page="dashboard"] .dc-header .app-nav>a,
- body[data-page="dashboard"] .dc-header .app-nav>.nav-group>.nav-group-trigger{
+ body.samantha-app-page .dc-header .app-nav>a,
+ body.samantha-app-page .dc-header .app-nav>.nav-group>.nav-group-trigger{
   display:flex!important;align-items:center!important;justify-content:flex-start!important;
   width:100%!important;min-width:0!important;min-height:47px!important;
   padding:11px 13px!important;margin:0!important;
@@ -39,48 +39,48 @@
   border-radius:12px!important;font-size:13px!important;font-weight:700!important;
   box-shadow:none!important;text-decoration:none!important;
  }
- body[data-page="dashboard"] .dc-header .app-nav>a.active{
+ body.samantha-app-page .dc-header .app-nav>a.active{
   background:#eadcf2!important;color:#684a81!important;font-weight:800!important;
  }
- body[data-page="dashboard"] .dc-header .app-nav>a.active::after{display:none!important}
- body[data-page="dashboard"] .dc-header .app-nav>a:hover,
- body[data-page="dashboard"] .dc-header .app-nav>.nav-group>.nav-group-trigger:hover{
+ body.samantha-app-page .dc-header .app-nav>a.active::after{display:none!important}
+ body.samantha-app-page .dc-header .app-nav>a:hover,
+ body.samantha-app-page .dc-header .app-nav>.nav-group>.nav-group-trigger:hover{
   color:#573e6e!important;background:#efe5f6!important;
  }
- body[data-page="dashboard"] .dc-header .app-nav>.nav-group{
+ body.samantha-app-page .dc-header .app-nav>.nav-group{
   display:block!important;position:relative!important;width:100%!important;
  }
- body[data-page="dashboard"] .dc-header .nav-group-trigger .nav-chevron{margin-left:auto!important}
- body[data-page="dashboard"] .dc-header .app-nav .nav-group-menu{
+ body.samantha-app-page .dc-header .nav-group-trigger .nav-chevron{margin-left:auto!important}
+ body.samantha-app-page .dc-header .app-nav .nav-group-menu{
   position:static!important;top:auto!important;left:auto!important;
   display:none!important;width:auto!important;margin:2px 0 8px 17px!important;
   padding:2px 0 2px 10px!important;border:0!important;border-left:2px solid #dfcfe9!important;
   border-radius:0!important;background:transparent!important;box-shadow:none!important;
  }
- body[data-page="dashboard"] .dc-header .app-nav .nav-group.open>.nav-group-menu{
+ body.samantha-app-page .dc-header .app-nav .nav-group.open>.nav-group-menu{
   display:grid!important;animation:none!important;
  }
- body[data-page="dashboard"] .dc-header .app-nav .nav-group-menu a{
+ body.samantha-app-page .dc-header .app-nav .nav-group-menu a{
   position:relative!important;display:flex!important;width:100%!important;min-width:0!important;
   min-height:40px!important;padding:8px 11px!important;white-space:normal!important;
   font-size:12px!important;color:#735d83!important;background:transparent!important;
  }
- body[data-page="dashboard"] .dc-header .app-nav .nav-group-menu a:hover,
- body[data-page="dashboard"] .dc-header .app-nav .nav-group-menu a.active{
+ body.samantha-app-page .dc-header .app-nav .nav-group-menu a:hover,
+ body.samantha-app-page .dc-header .app-nav .nav-group-menu a.active{
   background:#f0e5f7!important;color:#573a70!important
  }
- body[data-page="dashboard"] .dc-header>.dc-header-tools{margin-top:auto!important;margin-left:0!important;
+ body.samantha-app-page .dc-header>.dc-header-tools{margin-top:auto!important;margin-left:0!important;
   padding:16px 0 0!important;border-top:1px solid #eadff0;display:flex;flex-wrap:wrap;gap:8px}
- body[data-page="dashboard"] .dc-header-tools .dc-profile{display:flex!important;flex:1 1 auto!important;min-width:0}
- body[data-page="dashboard"] .dc-header-tools .dc-profile-copy{display:block!important}
- body[data-page="dashboard"] .dc-header-tools .dc-search{width:100%!important;min-width:0!important}
- body[data-page="dashboard"] .dc-header-tools .dc-search span{display:inline!important}
- body[data-page="dashboard"] .dc-header>.dc-menu-button{display:none!important}
- body[data-page="dashboard"] .samantha-sidebar-layout>.app-main{margin-left:260px!important;min-width:0!important}
- body[data-page="dashboard"] .app-main>.app-topbar{position:sticky!important;top:0!important;z-index:40!important;
+ body.samantha-app-page .dc-header-tools .dc-profile{display:flex!important;flex:1 1 auto!important;min-width:0}
+ body.samantha-app-page .dc-header-tools .dc-profile-copy{display:block!important}
+ body.samantha-app-page .dc-header-tools .dc-search{width:100%!important;min-width:0!important}
+ body.samantha-app-page .dc-header-tools .dc-search span{display:inline!important}
+ body.samantha-app-page .dc-header>.dc-menu-button{display:none!important}
+ body.samantha-app-page .samantha-sidebar-layout>.app-main{margin-left:260px!important;min-width:0!important}
+ body.samantha-app-page .app-main>.app-topbar{position:sticky!important;top:0!important;z-index:40!important;
   min-height:70px;height:auto!important;padding:12px 27px!important;background:rgba(255,255,255,.96)!important}
- body[data-page="dashboard"] .app-main>.app-topbar .page-identity small{color:#9c83af!important}
- body[data-page="dashboard"] .app-main>.app-topbar .page-identity strong{color:#59456d!important}
+ body.samantha-app-page .app-main>.app-topbar .page-identity small{color:#9c83af!important}
+ body.samantha-app-page .app-main>.app-topbar .page-identity strong{color:#59456d!important}
 }
 body[data-page="dashboard"] .content{width:100%!important;max-width:1600px!important;padding:28px clamp(15px,2.5vw,36px) 55px!important}
 body[data-page="dashboard"] .ssl-home{display:grid;gap:23px;min-width:0}
@@ -159,3 +159,78 @@ body[data-page="dashboard"] .ssl-home-shortcut-arrow{margin-left:auto;color:#977
  body[data-page="dashboard"] .ssl-home-hero-copy{max-width:100%}
  body[data-page="dashboard"] .ssl-home-hero-art{display:none}
 }
+
+
+/* Flecha persistente: contrae / expande toda la barra de navegación de escritorio. */
+@media (min-width:761px){
+ body.samantha-app-page .sidebar-collapse-toggle{
+  position:fixed;z-index:95;top:21px;left:241px;
+  display:grid;place-items:center;width:36px;height:45px;padding:0;
+  border:1px solid #c9b7d6;border-radius:0 13px 13px 0;
+  background:#eadcf2;color:#664a7e;font-size:24px;font-weight:800;
+  box-shadow:3px 3px 11px rgba(74,52,95,.11);
+  cursor:pointer;transition:left .2s ease,background .2s ease;
+ }
+ body.samantha-app-page .sidebar-collapse-toggle:hover{background:#dac9e8}
+ body.samantha-app-page.sidebar-is-collapsed .samantha-sidebar-layout>.dc-header{
+  transform:translateX(-100%)!important;visibility:hidden!important;pointer-events:none!important;
+ }
+ body.samantha-app-page.sidebar-is-collapsed .samantha-sidebar-layout>.app-main{margin-left:0!important}
+ body.samantha-app-page.sidebar-is-collapsed .sidebar-collapse-toggle{left:0;transform:none}
+ body.samantha-app-page.sidebar-is-collapsed .sidebar-collapse-toggle .arrow{transform:rotate(180deg)}
+ body.samantha-app-page .samantha-sidebar-layout>.dc-header{transition:transform .2s ease,visibility .2s ease}
+ body.samantha-app-page .samantha-sidebar-layout>.app-main{transition:margin-left .2s ease}
+}
+@media (min-width:761px) and (max-width:1160px){
+ body.samantha-app-page .sidebar-collapse-toggle{left:201px}
+}
+@media (max-width:760px){
+ body.samantha-app-page .sidebar-collapse-toggle{display:none!important}
+}
+@media (prefers-reduced-motion:reduce){
+ body.samantha-app-page .sidebar-collapse-toggle,
+ body.samantha-app-page .samantha-sidebar-layout>.dc-header,
+ body.samantha-app-page .samantha-sidebar-layout>.app-main{transition:none!important}
+}
+
+
+/* Recordatorios utiliza una página independiente: conserva el menú compartido. */
+.recordatorios-body .ssl-standalone-sidebar{
+ position:fixed;inset:0 auto 0 0;width:260px;z-index:75;
+ padding:24px 13px 20px;overflow-y:auto;overscroll-behavior:contain;
+ border-right:1px solid #e8dced;background:linear-gradient(175deg,#f9f3fc,#fffdfa);
+ box-shadow:0 3px 10px rgba(72,50,91,.06);
+}
+.recordatorios-body .ssl-standalone-brand{
+ display:flex;align-items:center;gap:10px;padding:0 4px 20px;margin-bottom:17px;
+ border-bottom:1px solid #e8dced;text-decoration:none;color:#705589;
+ font:400 18px/1.25 Georgia,serif;
+}
+.recordatorios-body .ssl-standalone-brand img{width:43px;height:43px;flex:none}
+.recordatorios-body .ssl-standalone-sidebar nav{display:grid;gap:3px}
+.recordatorios-body .ssl-standalone-sidebar nav a{
+ display:flex;align-items:center;min-height:43px;padding:10px 13px;border-radius:11px;
+ color:#6a5479;text-decoration:none;font-size:13px;font-weight:700;
+}
+.recordatorios-body .ssl-standalone-sidebar nav a.active{background:#eadcf2;color:#694985}
+.recordatorios-body .ssl-standalone-sidebar nav a:hover{background:#efe4f5}
+.recordatorios-body .ssl-standalone-toggle{
+ position:fixed;top:21px;left:241px;z-index:95;display:grid;place-items:center;
+ width:36px;height:45px;border:1px solid #c9b7d6;border-radius:0 13px 13px 0;
+ background:#eadcf2;color:#664a7e;font-size:23px;cursor:pointer
+}
+.recordatorios-body .ssl-standalone-scrim{display:none}
+@media(min-width:761px){
+ .recordatorios-body .ph-header,.recordatorios-body .ph-reminders-main{margin-left:260px}
+ .recordatorios-body.ssl-side-hidden .ssl-standalone-sidebar{transform:translateX(-100%);visibility:hidden;pointer-events:none}
+ .recordatorios-body.ssl-side-hidden .ph-header,.recordatorios-body.ssl-side-hidden .ph-reminders-main{margin-left:0}
+ .recordatorios-body.ssl-side-hidden .ssl-standalone-toggle{left:0}
+}
+@media(max-width:760px){
+ .recordatorios-body .ssl-standalone-sidebar{width:min(85vw,320px);transform:translateX(-105%);transition:transform .2s ease}
+ .recordatorios-body.ssl-mobile-open .ssl-standalone-sidebar{transform:translateX(0)}
+ .recordatorios-body .ssl-standalone-toggle{top:13px;left:8px;width:38px;height:39px;border-radius:12px;font-size:20px}
+ .recordatorios-body .ph-header{padding-left:54px}
+ .recordatorios-body.ssl-mobile-open .ssl-standalone-scrim{display:block;position:fixed;inset:0;z-index:70;background:#3b2a4b6b;border:0}
+}
+@media(prefers-reduced-motion:reduce){.recordatorios-body .ssl-standalone-sidebar{transition:none}}
