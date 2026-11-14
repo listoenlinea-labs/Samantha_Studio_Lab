@@ -73,6 +73,14 @@ app.use(cors((req, callback) => {
         }
     });
 }));
+// Identificador de solicitud para correlacionar fallos de guardado y descarga
+// con logs de Hostinger, sin mostrar SQL ni información clínica al usuario.
+app.use('/api', (req, res, next) => {
+    const requestId = crypto.randomBytes(6).toString('hex').toUpperCase();
+    req.requestId = requestId;
+    res.set('X-Request-ID', requestId);
+    next();
+});
 app.use(express.json({ limit: '1mb' }));
 // Muestra cada solicitud atendida y su resultado en la consola.
 app.use((req, res, next) => {
@@ -103,7 +111,9 @@ app.use('/api', rateLimit({
     handler: (_req, res) => {
         res.status(429).json({
             ok: false,
-            mensaje: 'Se alcanzó el límite temporal de consultas a la API. Intenta nuevamente en unos minutos.'
+            mensaje: 'Se alcanzó el límite temporal de consultas a la API. Intenta nuevamente en unos minutos.',
+            codigo: 'RATE_LIMIT',
+            requestId: res.getHeader('X-Request-ID') || null
         });
     }
 }));
