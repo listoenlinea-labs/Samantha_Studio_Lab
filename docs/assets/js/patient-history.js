@@ -406,14 +406,37 @@
   }
 
   async function saveOdontogramSettings() {
+    if (!state.odontogram || state.odontogram.estado === 'FINALIZADO') return;
+    const controls = ['dentitionType', 'nomenclature', 'odontogramNotes']
+      .map((id) => document.getElementById(id)).filter(Boolean);
+    const previous = {
+      dentition: state.odontogram.tipoDenticion,
+      nomenclature: state.odontogram.nomenclatura,
+      observations: state.odontogram.observaciones || ''
+    };
+    const requested = {
+      tipoDenticion: state.dentition,
+      nomenclatura: state.nomenclature,
+      observaciones: document.getElementById('odontogramNotes')?.value ?? previous.observations
+    };
+    controls.forEach((control) => { control.disabled = true; });
     try {
-      await api(`/odontogramas/${state.odontogram.idOdontograma}`, { method: 'PATCH', body: JSON.stringify({ tipoDenticion: state.dentition, nomenclatura: state.nomenclature, observaciones: document.getElementById('odontogramNotes')?.value || state.odontogram.observaciones || '' }) });
-      state.odontogram.tipoDenticion = state.dentition;
-      state.odontogram.nomenclatura = state.nomenclature;
-      state.odontogram.observaciones = document.getElementById('odontogramNotes')?.value || '';
-      notify('Configuración del odontograma guardada.');
+      await api(`/odontogramas/${state.odontogram.idOdontograma}`, {
+        method: 'PATCH', body: JSON.stringify(requested)
+      });
+      state.odontogram.tipoDenticion = requested.tipoDenticion;
+      state.odontogram.nomenclatura = requested.nomenclatura;
+      state.odontogram.observaciones = requested.observaciones;
       renderOdontogram();
-    } catch (error) { notify(error.message, true); }
+      notify('Configuración del odontograma guardada.');
+    } catch (error) {
+      // Si MySQL rechaza el cambio, no mostrar un tipo de dentición sin guardar.
+      state.dentition = previous.dentition;
+      state.nomenclature = previous.nomenclature;
+      state.odontogram.observaciones = previous.observations;
+      renderOdontogram();
+      notify(error.message, true);
+    }
   }
 
   async function finalizeOdontogram() {
