@@ -454,6 +454,35 @@
   await refresh();
  }
  function bindEvents(){
+  if(current.mode==='media'){
+   $('sslMediaSearch')?.addEventListener('input',filterLibrary);
+   $('sslMediaKind')?.addEventListener('change',filterLibrary);
+   $('sslLocalPreview')?.addEventListener('click',async event=>{
+    const button=event.currentTarget;button.disabled=true;
+    try{await previewLocalFile()}
+    catch(error){message('No fue posible visualizar localmente: '+error.message,true)}
+    finally{button.disabled=false}
+   });
+   $('sslMediaList').addEventListener('change',event=>{
+    const changed=event.target.closest('[data-media-compare]');if(!changed)return;
+    const checked=[...document.querySelectorAll('[data-media-compare]:checked')];
+    if(checked.length>2){
+     changed.checked=false;
+     message('Selecciona exactamente dos fotografías. Desmarca una antes de elegir otra.',true);
+    }
+    updateCompareBar();
+   });
+   $('sslMediaCompareStart')?.addEventListener('click',async event=>{
+    const ids=[...document.querySelectorAll('[data-media-compare]:checked')].map(input=>Number(input.dataset.mediaCompare));
+    const button=event.currentTarget;button.disabled=true;
+    try{await compareImages(ids)}catch(error){message(error.message,true)}
+    finally{button.disabled=false}
+   });
+   $('sslMediaCompareClear')?.addEventListener('click',()=>{
+    document.querySelectorAll('[data-media-compare]:checked').forEach(input=>{input.checked=false});
+    updateCompareBar();
+   });
+  }
   const fileForm=$('sslMediaUpload');
   fileForm.addEventListener('submit',async e=>{
    e.preventDefault();
@@ -462,7 +491,7 @@
    if(button.disabled)return;
    button.disabled=true;button.textContent='Guardando archivo…';
    try{
-    await uploadFile(file,$('sslMediaDescription').value.trim(),category());
+    await uploadFile(file,$('sslMediaDescription').value.trim(),uploadCategory(file));
     fileForm.reset();message('Archivo guardado en el expediente.');
     try{await refresh()}catch(_){message('El archivo se guardó, pero no se pudo actualizar el listado. Recarga para consultarlo.',true)}
    }catch(err){message('No se confirmó el guardado: '+err.message,true)}
@@ -482,7 +511,7 @@
     }
    }catch(err){message(err.message,true)}finally{button.disabled=false}
   });
-  if(category()!=='RADIOGRAFIA')return;
+  if(category()==='PDF')return;
   $('sslCbctFiles').addEventListener('change',e=>setSelection(e.target.files));
   $('sslCbctFolder').addEventListener('change',e=>setSelection(Array.from(e.target.files).filter(f=>/\.(dcm|dicom|ima|stl)$/i.test(f.name))));
   $('sslCbctPreview').addEventListener('click',async ()=>{
