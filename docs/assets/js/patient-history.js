@@ -279,8 +279,26 @@
     view.innerHTML = '<section class="ph-card ph-loading">Cargando filiación…</section>';
     try {
       const data = await api(`/pacientes/${patientId}/filiacion`);
-      const input = (name, label, type = 'text') => `<label>${label}<input type="${type}" name="${name}" value="${escapeHtml(data[name] || '')}"></label>`;
-      view.innerHTML = `<section class="ph-card ph-history"><header><div><h2>Filiación</h2><p>Datos personales y de contacto del paciente.</p></div><button class="ph-primary" id="saveFiliation">Guardar cambios</button></header><form id="filiationForm" class="ph-history-form">${input('nombres','Nombre(s)')}${input('apellidoPaterno','Apellido paterno')}${input('apellidoMaterno','Apellido materno')}${input('fechaNacimiento','Fecha de nacimiento','date')}<label>Sexo<select name="sexo"><option value="">No especificado</option>${['F','M','X','NO_ESPECIFICA'].map((value) => `<option ${data.sexo === value ? 'selected' : ''}>${value}</option>`).join('')}</select></label>${input('telefono','Teléfono','tel')}${input('correo','Correo','email')}${input('comoNosConocio','¿Cómo nos conoció?')}<label>Antecedentes médicos<textarea name="antecedentesMedicos" rows="4">${escapeHtml(data.antecedentesMedicos || '')}</textarea></label><label>Notas de alerta<textarea name="notasAlerta" rows="4">${escapeHtml(data.notasAlerta || '')}</textarea></label></form></section>`;
+      const input = (name, label, type = 'text') => `<label>${label}<input type="${type}" name="${name}" value="${escapeHtml(type==='date'?String(data[name]||'').slice(0,10):data[name]||'')}" autocomplete="off"></label>`;
+      const multiline=(name,label,rows=3)=>`<label class="ph-wide">${label}<textarea name="${name}" rows="${rows}">${escapeHtml(data[name]||'')}</textarea></label>`;
+      const checkbox=(key,label)=>`<label class="ph-consent"><input type="checkbox" name="${key}" ${data[key]?'checked':''}><span>${label}</span></label>`;
+      view.innerHTML = `<section class="ph-card ph-history ph-filiation"><header><div><h2>Información personal</h2><p>Datos generales, fecha de nacimiento y contacto de emergencia.</p></div><button class="ph-primary" id="saveFiliation" type="button">Guardar cambios</button></header>
+        <form id="filiationForm"><div class="ph-history-form">
+          ${input('nombres','Nombre(s)')}${input('apellidoPaterno','Apellido paterno')}${input('apellidoMaterno','Apellido materno')}
+          ${input('fechaNacimiento','Fecha de nacimiento','date')}${input('ocupacion','Ocupación')}${input('domicilio','Domicilio')}
+          <label>Sexo<select name="sexo"><option value="">No especificado</option>${['F','M','X','NO_ESPECIFICA'].map(value=>`<option value="${value}" ${data.sexo===value?'selected':''}>${value}</option>`).join('')}</select></label>
+          ${input('tutorResponsable','Responsable legal / tutor (si aplica)')}${input('telefono','Teléfono','tel')}${input('correo','Correo','email')}
+          ${input('contactoEmergencia','Contacto de emergencia')}${input('telefonoEmergencia','Teléfono de emergencia','tel')}
+          ${input('comoNosConocio','¿Cómo nos conoció?')}
+          ${multiline('observacionesFiliacion','Observaciones de filiación')}
+        </div>
+        <h3 class="ph-filiation-subhead">Antecedentes y alertas</h3>
+        <div class="ph-history-form">${multiline('antecedentesMedicos','Antecedentes médicos',4)}${multiline('notasAlerta','Notas de alerta',4)}</div>
+        <h3 class="ph-filiation-subhead">Consentimiento para recordatorios</h3>
+        <p class="ph-consent-help">Activa un canal únicamente cuando el paciente autorice recibir avisos de citas. Los recordatorios no incluyen diagnósticos ni datos clínicos.</p>
+        <div class="ph-consent-options">${checkbox('recordatorioCorreoConsentido','El paciente autorizó recordatorios por correo electrónico.')}${checkbox('recordatorioWhatsappConsentido','El paciente autorizó recordatorios por WhatsApp.')}</div>
+        </form></section>`;
+
       document.getElementById('saveFiliation').onclick = async () => {
         try {
           const payload = Object.fromEntries(new FormData(document.getElementById('filiationForm')));
