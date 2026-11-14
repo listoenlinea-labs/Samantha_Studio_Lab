@@ -1849,6 +1849,20 @@
   function bindCommon() {
     const body = document.body;
     const menu = document.getElementById('menuButton');
+    const navPanel=document.getElementById('appSidebar');
+    const header=document.querySelector('.samantha-sidebar-layout > .dc-header');
+    const mobileNavQuery=window.matchMedia('(max-width:760px)');
+    const positionNav=()=>{
+      if(!navPanel||!header)return;
+      if(mobileNavQuery.matches && navPanel.parentElement!==document.body){
+        document.body.appendChild(navPanel); // Escapa el contexto z-index del encabezado; queda delante del overlay.
+      }else if(!mobileNavQuery.matches && navPanel.parentElement!==header){
+        header.insertBefore(navPanel,header.querySelector('.dc-header-tools'));
+        body.classList.remove('nav-open');
+      }
+    };
+    positionNav();
+    mobileNavQuery.addEventListener?.('change',positionNav);
     const closeMenu = () => { body.classList.remove('nav-open'); menu?.setAttribute('aria-expanded','false'); };
     menu?.addEventListener('click', () => {
       const expanded=body.classList.toggle('nav-open');
