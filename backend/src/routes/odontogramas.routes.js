@@ -76,6 +76,7 @@ router.post('/:id/hallazgos', async (req, res, next) => {
         const pieces = [...new Set((Array.isArray(req.body.piezas) ? req.body.piezas : [])
             .map((piece) => String(piece).trim()).filter(Boolean))];
         const findingCode = String(req.body.codigoHallazgo || '').trim().toUpperCase();
+        const replacesToothFindings = findingCode === 'RESTAURACION';
         const surface = String(req.body.superficie || '').trim().toUpperCase() || null;
         const visualState = String(req.body.estadoVisual || '').trim().toUpperCase();
         const requestedVariant = String(req.body.variante || '').trim().slice(0, 40) || null;
@@ -133,6 +134,15 @@ router.post('/:id/hallazgos', async (req, res, next) => {
                AND column_name = 'pieza_dental'`
         );
         const hasLegacyPiece = legacyPieceColumns.length > 0;
+        let removedFindings = 0;
+        if (replacesToothFindings) {
+            const [deleteResult] = await connection.query(
+                `DELETE FROM odontograma_hallazgos
+                 WHERE id_odontograma = ? AND pieza IN (?)`,
+                [odontogramId, pieces]
+            );
+            removedFindings = Number(deleteResult.affectedRows || 0);
+        }
         const values = pieces.map((piece) => [
             odontogramId, catalog[0].id_catalogo_hallazgo, piece,
             ...(hasLegacyPiece ? [piece] : []), surface,
@@ -148,12 +158,19 @@ router.post('/:id/hallazgos', async (req, res, next) => {
         );
         await connection.query(
             `INSERT INTO auditoria (entidad, id_entidad, accion, detalle)
-             VALUES ('odontogramas', ?, 'REGISTRAR_HALLAZGOS', ?)`,
-            [odontogramId, JSON.stringify({ piezas: pieces, codigoHallazgo: findingCode,
-                superficie: surface, estadoVisual: normalizedState, variante: variant })]
+             VALUES ('odontogramas', ?, ?, ?)`,
+            [odontogramId, replacesToothFindings ? 'REEMPLAZAR_HALLAZGOS' : 'REGISTRAR_HALLAZGOS',
+                JSON.stringify({ piezas: pieces, codigoHallazgo: findingCode,
+                    superficie: surface, estadoVisual: normalizedState, variante: variant,
+                    hallazgosEliminados: removedFindings })]
         );
         await connection.commit();
-        return res.status(201).json({ ok: true, insertados: pieces.length });
+        return res.status(201).json({
+            ok: true,
+            insertados: pieces.length,
+            eliminados: removedFindings,
+            reemplazo: replacesToothFindings
+        });
     } catch (error) {
         await connection.rollback();
         next(error);

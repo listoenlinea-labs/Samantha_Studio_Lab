@@ -43,6 +43,14 @@ test('el odontograma muestra tres símbolos, excedente y detalle completo', () =
     assert.match(frontend, /aria-modal="true"/);
 });
 
+test('restauración confirma y reemplaza los indicadores anteriores', () => {
+    assert.match(frontend, /data-quick-code="RESTAURACION" class="good">Restauración<\/button>/);
+    assert.match(frontend, /item\.dataset\.code === 'RESTAURACION'/);
+    assert.match(frontend, /La restauración reemplazará todos los indicadores actuales/);
+    assert.match(frontend, /result\.eliminados/);
+    assert.match(patientHistoryHtml, /patient-history\.js\?v=20261114-restoration-replaces-findings/);
+});
+
 test('los indicadores sobre los dientes no dibujan fondos ni sombras', () => {
     assert.match(
         clinicalPolish,
