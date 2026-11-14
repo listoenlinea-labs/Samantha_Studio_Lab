@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es-MX"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#dacce6"><meta name="robots" content="noindex,nofollow">
+<title>Recordatorios | Samantha's Studio Lab</title>
+<link rel="stylesheet" href="assets/css/clinic-v2.css">
+<link rel="stylesheet" href="assets/css/samantha-pastel.css?v=20261114-lavanda">
+<script src="assets/js/api-config.js"></script>
+<script defer src="assets/js/recordatorios.js?v=20261114-consentimiento"></script>
+</head><body class="ph-body recordatorios-body">
+<header class="ph-header"><a class="ph-brand" href="index.html"><img src="assets/img/logo-ssl.svg" alt=""><span><strong>samantha's studio lab</strong><small>CONFIGURACIÓN CLÍNICA</small></span></a><div class="ph-top-actions"><a href="agenda.html" class="ph-return">← Volver a la agenda</a></div></header>
+<main class="ph-reminders-main">
+<div class="ph-clinical-heading"><span class="ph-eyebrow">AGENDA · COMUNICACIÓN</span><h2>Recordatorios automáticos</h2><p>Configura avisos de citas, consentimientos y seguimiento de entregas.</p></div>
+<div id="remindersNotice" class="ph-reminder-notice" role="status" hidden></div>
+<div class="ph-reminder-grid">
+<section class="ph-card"><h2>Configuración</h2><p>Los avisos solo se envían cuando el paciente dio su consentimiento y el proveedor correspondiente está listo.</p>
+<form id="reminderConfigForm">
+<label>Nombre del consultorio<input name="nombreConsultorio" maxlength="120" required></label>
+<label>Dirección para las indicaciones<input name="direccionConsultorio" maxlength="300" placeholder="Dirección del consultorio"></label>
+<fieldset><legend>Recordar días antes de la cita</legend><div class="ph-check-row"><label><input type="checkbox" name="days" value="1">1 día</label><label><input type="checkbox" name="days" value="2">2 días</label><label><input type="checkbox" name="days" value="3">3 días</label></div></fieldset>
+<fieldset><legend>Recordar horas antes de la cita</legend><div class="ph-check-row"><label><input type="checkbox" name="hours" value="1">1 hora</label><label><input type="checkbox" name="hours" value="2">2 horas</label><label><input type="checkbox" name="hours" value="3">3 horas</label></div></fieldset>
+<label>Hora del aviso por días (hora local de Guadalajara)<select name="horaEnvio"><option value="7">07:00</option><option value="8">08:00</option><option value="9">09:00</option><option value="10">10:00</option><option value="11">11:00</option><option value="12">12:00</option></select></label>
+<div class="ph-check-stack"><label><input type="checkbox" name="correoHabilitado">Enviar por correo SMTP</label><label><input type="checkbox" name="whatsappHabilitado">Enviar por WhatsApp Business (plantilla Meta aprobada)</label></div>
+<button type="submit" class="ph-primary">Guardar preferencias</button></form></section>
+<aside class="ph-card"><h2>Estado de los proveedores</h2><div id="reminderProviders" class="ph-provider-list">Consultando configuración…</div>
+<p class="ph-reminder-note">Por seguridad, <strong>REMINDERS_ENABLED=false</strong> mantiene todo apagado. Para activar los envíos reales configura SMTP y Meta en Hostinger, aprueba la plantilla y solicita autorización al paciente en su ficha de filiación. Nunca se envían diagnósticos por mensajes.</p>
+<h3>Estado de consentimientos</h3><p>En cada expediente, abre Filiación para marcar por separado el consentimiento de correo y WhatsApp.</p></aside>
+</div>
+<section class="ph-card ph-reminder-log"><div class="ph-reminder-log-header"><div><h2>Historial de envíos</h2><p>Últimos 100 intentos. Se evita el envío duplicado por cita, canal y periodo.</p></div><button type="button" id="refreshReminderLog">Actualizar</button></div>
+<div class="ph-reminder-log-scroll"><table><thead><tr><th>Paciente</th><th>Cita</th><th>Canal</th><th>Aviso</th><th>Estado</th><th>Registro</th></tr></thead><tbody id="reminderLogRows"><tr><td colspan="6">Consultando…</td></tr></tbody></table></div></section>
+</main></body></html>
