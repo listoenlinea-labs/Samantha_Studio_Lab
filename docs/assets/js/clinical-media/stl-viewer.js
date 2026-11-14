@@ -22,6 +22,8 @@
   // El encabezado de un STL binario también puede comenzar por "solid".
   if(bytes.length>=84){
    const faces=dv.getUint32(80,true);
+   if(faces>MAX_TRIANGLES&&84+faces*50===bytes.length)
+    fail('El STL tiene más de 450,000 triángulos. Reduce la malla para visualizarla.');
    if(faces>0&&faces<=MAX_TRIANGLES&&84+faces*50===bytes.length){
     format='binario';count=faces;
     for(let k=0;k<faces;k++){
