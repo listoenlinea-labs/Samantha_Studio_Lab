@@ -1,0 +1,176 @@
+/* Ajustes visuales Samantha 2026-11-14: referencias Yerena / HospitalOS.
+   No altera información clínica, API ni esquema de MySQL. */
+body[data-page="inventario"] .ssl-inventory-home{display:grid;gap:22px;margin-bottom:16px}
+body[data-page="inventario"] .ssl-home-hero{
+ display:flex;position:relative;align-items:center;justify-content:space-between;overflow:hidden;
+ padding:24px clamp(20px,3vw,40px);min-height:168px;border-radius:23px;
+ border:1px solid #e7dced;background:linear-gradient(110deg,#ece0f3,#f8f1fa 60%,#fff7f4);
+}
+body[data-page="inventario"] .ssl-home-hero:after{content:"";position:absolute;right:-35px;top:-60px;width:235px;height:235px;border-radius:50%;background:#fbe9e3;opacity:.8}
+body[data-page="inventario"] .ssl-home-hero-copy{position:relative;z-index:2;min-width:0;max-width:78%}
+body[data-page="inventario"] .ssl-home-eyebrow{margin:0 0 10px;color:#9b80ad;font-size:11px;font-weight:800;letter-spacing:.15em}
+body[data-page="inventario"] .ssl-home-hero h1{font:400 clamp(28px,3vw,44px)/1.18 Georgia,serif;color:#654f79;margin:0 0 11px}
+body[data-page="inventario"] .ssl-home-hero h1 em{color:#a77db4;font-style:italic}
+body[data-page="inventario"] .ssl-home-hero p:not(.ssl-home-eyebrow){color:#897b91;font-size:13px;margin:0}
+body[data-page="inventario"] .ssl-home-hero-art{position:relative;z-index:1;width:112px;height:112px;opacity:.63;object-fit:contain}
+body[data-page="inventario"] .ssl-inventory-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}
+body[data-page="inventario"] .ssl-inventory-actions .button{min-height:37px;padding:8px 12px;font-size:11px;border-radius:10px}
+body[data-page="inventario"] .ssl-inventory-heading{font:400 clamp(26px,2.5vw,36px) Georgia,serif;color:#715887;margin:0 0 19px}
+body[data-page="inventario"] .ssl-home-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+body[data-page="inventario"] .ssl-home-kpi{
+ display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:85px;
+ padding:16px 19px;border:1px solid;border-radius:19px;min-width:0;
+}
+body[data-page="inventario"] .ssl-home-kpi.sky{background:#edf6ff;border-color:#cfe5f8}
+body[data-page="inventario"] .ssl-home-kpi.mint{background:#eaf8f1;border-color:#c9eadb}
+body[data-page="inventario"] .ssl-home-kpi.peach{background:#fff4e9;border-color:#f6dbbe}
+body[data-page="inventario"] .ssl-home-kpi.orchid{background:#f9f0fb;border-color:#eddbf2}
+body[data-page="inventario"] .ssl-home-kpi-label{font-size:12px;font-weight:750;color:#5f526a}
+body[data-page="inventario"] .ssl-home-kpi-value{font-size:25px;font-weight:850;color:#392c47;font-variant-numeric:tabular-nums}
+/* Pacientes: tabla neutral, fondo lila grisáceo sin azul petróleo/turquesa. */
+body[data-page="pacientes"] .patient-table thead,
+body[data-page="pacientes"] .px-patient-table thead,
+body[data-page="pacientes"] .patient-table th,
+body[data-page="pacientes"] .px-patient-table th,
+body[data-page="pacientes"] .table-wrap table thead{
+ background:#eee4f4!important;color:#654c7a!important;border-color:#dfd0e9!important;
+}
+body[data-page="pacientes"] .table-wrap table th{
+ background:#eee4f4!important;color:#604a75!important;border-color:#e4d9eb!important;
+ font-weight:800!important
+}
+body[data-page="pacientes"] .table-wrap table tbody tr:nth-child(even){background:#fcf9fd}
+body[data-page="pacientes"] .table-wrap table tbody tr:hover{background:#f6effa}
+body[data-page="pacientes"] .table-wrap table td{border-color:#efe7f3!important}
+/* Perfil rápido: equivalente al modal lateral de Yerena con paleta lavanda. */
+body[data-page="pacientes"] .px-drawer{background:#fff;box-shadow:-18px 0 60px #44335138;z-index:110!important}
+body[data-page="pacientes"] .px-drawer-scrim{background:#394a454f;backdrop-filter:blur(4px);z-index:109!important}
+body[data-page="pacientes"].px-no-scroll .sidebar-collapse-toggle,
+body[data-page="pacientes"].px-no-scroll #menuButton{visibility:hidden!important;pointer-events:none!important}
+body[data-page="pacientes"] .px-patient-header{
+ display:grid;grid-template-columns:112px minmax(0,1fr);gap:22px;
+ align-items:center;padding:43px 52px 30px 40px!important;
+ background:linear-gradient(110deg,#f1e9f6,#f5f5f7 58%,#fff5f8);
+ border-bottom:1px solid #e9dced;position:relative
+}
+body[data-page="pacientes"] .px-patient-header::before{
+ content:"PERFIL DEL PACIENTE";position:absolute;top:21px;left:174px;
+ font-size:10px;letter-spacing:.16em;font-weight:850;color:#9e82ae;
+}
+body[data-page="pacientes"] .px-avatar-edit{width:96px;height:96px;align-self:center;grid-row:1/span 2}
+body[data-page="pacientes"] .px-avatar-edit :is(img,.avatar){width:96px;height:96px;border-radius:50%;border:5px solid #fff;box-shadow:0 0 0 1px #d8c8e6}
+body[data-page="pacientes"] .px-patient-header>div{min-width:0}
+body[data-page="pacientes"] .px-name-line{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
+body[data-page="pacientes"] .px-patient-header h2{font:400 clamp(23px,2.5vw,34px) Georgia,serif;color:#735688;margin:5px 0}
+body[data-page="pacientes"] .px-patient-header p{color:#786984;font-size:12px;flex-wrap:wrap}
+body[data-page="pacientes"] .px-patient-header>small{grid-column:2;color:#9c8eaa;font-size:11px;padding:0}
+body[data-page="pacientes"] .px-history-button{background:#81669b!important;color:#fff!important;border-radius:11px}
+body[data-page="pacientes"] .px-drawer-close{z-index:3;color:#6d5183;background:#fff;border:1px solid #e5d7ec;border-radius:12px}
+body[data-page="pacientes"] .px-note{padding:19px 32px;color:#715b81;font-size:12px}
+body[data-page="pacientes"] .px-note textarea{border-color:#e3d6eb;border-radius:12px;background:#fff;min-height:82px;font:400 13px system-ui}
+body[data-page="pacientes"] .px-drawer-tabs{border-color:#e5d9ed;gap:4px}
+body[data-page="pacientes"] .px-drawer-tabs button{color:#82718e;font-size:12px;font-weight:750;padding:14px 16px}
+body[data-page="pacientes"] .px-drawer-tabs button.active{color:#75548d;border-color:#9a78b1}
+body[data-page="pacientes"] .px-mini-table .head{background:#eee4f4;color:#654b7c}
+body[data-page="pacientes"] .px-mini-table .row:nth-child(even){background:#fcf9fd}
+body[data-page="pacientes"] .px-drawer :is(.px-primary,.px-history-button){background:#81669b;color:white}
+body[data-page="pacientes"] .px-drawer .px-tab-empty{background:#faf8fc;border:1px dashed #e0d3e8;border-radius:14px;color:#9586a0}
+/* También ocultar flecha para cualquier modal del sistema general. */
+body.samantha-app-page:has(.modal-backdrop.open) .sidebar-collapse-toggle,
+body.samantha-app-page:has(.modal-backdrop.active) .sidebar-collapse-toggle,
+body.samantha-app-page:has(.px-drawer.open) .sidebar-collapse-toggle{visibility:hidden!important;pointer-events:none!important}
+/* Odontograma: proporciones y presentación de dientes iguales al diseño de Yerena.
+   Los identificadores, hallazgos y guardado permanecen en Samantha. */
+.ph-odontogram{padding:clamp(14px,2vw,28px)!important}
+.ph-odontogram .ph-card-tabs{padding-bottom:14px;border-bottom:1px solid #e9deee}
+.ph-odontogram .ph-card-tabs>div:first-child button{padding:11px 15px;font-weight:700;font-size:13px}
+.ph-odontogram .ph-odo-controls{margin:17px 0 20px;padding:0;border-bottom:0;justify-content:center;align-items:end;gap:12px}
+.ph-odontogram .ph-odo-controls select{padding:12px;min-width:165px;border-color:#dfd2e8}
+.ph-odontogram .ph-odontogram-help{background:transparent!important;padding:0!important;color:#9889a0;font-size:12px;line-height:1.65}
+.ph-odontogram .ph-teeth-chart{max-width:100%;overflow-x:auto;overflow-y:hidden;padding:12px 0 19px;scrollbar-color:#cebadb #f8f3fb}
+.ph-odontogram .ph-dentition-block{min-width:928px;position:relative}
+.ph-odontogram .ph-dentition-block.adult{display:grid;gap:24px}
+.ph-odontogram .ph-tooth-row{min-width:928px;display:grid!important;grid-template-columns:repeat(var(--tooth-count),minmax(58px,1fr))!important;
+ min-height:145px!important;gap:0!important;padding:4px 0!important;align-items:start!important}
+.ph-odontogram .ph-tooth-row.primary{width:100%!important;min-width:580px;max-width:700px;margin-inline:auto}
+.ph-odontogram .ph-dentition-block.child{min-width:600px}
+.ph-odontogram .ph-dentition-block.child .ph-tooth-row{min-width:600px;grid-template-columns:repeat(var(--tooth-count),minmax(58px,1fr))!important}
+.ph-odontogram .ph-midline{height:1px;background:#e6dce8;margin:0}
+.ph-odontogram .ph-tooth{display:grid!important;grid-template-rows:18px 94px auto;min-height:123px!important;
+ align-content:start!important;align-items:start!important;justify-items:center!important;padding:5px 2px!important;
+ border-radius:12px!important;background:transparent;gap:3px;color:#7b678b}
+.ph-odontogram .ph-tooth:hover,.ph-odontogram .ph-tooth.selected{background:#f3e9f8!important}
+.ph-odontogram .ph-tooth>span.ph-tooth-number{display:grid!important;place-items:center;position:static!important;
+ height:18px!important;min-height:18px!important;font-size:11px!important;font-weight:800;color:#765e87!important;background:transparent!important;order:0}
+.ph-odontogram .ph-tooth>.ph-tooth-visual{height:94px!important;min-height:94px!important;display:grid!important;
+ place-items:center!important;width:54px!important;max-width:100%!important;order:1;position:relative!important}
+.ph-odontogram .ph-tooth-visual>.ph-tooth-art{width:54px!important;height:90px!important;max-width:100%!important;
+ margin:0!important;display:block;transform:none!important;filter:drop-shadow(0 2px 2px #8ca89d29)}
+.ph-odontogram .ph-tooth-visual>.ph-tooth-art.lower{transform:rotate(180deg)!important}
+.ph-odontogram .ph-tooth svg path:not(.crown){fill:#f4e9d6;stroke:#e1d3bf;stroke-width:1.25}
+.ph-odontogram .ph-tooth svg .root-groove{fill:none!important;stroke:#e6dac6!important}
+.ph-odontogram .ph-tooth svg .crown{fill:white;stroke:#d5dfe2;stroke-width:1.65}
+/* Como Yerena: dientes blancos neutros; el diagnóstico se expresa en los símbolos,
+   no coloreando toda la corona (evita confundir un hallazgo con el estado del diente). */
+.ph-odontogram .ph-tooth:is(.bad,.good) svg .crown{fill:#fff;stroke:#d5dfe2}
+.ph-odontogram .ph-dentition-block::after{display:none}
+.ph-odontogram .ph-tooth-markers{inset:9px 0!important;display:flex!important;flex-direction:column!important;
+ align-items:center!important;justify-content:space-evenly!important;pointer-events:none}
+.ph-odontogram .ph-tooth-marker{position:static!important;display:flex!important;align-items:center!important;
+ justify-content:center!important;flex:none;width:20px!important;height:20px!important}
+.ph-odontogram .ph-tooth-marker .ph-symbol{min-width:20px;min-height:20px;background:#ffffffd9}
+.ph-odontogram .ph-tooth>.ph-tooth-overflow{position:static!important;order:2;margin-top:0;
+ height:17px!important;font-size:10px!important;background:transparent!important;color:#7d5a92!important}
+.ph-odontogram .ph-odo-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+ padding:14px 0;border-top:1px solid #ece2ef}
+.ph-odontogram .ph-odo-selected{background:#f0e7f5;color:#735a89;border-radius:99px}
+.ph-odontogram .ph-odo-legend{color:#9f92a8}
+.ph-odontogram .ph-treatment-plan{margin-top:17px;border:1px solid #e9e0ed;border-radius:20px;padding:23px!important}
+.ph-odontogram .ph-treatment-plan h2{font:400 25px Georgia,serif;color:#755889}
+@media(max-width:1120px){
+ body[data-page="inventario"] .ssl-home-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:760px){
+ body[data-page="inventario"] .ssl-home-hero{padding:19px;min-height:135px}
+ body[data-page="inventario"] .ssl-home-hero-copy{max-width:85%}
+ body[data-page="inventario"] .ssl-home-hero h1{font-size:clamp(24px,6.2vw,32px)}
+ body[data-page="inventario"] .ssl-home-hero-art{position:absolute;right:5px;bottom:6px;width:64px;height:64px;opacity:.3}
+ body[data-page="inventario"] .ssl-home-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ body[data-page="inventario"] .ssl-home-kpi{min-height:92px;padding:12px;flex-direction:column;align-items:flex-start}
+ body[data-page="inventario"] .ssl-inventory-actions .button{flex:1 1 130px}
+ body[data-page="pacientes"] .px-drawer{width:100vw!important;max-width:none}
+ body[data-page="pacientes"] .px-patient-header{grid-template-columns:75px minmax(0,1fr);gap:15px;padding:54px 18px 20px!important}
+ body[data-page="pacientes"] .px-avatar-edit,body[data-page="pacientes"] .px-avatar-edit :is(img,.avatar){width:72px;height:72px}
+ body[data-page="pacientes"] .px-patient-header::before{left:110px;top:28px;font-size:9px}
+ body[data-page="pacientes"] .px-patient-header h2{font-size:24px}
+ body[data-page="pacientes"] .px-patient-header>small{grid-column:1/-1}
+ body[data-page="pacientes"] .px-name-line{align-items:flex-start;flex-direction:column}
+ body[data-page="pacientes"] .px-note{padding:14px}
+ body[data-page="pacientes"] .px-drawer-tabs{margin:0 14px;overflow-x:auto}
+ body[data-page="pacientes"] .px-drawer-tabs button{padding:13px 10px;white-space:nowrap}
+ body[data-page="pacientes"] .px-drawer-panel{padding:15px}
+ .ph-odontogram .ph-odo-controls{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+ .ph-odontogram .ph-odo-controls select{min-width:0;width:100%}
+ .ph-odontogram .ph-odo-controls .ph-multi{grid-column:1/-1}
+ .ph-odontogram .ph-treatment-plan{padding:14px!important}
+}
+
+/* Acceso a recetas dentro del perfil rápido: mismo tratamiento visual del historial. */
+body[data-page="pacientes"] .px-prescription-button{
+ display:inline-flex;align-items:center;justify-content:center;padding:9px 12px;
+ border:1px solid #d9c4e7;border-radius:11px;background:#f9f3fc;color:#6b4b80;
+ font-size:11px;font-weight:800;text-decoration:none;
+}
+body[data-page="pacientes"] .px-prescription-button:hover{background:#eedff6}
+body[data-page="pacientes"] .px-patient-table thead,
+body[data-page="pacientes"] .px-patient-table th{
+ background:#eee4f4!important;color:#664f7b!important;border-bottom:1px solid #dcccde!important;
+}
+body[data-page="pacientes"] .px-table-shell{border-color:#e5daeb;box-shadow:0 5px 17px #7154870c}
+body[data-page="pacientes"] .px-patient-table td{border-bottom:1px solid #ede5f0}
+body[data-page="pacientes"] .px-patient-table tbody tr:nth-child(even){background:#fcfafd}
+body[data-page="pacientes"] .px-patient-table tbody tr:hover{background:#f6eff9}
+@media(max-width:760px){
+ body[data-page="pacientes"] .px-prescription-button,
+ body[data-page="pacientes"] .px-history-button{width:100%;text-align:center}
+}

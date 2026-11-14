@@ -728,7 +728,10 @@
       state.findingCatalog = catalog.items || [];
       shell();
       window.dispatchEvent(new Event('ssl:ready'));
-      await renderFiliation();
+      // Enlace directo a Prescripciones: editor y PDFs privados por paciente.
+      const requestedView=new URLSearchParams(window.location.search).get('view');
+      if(requestedView==='prescriptions') await activateView('prescriptions');
+      else await renderFiliation();
     } catch (error) {
       app.innerHTML = `<main class="ph-fatal"><h1>No se pudo abrir el expediente</h1><p>${escapeHtml(error.message)}</p><a href="pacientes.html">Volver a pacientes</a></main>`;
     }
