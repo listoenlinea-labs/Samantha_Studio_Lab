@@ -79,7 +79,16 @@
  }
  function listRows(items,cat){
   if(!items.length)return '<p class="ssl-media-empty">Todavía no hay archivos en este apartado.</p>';
-  return '<div class="ssl-media-list">'+items.map(item=>{
+  const groups=new Map();
+  if(cat==='RADIOGRAFIA')for(const item of items){
+    if(item.tipoMime==='application/dicom'&&String(item.descripcion||'').startsWith('CBCT:')){
+      const key=String(item.descripcion);groups.set(key,[...(groups.get(key)||[]),item]);
+    }
+  }
+  const series=[...groups.entries()].filter(([,entries])=>entries.length>=12).map(([uid,entries])=>
+    '<article class="ssl-media-series"><strong>Serie CBCT guardada · '+entries.length+' cortes</strong>'+
+    '<button type="button" data-media-series="'+escape(uid)+'">Ver tomografía 2D / 3D / Panorámica</button></article>').join('');
+  return '<div class="ssl-media-list">'+series+items.map(item=>{
    const mime=item.tipoMime||'',id=Number(item.idArchivo),isZip=mime==='application/zip',isDicom=mime==='application/dicom';
    const action=isZip?'Ver tomografía':isDicom?'Ver DICOM':mime.startsWith('image/')?'Ver imagen':mime==='application/pdf'?'Ver PDF':'Descargar';
    return '<article class="ssl-media-entry" data-file-id="'+id+'"><div><strong>'+escape(item.nombre)+'</strong>'+
@@ -140,6 +149,19 @@
    return;
   }
   const a=document.createElement('a');a.textContent='Abrir descarga original';a.href=url(blob);a.download=item.nombre;host.append(a);
+ }
+ async function viewSavedSeries(uid){
+  const items=current.items.filter(item=>item.tipoMime==='application/dicom'&&String(item.descripcion)===uid);
+  if(items.length<12||items.length>400)throw Error('La serie guardada debe tener entre 12 y 400 cortes. Revisa si faltan archivos.');
+  const size=items.reduce((n,item)=>n+Number(item.bytes||0),0);
+  if(size>256*1024*1024)throw Error('La serie supera 256 MB; ábrela en un PACS compatible.');
+  const files=[];
+  for(let i=0;i<items.length;i++){
+    const entry=items[i],blob=await blobRequest(Number(entry.idArchivo));
+    files.push(new File([blob],entry.nombre,{type:'application/dicom'}));
+    const label=$('sslCbctSelected');if(label)label.textContent='Descargando corte '+(i+1)+' de '+items.length;
+  }
+  await openVolume(files,'Serie CBCT guardada');
  }
  async function downloadFile(id,name){
   const blob=await blobRequest(id),link=document.createElement('a');
@@ -206,10 +228,11 @@
    }catch(err){message(err.message,true)}finally{button.disabled=false}
   });
   $('sslMediaList').addEventListener('click',async e=>{
-   const view=e.target.closest('[data-media-view]'),down=e.target.closest('[data-media-download]'),del=e.target.closest('[data-media-delete]');
-   const button=view||down||del;if(!button)return;button.disabled=true;
+   const view=e.target.closest('[data-media-view]'),down=e.target.closest('[data-media-download]'),del=e.target.closest('[data-media-delete]'),series=e.target.closest('[data-media-series]');
+   const button=view||down||del||series;if(!button)return;button.disabled=true;
    try{
-    if(view)await viewFile(Number(view.dataset.mediaView));
+    if(series)await viewSavedSeries(series.dataset.mediaSeries);
+    else if(view)await viewFile(Number(view.dataset.mediaView));
     else if(down)await downloadFile(Number(down.dataset.mediaDownload),down.dataset.name);
     else if(del){
      if(!confirm('¿Eliminar definitivamente este archivo del expediente? No se puede deshacer.'))return;
