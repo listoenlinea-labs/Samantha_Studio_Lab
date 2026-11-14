@@ -1,0 +1,59 @@
+/* Samantha · Biblioteca multimedia odontológica.
+ * Una sola experiencia para PDF, fotos, video, audio, tomografía y modelos 3D.
+ * Pasteles discretos y controles accesibles en escritorio y celular. */
+.ssl-media-intro{
+ padding:clamp(18px,2.8vw,30px);border-radius:22px;
+ background:linear-gradient(115deg,#f0e5f6 0%,#fff9fc 58%,#ecf4fa 100%);
+ border:1px solid #e5d8ee;box-shadow:0 9px 25px #76558c0d
+}
+.ssl-media-intro span{color:#9b7aa6;letter-spacing:.16em;font-size:10px;font-weight:850}
+.ssl-media-intro h3{margin:7px 0;color:#634a79;font:400 clamp(25px,3vw,39px)/1.13 Georgia,serif}
+.ssl-media-intro p{color:#826f91;font-size:12px;line-height:1.6;margin:5px 0 0;max-width:760px}
+.ssl-media-library-tools{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(140px,.7fr);gap:9px;align-items:end;margin-bottom:14px}
+.ssl-media-library-tools label{display:grid;gap:5px;font-weight:750;color:#74607f;font-size:11px}
+.ssl-media-library-tools input,.ssl-media-library-tools select{
+ width:100%;min-width:0;box-sizing:border-box;padding:11px;border:1px solid #d9cce4;
+ border-radius:11px;background:#fff;color:#614d75;font-size:12px
+}
+.ssl-media-library-tools #sslMediaCount{grid-column:1/-1;font-size:11px;color:#9580a1;text-align:right}
+.ssl-media-entry[hidden]{display:none!important}
+.ssl-media-entry-info{gap:6px!important}
+.ssl-media-kind{
+ display:inline-flex;align-self:start;width:max-content;
+ font-size:9px;letter-spacing:.04em;font-weight:800;
+ color:#755b8d;background:#efe5f6;border:1px solid #e0d0ed;border-radius:999px;padding:4px 9px
+}
+.ssl-media-compare-check{display:flex;align-items:center;gap:6px;color:#775a8d;font-size:11px;font-weight:700;padding:7px 9px;border-radius:9px;background:#f3eafa;cursor:pointer}
+.ssl-media-compare-check input{accent-color:#9674b2;width:15px;height:15px}
+.ssl-media-compare-bar{
+ display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;
+ padding:11px;margin-top:13px;border-radius:12px;background:#f4edf9;border:1px solid #e5d6ee
+}
+.ssl-media-compare-bar[hidden]{display:none!important}
+.ssl-media-compare-bar span{font-size:11px;color:#74578b;font-weight:750}
+.ssl-media-compare-bar button{min-height:36px;border:1px solid #cbb6df;border-radius:10px;padding:8px 13px;background:#fff;color:#765c92;cursor:pointer;font-size:11px}
+.ssl-media-compare-bar button:disabled{opacity:.45;cursor:not-allowed}
+.ssl-media-video{display:block;width:100%;max-height:600px;min-height:200px;aspect-ratio:16/9;object-fit:contain;background:#1a2230;border-radius:13px}
+.ssl-media-audio{display:block;width:min(640px,95%);margin:25px auto;min-height:52px;accent-color:#a48abb}
+.ssl-media-image-comparison{padding:12px;display:grid;gap:12px;background:#fff}
+.ssl-media-comparison-controls{display:flex;align-items:center;justify-content:flex-end;gap:8px;color:#74608a;font-size:12px}
+.ssl-media-comparison-controls label{display:flex;align-items:center;gap:8px}
+.ssl-media-comparison-controls input{accent-color:#977db0;max-width:130px}
+.ssl-media-image-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.ssl-media-image-pair figure{min-width:0;margin:0;border:1px solid #e1d6e9;border-radius:13px;overflow:hidden;background:#1d2430;display:grid;grid-template-rows:minmax(240px,380px) auto}
+.ssl-media-image-pair figure img{width:100%;height:100%;min-height:240px;object-fit:contain;transition:transform .18s}
+.ssl-media-image-pair figure figcaption{background:#f8f3fb;border-top:1px solid #e9dff0;color:#715b87;font-size:11px;padding:10px 12px;overflow-wrap:anywhere}
+.ssl-media-image-comparison .ssl-media-note{margin:0;padding:0 5px}
+.ssl-media-root .ssl-media-entry-actions button:first-child:not(.ssl-media-delete){
+ background:#e7def2;border-color:#d4c1e4;color:#654b80
+}
+.ssl-media-root .ssl-media-viewer{overflow:hidden;position:relative}
+@media(max-width:760px){
+ .ssl-media-library-tools{grid-template-columns:1fr}
+ .ssl-media-intro{border-radius:16px}
+ .ssl-media-entry-actions .ssl-media-compare-check{flex:1 1 auto;justify-content:center}
+ .ssl-media-image-pair{grid-template-columns:1fr}
+ .ssl-media-image-pair figure{grid-template-rows:minmax(210px,320px) auto}
+ .ssl-media-video{aspect-ratio:4/3;min-height:210px}
+ .ssl-media-comparison-controls{justify-content:center}
+}

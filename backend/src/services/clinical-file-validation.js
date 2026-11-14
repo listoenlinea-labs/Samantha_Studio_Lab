@@ -27,20 +27,59 @@ function sniff(buffer){
  if(buffer.length>12&&buffer.toString('ascii',0,4)==='RIFF'&&buffer.toString('ascii',8,12)==='WEBP')return 'image/webp';
  if(buffer.length>4&&(buffer.subarray(0,4).equals(Buffer.from([73,73,42,0]))||buffer.subarray(0,4).equals(Buffer.from([77,77,0,42]))))return 'image/tiff';
  if(buffer.length>2&&buffer.toString('ascii',0,2)==='BM')return 'image/bmp';
+ if(buffer.length>=6&&['GIF87a','GIF89a'].includes(buffer.toString('ascii',0,6)))return 'image/gif';
+ // Vídeos: ISO Base Media (ftyp) y WebM con DocType explícito.
+ if(buffer.length>16&&buffer.toString('ascii',4,8)==='ftyp'){
+  const brand=buffer.toString('ascii',8,12);
+  const allBrands=buffer.toString('ascii',8,Math.min(buffer.length,64));
+  if(/^(isom|iso2|mp41|mp42|avc1|M4V |MSNV|qt  )$/.test(brand)||/mp4|isom|avc1|iso2/.test(allBrands))
+   return 'video/mp4';
+ }
+ if(buffer.length>16&&buffer.subarray(0,4).equals(Buffer.from([0x1a,0x45,0xdf,0xa3]))&&
+   buffer.subarray(0,Math.min(buffer.length,256)).includes(Buffer.from('webm')))return 'video/webm';
+ // Nota: no intentar reproducir AVI/MKV/MOV arbitrarios: el navegador puede carecer de códec.
+ if(buffer.length>12&&buffer.toString('ascii',0,4)==='RIFF'&&
+    buffer.toString('ascii',8,12)==='WAVE')return 'audio/wav';
+ if(buffer.length>4&&buffer.toString('ascii',0,4)==='OggS')return 'audio/ogg';
+ if(buffer.length>12&&(buffer.toString('ascii',0,3)==='ID3'||
+    (buffer[0]===0xff&&(buffer[1]&0xe0)===0xe0&&((buffer[1]>>1)&3)!==0)))
+  return 'audio/mpeg';
+ // Mallas CAD sin scripts: OBJ y PLY se entregan siempre como attachment.
+ const textStart=buffer.toString('utf8',0,Math.min(buffer.length,8192));
+ if(/^ply\r?\nformat (?:ascii|binary_little_endian) 1\.0(?:\r?\n)/.test(textStart)&&
+    /\nelement vertex [1-9]\d*/.test(textStart)&&/\nend_header\r?\n/.test(textStart))
+  return 'model/ply';
+ // En OBJ grandes todas las caras siguen a miles de líneas de vértices.
+ // Inspeccionar la cabecera y el final; no exigir caras dentro de los primeros 8 KB.
+ const textEnd=buffer.toString('utf8',Math.max(0,buffer.length-256*1024));
+ const hasVertices=/(?:^|\n)v\s+[-+]?\d+(?:\.\d+)?\s+[-+]?\d+(?:\.\d+)?\s+[-+]?\d+/m.test(textStart);
+ const hasFaces=/(?:^|\n)f\s+(?:[-\d]+(?:\/[-\d]*){0,2}\s+){2,}/m.test(textEnd);
+ if(hasVertices&&hasFaces)return 'model/obj';
  return null;
 }
-const allowedImages=new Set(['image/jpeg','image/png','image/webp','image/tiff','image/bmp']);
+const allowedImages=new Set(['image/jpeg','image/png','image/webp','image/tiff','image/bmp','image/gif']);
+const allowedVideos=new Set(['video/mp4','video/webm']);
+const allowedAudio=new Set(['audio/mpeg','audio/wav','audio/ogg']);
+const allowedModels=new Set(['model/stl','model/obj','model/ply']);
 function validateFile({buffer,filename,category}){
  const nombre=publicName(filename);
  if(!['PDF','RADIOGRAFIA'].includes(category))throw bad('Categoría de archivo no permitida.');
  const mime=sniff(buffer);
- const allowed=category==='PDF'?mime==='application/pdf':mime==='application/dicom'||mime==='application/zip'||mime==='model/stl'||allowedImages.has(mime)||mime==='application/pdf';
- if(!allowed)throw bad('Formato inválido: solo PDF, DICOM Part 10, STL, ZIP CBCT e imágenes radiográficas permitidas.');
- const max=['application/zip','application/dicom','model/stl'].includes(mime)?MAX_ADVANCED:MAX_STANDARD;
+ // Compartir el almacén clínico ya existente, sin alterar el ENUM/índices de MySQL.
+ // Categoría RADIOGRAFIA también agrupa video, audio y modelos CAD de la biblioteca multimedia.
+ const allowed=category==='PDF'?mime==='application/pdf':
+  mime==='application/dicom'||mime==='application/zip'||allowedModels.has(mime)||
+  allowedImages.has(mime)||allowedVideos.has(mime)||allowedAudio.has(mime)||mime==='application/pdf';
+ if(!allowed)throw bad('Formato no compatible. Admite PDF, imágenes JPG/PNG/WebP/GIF/TIFF/BMP, MP4/WebM, MP3/WAV/OGG, DICOM, ZIP CBCT y modelos STL/OBJ/PLY.');
+ const max=['application/zip','application/dicom',...allowedModels,...allowedVideos,...allowedAudio].includes(mime)?MAX_ADVANCED:MAX_STANDARD;
  if(buffer.byteLength>max)throw bad('Archivo demasiado grande (máximo '+max/(1024*1024)+' MB).',413);
  if(mime==='application/dicom'&&!/\.(dcm|dicom|ima)$/i.test(nombre))throw bad('DICOM requiere extensión .dcm, .dicom o .ima.');
  if(mime==='application/zip'&&!/\.zip$/i.test(nombre))throw bad('ZIP requiere extensión .zip.');
  if(mime==='model/stl'&&!/\.stl$/i.test(nombre))throw bad('El modelo STL debe tener extensión .stl.');
+ const suffix={'model/obj':/\.obj$/i,'model/ply':/\.ply$/i,'video/mp4':/\.mp4$/i,
+  'video/webm':/\.webm$/i,'audio/mpeg':/\.mp3$/i,'audio/wav':/\.wav$/i,
+  'audio/ogg':/\.ogg$/i,'image/gif':/\.gif$/i};
+ if(suffix[mime]&&!suffix[mime].test(nombre))throw bad('La extensión del archivo no corresponde con su contenido.');
  if(category==='PDF'&&!/\.pdf$/i.test(nombre))throw bad('PDF requiere extensión .pdf.');
  return {nombre,mime,max,size:buffer.byteLength};
 }

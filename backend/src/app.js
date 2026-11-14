@@ -48,6 +48,16 @@ const allowedOrigins = (process.env.FRONTEND_ORIGINS || '')
     .filter(Boolean);
 
 app.use(helmet({
+    // Los medios clínicos llegan mediante fetch autenticado y se muestran en URLs
+    // blob: privadas. No permitir iframes/medios externos ni contenido ejecutable.
+    contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+            'img-src': ["'self'", 'data:', 'blob:'],
+            'media-src': ["'self'", 'blob:'],
+            'frame-src': ["'self'", 'blob:']
+        }
+    },
     // El frontend y la API usan puertos/dominios distintos; permite mostrar
     // las fotos servidas por el endpoint de pacientes.
     crossOriginResourcePolicy: { policy: 'cross-origin' }
