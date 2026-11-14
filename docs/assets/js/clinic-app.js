@@ -1580,15 +1580,31 @@
 
     if (type === 'appointment') {
       fields = `
+    <div class="field wide ssl-appointment-patient">
+      <label for="appointmentPatientName">Paciente · buscar en MySQL</label>
+      <input class="input" name="patient" id="appointmentPatientName"
+        autocomplete="off" required placeholder="Escribe nombre, teléfono o expediente">
+      <input type="hidden" id="appointmentPatientId" name="idPaciente" value="">
+      <p class="ssl-appointment-hint" id="appointmentPatientNotice">Selecciona un paciente o registra uno nuevo.</p>
+      <div class="ssl-appointment-matches" id="appointmentPatientMatches" role="status" aria-live="polite"></div>
+    </div>
+    <div class="field wide ssl-appointment-new-fields" id="appointmentNewPatientFields" hidden>
+      <strong>Nuevo paciente</strong>
+      <label for="appointmentNewGivenNames">Nombre(s) *</label>
+      <input id="appointmentNewGivenNames" class="input" name="nuevoNombre" autocomplete="given-name" placeholder="Nombre(s)">
+      <label for="appointmentNewLastNames">Apellido(s)</label>
+      <input id="appointmentNewLastNames" class="input" name="nuevoApellido" autocomplete="family-name" placeholder="Apellido paterno">
+      <label for="appointmentNewPhone">Teléfono</label>
+      <input id="appointmentNewPhone" class="input" name="nuevoTelefono" type="tel" autocomplete="tel">
+      <label for="appointmentNewEmail">Correo electrónico</label>
+      <input id="appointmentNewEmail" class="input" name="nuevoCorreo" type="email" autocomplete="email">
+    </div>
     <div class="field wide">
-      <label>Paciente</label>
-
-      <input
-        class="input"
-        name="patient"
-        required
-        placeholder="Buscar o registrar paciente"
-      >
+      <label for="appointmentDoctor">Doctor responsable *</label>
+      <input id="appointmentDoctor" class="input" name="doctor" list="appointmentDoctorSuggestions"
+        placeholder="Escribe o selecciona el doctor" maxlength="160" autocomplete="off" required>
+      <datalist id="appointmentDoctorSuggestions"></datalist>
+      <small class="field-help">Los doctores usados anteriormente aparecerán como sugerencias.</small>
     </div>
 
     <div class="field">
@@ -1874,11 +1890,12 @@
     ${close}
   </div>
 
-  <form id="demoForm">
+  <form id="demoForm" data-flow="${type === 'appointment' ? 'appointment' : 'demo'}">
     <div class="form-grid">
       ${fields}
     </div>
 
+    ${type === 'appointment' ? '<p class="ssl-appointment-error" id="appointmentCreateError" role="alert" hidden></p>' : ''}
     <div class="form-actions">
       <button
         type="button"
@@ -2044,6 +2061,7 @@
           appointmentType?.addEventListener('change', syncChairRules);
           syncChairRules();
           if (appointmentChair && requestedChair) appointmentChair.value = requestedChair;
+          window.SamanthaAppointmentFlow?.setup({form: document.getElementById('demoForm'), apiBase: clinicApi});
         }
         backdrop.classList.add('open');
         backdrop.setAttribute('aria-hidden', 'false');
@@ -2075,30 +2093,43 @@
         button.disabled = false;
       }
     });
-    document.addEventListener('submit', (event) => {
+    document.addEventListener('submit', async (event) => {
       if (event.target.id === 'agendaConfigForm') {
         event.preventDefault();
-
-        const defaultView =
-          document.getElementById('defaultAgendaView')?.value || 'week';
-
+        const defaultView = document.getElementById('defaultAgendaView')?.value || 'week';
         localStorage.setItem('ssl-agenda-view', defaultView);
-
         setAgendaView(defaultView);
         closeModal();
-
         showToast('Configuración de Agenda guardada correctamente.');
         return;
       }
-
       if (event.target.id !== 'demoForm') return;
-
       event.preventDefault();
+      const form = event.target;
+      if (form.dataset.flow === 'appointment') {
+        const save = form.querySelector('[type="submit"]');
+        if (!save || save.disabled) return;
+        const errorBox = form.querySelector('#appointmentCreateError');
+        if (errorBox) { errorBox.hidden = true; errorBox.textContent = ''; }
+        save.disabled = true;save.textContent = 'Guardando…';
+        try {
+          const result = await window.SamanthaAppointmentFlow.save({form, apiBase: clinicApi});
+          if (!result?.ok) throw Error('La API no confirmó el guardado.');
+          closeModal();
+          showToast('Cita registrada correctamente en MySQL.');
+          if (page === 'agenda') { loadedAgendaMonth=''; refreshAgendaRange(); }
+          else if (page === 'dashboard') window.location.reload();
+        } catch (error) {
+          if (errorBox) { errorBox.hidden = false; errorBox.textContent = error.message; }
+          else showToast(error.message);
+        } finally {
+          if (save.isConnected) { save.disabled=false;save.textContent='Guardar'; }
+        }
+        return;
+      }
+      // Otros formularios demostrativos permanecen sin cambios.
       closeModal();
-
-      showToast(
-        'Registro guardado en la demostración. El backend persistirá y auditará el cambio.'
-      );
+      showToast('Registro guardado en la demostración.');
     });
     document.addEventListener('submit', async (event) => {
       if (event.target.id !== 'appointmentEditForm') return;
