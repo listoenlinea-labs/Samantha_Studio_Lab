@@ -1,6 +1,9 @@
 const multer = require('multer');
 
 function errorHandler(error, _req, res, _next) {
+    if (error.type === 'entity.too.large') {
+        return res.status(413).json({ok:false,mensaje:'El archivo supera el límite permitido por el servidor.'});
+    }
     if (error instanceof multer.MulterError) {
         const mensaje = error.code === 'LIMIT_FILE_SIZE'
             ? 'La foto no puede pesar más de 5 MB.'
