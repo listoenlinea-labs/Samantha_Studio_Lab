@@ -140,19 +140,30 @@
     '<button type="button" data-stl-view="bottom">Inferior</button>'+
     '<button type="button" data-stl-view="left">Izquierda</button>'+
     '<button type="button" data-stl-view="right">Derecha</button>'+
-    '<button type="button" data-stl-view="reset">Restablecer</button>'+
+    '<button type="button" data-stl-view="reset">Restablecer vista</button>'+
+    '<button type="button" data-stl-view="center-model">Centrar modelo</button>'+
     '<button type="button" data-stl-view="zoom-in">＋</button>'+
     '<button type="button" data-stl-view="zoom-out">−</button>'+
     '<button type="button" data-stl-view="image">Capturar PNG</button>';
+  const navigation=document.createElement('div');navigation.className='ssl-stl-premium-navigation';
+  navigation.innerHTML='<div class="ssl-stl-navigation-modes" role="group" aria-label="Modo de navegación del modelo dental">'+
+    '<button type="button" data-stl-mode="rotate" aria-pressed="true">Girar 3D</button>'+
+    '<button type="button" data-stl-mode="pan" aria-pressed="false">Mover modelo</button>'+
+    '<button type="button" data-stl-mode="center" aria-pressed="false">Centrar un punto</button></div>'+
+    '<div class="ssl-stl-navigation-arrows" role="group" aria-label="Desplazar el modelo">'+
+    '<button type="button" data-stl-pan="left" aria-label="Mover modelo a la izquierda">←</button>'+
+    '<button type="button" data-stl-pan="up" aria-label="Mover modelo hacia arriba">↑</button>'+
+    '<button type="button" data-stl-pan="down" aria-label="Mover modelo hacia abajo">↓</button>'+
+    '<button type="button" data-stl-pan="right" aria-label="Mover modelo a la derecha">→</button></div>';
   const stage=document.createElement('div');stage.className='ssl-stl-premium-stage';stage.dataset.environment='navy';
   const canvas=document.createElement('canvas');canvas.className='ssl-stl-premium-canvas';canvas.tabIndex=0;
-  canvas.setAttribute('aria-label','Modelo STL odontológico. Arrastra para girar, usa zoom, o cambia las vistas en la barra superior.');
+  canvas.setAttribute('aria-label','Modelo STL dental. Arrastra para girar, elige Mover modelo para desplazarlo o Centrar un punto y toca el lugar que quieres centrar.');
   const hint=document.createElement('p');hint.className='ssl-stl-premium-hint';
-  hint.textContent='Arrastra para girar · rueda para acercar · doble clic para restablecer';
+  hint.textContent='Arrastra para girar · Mayús + arrastrar para mover · rueda para acercar';
   stage.append(canvas,hint);
   const footer=document.createElement('p');footer.className='ssl-stl-premium-disclaimer';
   footer.textContent='Las orientaciones siguen los ejes del archivo original. Visor de consulta; no certificado para diagnóstico, análisis de oclusión o mediciones clínicas.';
-  wrapper.append(header,toolbar,viewbar,stage,footer);host.append(wrapper);
+  wrapper.append(header,toolbar,viewbar,navigation,stage,footer);host.append(wrapper);
 
   const gl=canvas.getContext('webgl',{antialias:true,alpha:true,preserveDrawingBuffer:true})
     ||canvas.getContext('experimental-webgl',{antialias:true,alpha:true,preserveDrawingBuffer:true});
@@ -174,9 +185,9 @@
    if(!gl.getProgramParameter(p,gl.LINK_STATUS))fail('No se pudo iniciar el programa gráfico 3D.');
    return p;
   }
-  const vertex='attribute vec3 aPosition;attribute vec3 aNormal;uniform mat3 uRotation;uniform vec2 uScreen;uniform float uZoom;varying vec3 vNormal;varying vec3 vPosition;void main(){vec3 q=uRotation*aPosition;vPosition=q;vNormal=normalize(uRotation*aNormal);gl_Position=vec4(q.x*uScreen.x*uZoom,q.y*uScreen.y*uZoom,-q.z*.65,1.0);}';
+  const vertex='attribute vec3 aPosition;attribute vec3 aNormal;uniform mat3 uRotation;uniform vec2 uScreen;uniform vec2 uPan;uniform float uZoom;varying vec3 vNormal;varying vec3 vPosition;void main(){vec3 q=uRotation*aPosition;vPosition=q;vNormal=normalize(uRotation*aNormal);gl_Position=vec4(q.x*uScreen.x*uZoom+uPan.x,q.y*uScreen.y*uZoom+uPan.y,-q.z*.65,1.0);}';
   const fragment='precision mediump float;varying vec3 vNormal;varying vec3 vPosition;uniform vec3 uColor;uniform float uLight;uniform float uAlpha;uniform float uGloss;void main(){vec3 n=normalize(vNormal);if(!gl_FrontFacing)n=-n;vec3 key=normalize(vec3(.44,.66,1.0));vec3 fill=normalize(vec3(-.65,.24,.6));float a=max(dot(n,key),0.0);float b=max(dot(n,fill),0.0);float rim=pow(1.0-abs(dot(n,vec3(0.,0.,1.))),2.0);vec3 h=normalize(key+vec3(0.,0.,1.));float spec=pow(max(dot(n,h),0.0),uGloss);vec3 c=uColor*(.42+.61*a+.22*b)+vec3(.45,.40,.5)*spec*.39+uColor*rim*.15;c*=uLight;c=c/(c+vec3(.28));c=pow(c,vec3(.85));gl_FragColor=vec4(c,uAlpha);}';
-  const edgeVertex='attribute vec3 aPosition;uniform mat3 uRotation;uniform vec2 uScreen;uniform float uZoom;void main(){vec3 q=uRotation*aPosition;gl_Position=vec4(q.x*uScreen.x*uZoom,q.y*uScreen.y*uZoom,-q.z*.65,1.0);}';
+  const edgeVertex='attribute vec3 aPosition;uniform mat3 uRotation;uniform vec2 uScreen;uniform vec2 uPan;uniform float uZoom;void main(){vec3 q=uRotation*aPosition;gl_Position=vec4(q.x*uScreen.x*uZoom+uPan.x,q.y*uScreen.y*uZoom+uPan.y,-q.z*.65,1.0);}';
   const edgeFragment='precision mediump float;void main(){gl_FragColor=vec4(.33,.30,.41,.25);}';
   const meshProgram=program(vertex,fragment),wireProgram=program(edgeVertex,edgeFragment);
   const positions=gl.createBuffer(),facetNormals=gl.createBuffer(),smoothNormals=gl.createBuffer();
@@ -221,7 +232,8 @@
    blue:[.56,.76,.91],rose:[.9,.65,.71],graphite:[.40,.46,.55]
   };
   let material='ivory',environment='navy',light=1.15,showWire=false,
-      smooth=true,alpha=1,yaw=.28,pitch=-.4,zoom=1,panX=0,panY=0,drag=null,frame=null;
+      smooth=true,alpha=1,yaw=.28,pitch=-.4,zoom=1,panX=0,panY=0,drag=null,frame=null,interactionMode='rotate';
+  const pointers=new Map();
   const attr=(program,name)=>gl.getAttribLocation(program,name);
   const uniform=(program,name)=>gl.getUniformLocation(program,name);
   const rotate=()=>{
@@ -241,6 +253,7 @@
    const screen=new Float32Array([ratio,inverse]);
    gl.uniformMatrix3fv(uniform(meshProgram,'uRotation'),false,rotate());
    gl.uniform2fv(uniform(meshProgram,'uScreen'),screen);
+   gl.uniform2fv(uniform(meshProgram,'uPan'),new Float32Array([panX,panY]));
    gl.uniform1f(uniform(meshProgram,'uZoom'),zoom);
    gl.uniform3fv(uniform(meshProgram,'uColor'),new Float32Array(palette[material]));
    gl.uniform1f(uniform(meshProgram,'uLight'),light);
@@ -261,6 +274,7 @@
     makeWireframe();gl.useProgram(wireProgram);
     gl.uniformMatrix3fv(uniform(wireProgram,'uRotation'),false,rotate());
     gl.uniform2fv(uniform(wireProgram,'uScreen'),screen);
+    gl.uniform2fv(uniform(wireProgram,'uPan'),new Float32Array([panX,panY]));
     gl.uniform1f(uniform(wireProgram,'uZoom'),zoom);
     gl.bindBuffer(gl.ARRAY_BUFFER,wireBuffer);
     const wirePos=attr(wireProgram,'aPosition');
@@ -270,25 +284,104 @@
    }
   }
   const repaint=()=>{if(!disposed&&frame===null)frame=requestAnimationFrame(draw)};
-  function reset(){yaw=.28;pitch=-.4;zoom=1;panX=0;panY=0;repaint()}
+  const clampPan=value=>Math.max(-4,Math.min(4,value));
+  function shiftModel(dx,dy){
+   const rect=canvas.getBoundingClientRect();
+   if(!rect.width||!rect.height)return;
+   // Convertir movimiento en píxeles a coordenadas de pantalla sin alterar zoom/rotación.
+   panX=clampPan(panX+2*dx/rect.width);
+   panY=clampPan(panY-2*dy/rect.height);
+   repaint();
+  }
+  function centerModel(){panX=0;panY=0;repaint()}
+  function reset(){yaw=.28;pitch=-.4;zoom=1;centerModel()}
+  function updateHint(text){hint.textContent=text}
+  function setMode(next){
+   interactionMode=next;
+   navigation.querySelectorAll('[data-stl-mode]').forEach(button=>{
+    button.setAttribute('aria-pressed',String(button.dataset.stlMode===next));
+   });
+   stage.dataset.interaction=next;
+   updateHint(next==='pan'
+    ?'Arrastra con el mouse o un dedo para mover el modelo horizontal o verticalmente.'
+    :next==='center'
+     ?'Haz clic o toca un diente del modelo para llevar ese punto al centro de la pantalla.'
+     :'Arrastra para girar · Mayús + arrastrar para mover · dos dedos para desplazar');
+  }
+  function centerAt(clientX,clientY){
+   const rect=canvas.getBoundingClientRect();
+   if(!rect.width||!rect.height)return;
+   // Seleccionar píxel de superficie visible; el fondo tiene alpha=0.
+   const x=Math.max(0,Math.min(canvas.width-1,Math.floor((clientX-rect.left)/rect.width*canvas.width)));
+   const y=Math.max(0,Math.min(canvas.height-1,Math.floor((rect.bottom-clientY)/rect.height*canvas.height)));
+   const pixel=new Uint8Array(4);
+   gl.readPixels(x,y,1,1,gl.RGBA,gl.UNSIGNED_BYTE,pixel);
+   if(pixel[3]===0){
+    updateHint('Selecciona un punto de la superficie dental y no el fondo.');
+    return;
+   }
+   const ndcX=2*(clientX-rect.left)/rect.width-1;
+   const ndcY=1-2*(clientY-rect.top)/rect.height;
+   panX=clampPan(panX-ndcX);
+   panY=clampPan(panY-ndcY);
+   setMode('rotate');
+   repaint();
+  }
+  canvas.addEventListener('contextmenu',event=>event.preventDefault());
   canvas.addEventListener('pointerdown',event=>{
-   drag=[event.clientX,event.clientY,event.pointerId];
+   pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
+   drag={x:event.clientX,y:event.clientY,startX:event.clientX,startY:event.clientY,
+      pointerId:event.pointerId,mode:event.shiftKey||event.button===2?'pan':interactionMode};
    canvas.setPointerCapture?.(event.pointerId);
   });
   canvas.addEventListener('pointermove',event=>{
-   if(!drag||event.pointerId!==drag[2])return;
-   yaw+=(event.clientX-drag[0])*.009;
-   pitch=Math.max(-1.57,Math.min(1.57,pitch+(event.clientY-drag[1])*.009));
-   drag=[event.clientX,event.clientY,event.pointerId];repaint();
+   const previous=pointers.get(event.pointerId);
+   if(!previous)return;
+   if(event.pointerType==='touch'&&pointers.size>=2){
+    const entries=[...pointers.values()];
+    const oldX=entries.reduce((sum,point)=>sum+point.x,0)/entries.length;
+    const oldY=entries.reduce((sum,point)=>sum+point.y,0)/entries.length;
+    pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
+    const points=[...pointers.values()];
+    shiftModel(points.reduce((sum,point)=>sum+point.x,0)/points.length-oldX,
+      points.reduce((sum,point)=>sum+point.y,0)/points.length-oldY);
+    drag=null;
+    return;
+   }
+   pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
+   if(!drag||event.pointerId!==drag.pointerId){
+    drag={x:event.clientX,y:event.clientY,startX:event.clientX,startY:event.clientY,
+      pointerId:event.pointerId,mode:interactionMode};
+    return;
+   }
+   const dx=event.clientX-drag.x,dy=event.clientY-drag.y;
+   if(interactionMode==='center')return;
+   if(drag.mode==='pan')shiftModel(dx,dy);
+   else{
+    yaw+=dx*.009;
+    pitch=Math.max(-1.57,Math.min(1.57,pitch+dy*.009));
+    repaint();
+   }
+   drag.x=event.clientX;drag.y=event.clientY;
   });
-  canvas.addEventListener('pointerup',()=>{drag=null});
-  canvas.addEventListener('pointercancel',()=>{drag=null});
-  canvas.addEventListener('dblclick',reset);
+  canvas.addEventListener('pointerup',event=>{
+   if(interactionMode==='center'&&drag?.pointerId===event.pointerId
+      &&Math.hypot(event.clientX-drag.startX,event.clientY-drag.startY)<9
+      &&pointers.size===1)centerAt(event.clientX,event.clientY);
+   pointers.delete(event.pointerId);
+   drag=null;
+  });
+  canvas.addEventListener('pointercancel',event=>{pointers.delete(event.pointerId);drag=null});
+  canvas.addEventListener('dblclick',()=>{if(interactionMode!=='center')reset()});
   canvas.addEventListener('wheel',event=>{
    event.preventDefault();zoom=Math.max(.35,Math.min(3,zoom*(event.deltaY<0?1.1:.9)));repaint();
   },{passive:false});
   canvas.addEventListener('keydown',event=>{
-   if(event.key==='ArrowLeft')yaw-=.12;
+   if(event.shiftKey&&event.key==='ArrowLeft')shiftModel(-28,0);
+   else if(event.shiftKey&&event.key==='ArrowRight')shiftModel(28,0);
+   else if(event.shiftKey&&event.key==='ArrowUp')shiftModel(0,-28);
+   else if(event.shiftKey&&event.key==='ArrowDown')shiftModel(0,28);
+   else if(event.key==='ArrowLeft')yaw-=.12;
    else if(event.key==='ArrowRight')yaw+=.12;
    else if(event.key==='ArrowUp')pitch-=.12;
    else if(event.key==='ArrowDown')pitch+=.12;
@@ -297,6 +390,16 @@
    else return;
    event.preventDefault();repaint();
   });
+  navigation.addEventListener('click',event=>{
+   const mode=event.target.closest('[data-stl-mode]')?.dataset.stlMode;
+   if(mode){setMode(mode);return}
+   const direction=event.target.closest('[data-stl-pan]')?.dataset.stlPan;
+   if(direction==='left')shiftModel(-45,0);
+   else if(direction==='right')shiftModel(45,0);
+   else if(direction==='up')shiftModel(0,-45);
+   else if(direction==='down')shiftModel(0,45);
+  });
+  setMode('rotate');
   toolbar.addEventListener('input',event=>{
    const target=event.target,setting=target?.dataset.stlSetting;
    if(setting==='material')material=target.value;
@@ -326,6 +429,7 @@
    else if(key==='zoom-in')zoom=Math.min(3,zoom*1.2);
    else if(key==='zoom-out')zoom=Math.max(.35,zoom/1.2);
    else if(key==='reset')reset();
+   else if(key==='center-model')centerModel();
    else if(key==='image'){
     repaint();
     requestAnimationFrame(()=>{

@@ -36,3 +36,38 @@
  .ssl-stl-premium-stage{height:clamp(330px,100vw,510px)}
  .ssl-stl-premium-hint{font-size:10px;bottom:10px}
 }
+
+/* Navegación del STL: girar / pan / centrar un punto del modelo. */
+.ssl-stl-premium-navigation{
+  display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;
+  gap:12px;padding:12px 20px;background:#f7f2fb;border-bottom:1px solid #e4d7ed
+}
+.ssl-stl-navigation-modes,.ssl-stl-navigation-arrows{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.ssl-stl-navigation-modes button,.ssl-stl-navigation-arrows button{
+  border:1px solid #dccde8;background:#fff;color:#745d89;min-height:38px;
+  border-radius:10px;padding:9px 14px;font-size:12px;font-weight:700;
+  cursor:pointer;transition:background .15s,border-color .15s,box-shadow .15s
+}
+.ssl-stl-navigation-modes button[aria-pressed=true]{
+  background:#e2d3ef;border-color:#b99acb;color:#4f356b;
+  box-shadow:inset 0 0 0 1px #d0b9df
+}
+.ssl-stl-navigation-modes button:hover,.ssl-stl-navigation-arrows button:hover{
+  background:#efe5f6;border-color:#bca6d1
+}
+.ssl-stl-navigation-modes button:focus-visible,
+.ssl-stl-navigation-arrows button:focus-visible{outline:3px solid #a985c2;outline-offset:2px}
+.ssl-stl-navigation-arrows button{width:40px;padding:8px;font-size:17px}
+.ssl-stl-premium-stage[data-interaction=pan] .ssl-stl-premium-canvas{cursor:move}
+.ssl-stl-premium-stage[data-interaction=center] .ssl-stl-premium-canvas{cursor:crosshair}
+.ssl-stl-premium-stage[data-interaction=center] .ssl-stl-premium-hint{
+  background:#563c79e6;border-color:#ceb6eb;color:#fff
+}
+@media(max-width:720px){
+ .ssl-stl-premium-navigation{padding:10px;justify-content:center;gap:9px}
+ .ssl-stl-navigation-modes{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+ .ssl-stl-navigation-modes button{min-height:44px;padding:8px 4px;font-size:11px}
+ .ssl-stl-navigation-arrows{justify-content:center;width:100%}
+ .ssl-stl-navigation-arrows button{min-height:42px;width:48px}
+ .ssl-stl-premium-hint{max-width:94%;line-height:1.35}
+}
