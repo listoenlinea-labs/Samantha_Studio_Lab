@@ -135,11 +135,12 @@ app.use('/api/clinica/asistencias', asistenciasRoutes);
 app.use('/api/busqueda', busquedaRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/pacientes', pacientesClinicosRoutes);
+// Antes del router antiguo, que contiene stubs /:id/archivos con error 501.
+app.use('/api/pacientes', archivosClinicosRoutes);
 app.use('/api/pacientes', pacientesRoutes);
 app.use('/api/odontogramas', odontogramasRoutes);
 app.use('/api/periodontogramas', periodontogramasRoutes);
 app.use('/api/archivos', archivosRoutes);
-app.use('/api/pacientes', archivosClinicosRoutes);
 app.use('/api/tratamientos', tratamientosRoutes);
 app.use('/api/recetas', recetasRoutes);
 app.use('/api/recordatorios', recordatoriosRoutes);
