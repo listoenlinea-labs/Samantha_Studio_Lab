@@ -12,9 +12,15 @@
   let clinicalData = null;
   let clinicalError = '';
   let agendaError = '';
-  const clinicApi = window.APP_CONFIG?.API_URL ||
-    (['localhost', '127.0.0.1'].includes(location.hostname)
-      ? 'http://localhost:3000/api' : `${location.origin}/api`);
+  // GitHub Pages no ejecuta Node.js. Utiliza una API externa explícita si el
+  // frontend se hospeda allí; nunca interpreta /api de GitHub Pages como backend.
+  const isGithubPages = location.hostname.endsWith('.github.io');
+  const explicitApi = window.SSL_API_BASE_URL || window.APP_CONFIG?.API_URL || '';
+  const clinicApi = String(explicitApi || (
+    ['localhost','127.0.0.1'].includes(location.hostname)
+      ? 'http://localhost:3000/api' : location.origin + '/api'
+  )).replace(/\\/$/, '');
+  const requiresBackendConfiguration = isGithubPages && !explicitApi;
 
   const nav = [{
     section: 'Operación'
@@ -2674,13 +2680,30 @@
 
   async function loadClinicalData(date = '') {
     try {
-      const response = await fetch(`${clinicApi}/clinica/resumen${date ? `?fecha=${encodeURIComponent(date)}` : ''}`);
-      if (!response.ok) throw new Error('No se pudo cargar la información clínica.');
-      clinicalData = await response.json();
+      if (requiresBackendConfiguration) {
+        throw new Error('Este sitio se abre desde GitHub Pages. Para consultar citas y pacientes, primero configura la URL HTTPS de la API Node.js desplegada en Hostinger. GitHub Pages no puede conectarse directamente a MySQL.');
+      }
+      const response = await fetch(`${clinicApi}/clinica/resumen${date ? `?fecha=${encodeURIComponent(date)}` : ''}`, { headers: { Accept: 'application/json' } });
+      if (!response.ok) {
+        const reason=response.status===401||response.status===403
+          ? 'La API exige autenticación o no permite el acceso desde esta página.'
+          : response.status===404
+            ? 'No existe el endpoint /api/clinica/resumen en el servidor configurado.'
+            : 'La API respondió con HTTP '+response.status+'. Revisa su estado y los registros de Hostinger.';
+        throw new Error(reason);
+      }
+      if (!(response.headers.get('content-type')||'').includes('application/json')) {
+        throw new Error('El servidor respondió HTML en lugar de JSON: verifica la URL base de la API.');
+      }
+      const payload=await response.json();
+      if (!payload || !payload.metricas || !Array.isArray(payload.citas)) throw new Error('La API respondió sin los datos de resumen esperados.');
+      clinicalData = payload;
       clinicalError = '';
     } catch (error) {
       clinicalData = null;
-      clinicalError = error.message;
+      clinicalError = error instanceof TypeError
+        ? 'No se pudo acceder al servidor de la API. Comprueba la URL HTTPS, el CORS, la conectividad y si Node.js está activo en Hostinger.'
+        : error.message;
     }
   }
 
