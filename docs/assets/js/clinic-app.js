@@ -239,7 +239,7 @@
     const allowed = nav.find((item) => item.id === page)?.permissions?.includes(role) ?? true;
     document.getElementById('app').innerHTML = `
       <div class="app-shell samantha-sidebar-layout">
-        <button type="button" class="sidebar-collapse-toggle" id="sidebarCollapseToggle" aria-controls="appSidebar" aria-label="Ocultar barra lateral" aria-expanded="true" title="Ocultar o mostrar barra lateral"><span class="arrow" aria-hidden="true">‹</span></button>
+        <button type="button" class="sidebar-collapse-toggle" id="sidebarCollapseToggle" aria-controls="appSidebar" aria-label="Ocultar barra lateral" aria-expanded="true" title="Ocultar o mostrar barra lateral"><svg class="arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14.5 5-7 7 7 7" /></svg></button>
         <header class="dc-header">
           <a class="brand" href="index.html"><img src="assets/img/logo-ssl.svg" alt="Logo Samantha's Studio Lab"><div><strong>samantha's studio lab</strong><span>odontopediatría</span></div></a>
           <button class="dc-menu-button" id="menuButton" aria-label="Abrir navegación" aria-controls="appSidebar" aria-expanded="false">☰</button>
@@ -1314,9 +1314,23 @@
 
   function renderLiveOperation() {
     if (!clinicalData) return liveUnavailable();
-    shell(hero('Jornada clínica', 'Pacientes citados hoy.',
-      'Abre el expediente de cada paciente para registrar su atención.') +
-      `<section class="card"><div class="card-head"><div><h2>Atenciones del día</h2><p>${clinicalData.metricas.citas} citas registradas</p></div><a class="button soft" href="agenda.html">Ver otra fecha</a></div>${liveAppointments(clinicalData.citas)}</section>`);
+    shell(`<div class="ssl-operation-layout">
+      <section class="ssl-operation-hero" aria-label="Resumen de jornada clínica">
+        <div class="ssl-operation-hero-copy">
+          <p class="ssl-home-eyebrow">JORNADA CLÍNICA</p>
+          <h1>Pacientes citados <em>hoy.</em></h1>
+          <p>Abre el expediente de cada paciente para registrar su atención.</p>
+        </div>
+        <img src="assets/img/logo-ssl.svg" alt="" loading="lazy">
+      </section>
+      <section class="ssl-operation-panel">
+        <div class="ssl-operation-panel-head">
+          <div><h2>Atenciones del día</h2><p>${number.format(clinicalData.metricas.citas)} citas registradas</p></div>
+          <a class="ssl-operation-date" href="agenda.html">Ver otra fecha</a>
+        </div>
+        ${liveAppointments(clinicalData.citas)}
+      </section>
+    </div>`);
   }
 
   function renderLiveFollowups() {
@@ -1902,26 +1916,31 @@
     };
     positionNav();
     mobileNavQuery.addEventListener?.('change',positionNav);
-    const closeMenu = () => { body.classList.remove('nav-open'); menu?.setAttribute('aria-expanded','false'); };
-    menu?.addEventListener('click', () => {
-      const expanded=body.classList.toggle('nav-open');
-      menu.setAttribute('aria-expanded',String(expanded));
-    });
-    document.getElementById('sidebarScrim')?.addEventListener('click', closeMenu);
-    document.getElementById('mobileNavClose')?.addEventListener('click',closeMenu);
-    document.querySelectorAll('#appSidebar a').forEach(a=>a.addEventListener('click',closeMenu));
     const collapseToggle=document.getElementById('sidebarCollapseToggle');
+    const isMobile=()=>mobileNavQuery.matches;
     const syncCollapse=()=>{
-      const shown=!body.classList.contains('sidebar-is-collapsed');
+      const shown=isMobile()?body.classList.contains('nav-open'):!body.classList.contains('sidebar-is-collapsed');
       collapseToggle?.setAttribute('aria-expanded',String(shown));
       collapseToggle?.setAttribute('aria-label',shown?'Ocultar barra lateral':'Mostrar barra lateral');
       if(collapseToggle)collapseToggle.title=shown?'Ocultar barra lateral':'Mostrar barra lateral';
+      menu?.setAttribute('aria-expanded',String(isMobile()&&shown));
     };
+    const closeMenu=()=>{body.classList.remove('nav-open');syncCollapse();};
+    const toggleMobile=()=>{
+      if(!isMobile())return;
+      body.classList.toggle('nav-open');syncCollapse();
+    };
+    menu?.addEventListener('click',toggleMobile);
+    document.getElementById('sidebarScrim')?.addEventListener('click', closeMenu);
+    document.getElementById('mobileNavClose')?.addEventListener('click',closeMenu);
+    document.querySelectorAll('#appSidebar a').forEach(a=>a.addEventListener('click',closeMenu));
     collapseToggle?.addEventListener('click',()=>{
+      if(isMobile()) {toggleMobile();return;}
       const collapsed=body.classList.toggle('sidebar-is-collapsed');
       try{localStorage.setItem('ssl-sidebar-collapsed',String(collapsed));}catch(_){}
       syncCollapse();
     });
+    mobileNavQuery.addEventListener?.('change',()=>{closeMenu();syncCollapse();});
     syncCollapse();
     document.addEventListener('keydown',(event)=>{if(event.key==='Escape')closeMenu();});
     document.querySelectorAll('.nav-group-trigger').forEach((trigger) => {
