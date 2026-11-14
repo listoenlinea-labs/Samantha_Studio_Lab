@@ -1344,10 +1344,49 @@
       ${kpi('Seguimientos', number.format(m.tareas), 'Pendientes', 'var(--sage-500)')}</section>`);
   }
 
+  function renderRecipes() {
+    shell(`<section class="ssl-recipes-page">
+      <header class="ssl-recipes-intro"><p class="ssl-home-eyebrow">EXPEDIENTE CLÍNICO · PRESCRIPCIONES</p>
+        <h1>Recetas médicas PDF</h1>
+        <p>Busca un paciente para escribir su receta, guardarla en MySQL, generar PDF o consultar recetas anteriores.</p>
+      </header>
+      <section class="ssl-recipes-card">
+        <label for="sslRecipePatientSearch">Buscar paciente por nombre, teléfono o expediente</label>
+        <div class="ssl-recipes-search"><input id="sslRecipePatientSearch" type="search" autocomplete="off" placeholder="Buscar paciente…"><button id="sslRecipeSearchButton" type="button">Buscar</button></div>
+        <div id="sslRecipePatients" role="status" aria-live="polite">Consultando pacientes…</div>
+      </section>
+      <p class="ssl-recipes-disclaimer">Las recetas pertenecen al expediente privado del paciente. Revisa su contenido antes de entregarlas.</p>
+    </section>`);
+    const search=document.getElementById('sslRecipePatientSearch'),button=document.getElementById('sslRecipeSearchButton'),target=document.getElementById('sslRecipePatients');
+    let sequence=0;
+    async function load(){
+      const ticket=++sequence;
+      target.textContent='Consultando pacientes…';button.disabled=true;
+      try{
+        const result=await fetch(clinicApi+'/pacientes?buscar='+encodeURIComponent(search.value.trim())+'&pagina=1&limite=30',{headers:{Accept:'application/json'}});
+        const data=await result.json().catch(()=>({}));
+        if(!result.ok)throw Error(data.mensaje||'No se pudo consultar el directorio de pacientes.');
+        if(ticket!==sequence)return;
+        const items=Array.isArray(data.items)?data.items:[];
+        target.innerHTML=items.length?items.map(p=>{
+          const id=Number(p.idPaciente);
+          if(!Number.isSafeInteger(id)||id<1)return '';
+          return '<div class="ssl-recipes-patient"><span><strong>'+esc(p.nombreCompleto||'Paciente')+'</strong><small>'+esc(p.numeroExpediente||'Sin expediente')+'</small></span>'+
+          '<a href="historial-paciente.html?id='+id+'&view=prescriptions">Redactar o consultar recetas →</a></div>';
+        }).join(''):'<p>No se encontraron pacientes con ese criterio.</p>';
+      }catch(e){if(ticket===sequence)target.textContent=e.message;}
+      finally{if(ticket===sequence)button.disabled=false}
+    }
+    button.addEventListener('click',load);
+    search.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();load();}});
+    load();
+  }
+
   const renderers = {
     dashboard: renderLiveDashboard,
     agenda: renderAgenda,
     pacientes: renderPatients,
+    recetas: renderRecipes,
     operacion: renderLiveOperation,
     tratamientos: renderTreatments,
     seguimientos: renderLiveFollowups,
