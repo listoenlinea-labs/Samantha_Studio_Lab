@@ -25,6 +25,8 @@
   catch(_){throw errors.networkError()}
   const data=await errors.parseJson(res);
   if(!res.ok||data.ok===false)throw errors.errorFrom(res,data);
+  if(!(res.headers.get('Content-Type')||'').toLowerCase().includes('application/json'))
+   throw errors.errorFrom({status:502,headers:res.headers},{mensaje:'La API devolvió una página inesperada en lugar de JSON. Comprueba el estado antes de repetir.'});
   return data;
  }
  async function blobRequest(fileId){
@@ -32,7 +34,7 @@
   let res;
   try{res=await fetch(apiUrl()+'/'+fileId,{credentials:'same-origin',cache:'no-store'})}
   catch(_){throw errors.networkError()}
-  return errors.expectBlob(res);
+  return errors.expectBlob(res,['application/pdf','application/dicom','application/zip','model/stl','image/*']);
  }
  async function uploadFile(file,description,cat,progress){
   const errors=window.SamanthaRequestErrors;
@@ -48,7 +50,8 @@
    });
   }catch(_){throw errors.networkError()}
   const data=await errors.parseJson(res);
-  if(!res.ok||data.ok===false)throw errors.errorFrom(res,data);
+  if(!res.ok||data.ok!==true||!(res.headers.get('Content-Type')||'').toLowerCase().includes('application/json'))
+   throw errors.errorFrom(res,data,{mensaje:'No se recibió confirmación del almacenamiento. Comprueba el expediente antes de repetir la subida.'});
   progress?.();
   return data;
  }
