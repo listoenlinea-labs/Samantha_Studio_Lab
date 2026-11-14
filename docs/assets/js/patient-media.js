@@ -189,44 +189,133 @@
  async function viewFile(id){
   const item=current.items.find(i=>Number(i.idArchivo)===id);
   if(!item)throw Error('Archivo no disponible. Actualiza el listado.');
-  const blob=await blobRequest(id),host=$('sslMediaViewer');
-  if(!host)return;
+  const token=modeToken,blob=await blobRequest(id);
+  if(token!==modeToken)return;
+  await previewBlob(blob,item,token);
+ }
+ async function previewBlob(blob,item,token=modeToken){
+  const host=$('sslMediaViewer');if(!host||token!==modeToken)return;
   if(viewer){viewer.dispose?.();viewer=null}
   objectUrls.forEach(saved=>URL.revokeObjectURL(saved));objectUrls=[];
-  const mime=item.tipoMime;
-  if(mime==='application/zip'||mime==='model/stl'||/\.(stl|zip)$/i.test(item.nombre||'')){
-   const file=new File([blob],item.nombre,{type:mime});
-   await openSelectedStudy([file],item.nombre);
+  const kind=classify(item),mime=String(item.tipoMime||blob.type||''),name=item.nombre||'Estudio';
+  if(kind==='3d'){
+   const file=new File([blob],name,{type:mime});
+   if(/\.stl$/i.test(name)){
+    await openSelectedStudy([file],name);
+    return;
+   }
+   if(!window.SamanthaDentalMesh||!window.SamanthaSTLViewer)
+    throw Error('Los visores OBJ/PLY no están disponibles. Actualiza la página.');
+   const study=await window.SamanthaDentalMesh.open(file);
+   if(token!==modeToken)return;
+   viewer=window.SamanthaSTLViewer.mount(host,study.mesh,{name});
+   host.scrollIntoView({behavior:'smooth',block:'start'});
+   return;
+  }
+  if(kind==='cbct'){
+   await openSelectedStudy([new File([blob],name,{type:mime})],name);
    return;
   }
   host.replaceChildren();
-  if(mime==='application/dicom'){
-   const heading=document.createElement('p');heading.className='ssl-media-note';heading.textContent='DICOM 2D: '+item.nombre;
+  if(kind==='dicom'){
+   const heading=document.createElement('p');heading.className='ssl-media-note';heading.textContent='DICOM 2D: '+name;
    const container=document.createElement('div');container.className='ssl-media-dicom-host';host.append(heading,container);
-   const data=await blob.arrayBuffer();
    try{
-    const info=window.YerenaDicomViewer.inspect(data);
-    viewer=await window.YerenaDicomViewer.mount(data,container);
-    const note=document.createElement('p');note.className='ssl-media-note';note.textContent='Transfer Syntax: '+info.label+' · '+info.uid;
-    host.append(note);
-   }catch(e){container.textContent=e.message+' Descarga el estudio para abrirlo en un PACS compatible.';throw e}
+    const array=await blob.arrayBuffer();
+    if(token!==modeToken)return;
+    const info=window.YerenaDicomViewer.inspect(array);
+    viewer=await window.YerenaDicomViewer.mount(array,container);
+    const note=document.createElement('p');note.className='ssl-media-note';
+    note.textContent='Transfer Syntax: '+info.label+' · '+info.uid;host.append(note);
+   }catch(e){
+    container.textContent=e.message+' Descarga el estudio para abrirlo en un PACS compatible.';
+    throw e;
+   }
    return;
   }
-  if(mime==='application/pdf'){
-   const frame=document.createElement('iframe');frame.title='Documento PDF privado';frame.loading='lazy';
-   frame.className='ssl-media-pdf';frame.src=url(blob);host.append(frame);return;
+  if(kind==='pdf'){
+   const frame=document.createElement('iframe');
+   frame.title='Documento PDF privado · '+name;
+   frame.loading='lazy';frame.className='ssl-media-pdf';
+   frame.setAttribute('referrerpolicy','no-referrer');
+   frame.src=url(blob);host.append(frame);
+   return;
   }
-  if(mime.startsWith('image/')&&mime!=='image/tiff'&&mime!=='image/bmp'){
+  if(kind==='video'||kind==='audio'){
+   const element=document.createElement(kind==='video'?'video':'audio');
+   const sourceMime=mime||blob.type;
+   element.controls=true;element.autoplay=false;element.preload='metadata';
+   element.className=kind==='video'?'ssl-media-video':'ssl-media-audio';
+   element.setAttribute('aria-label',name);
+   if(kind==='video'){element.playsInline=true;element.disablePictureInPicture=false}
+   const note=document.createElement('p');note.className='ssl-media-note';
+   note.textContent=(kind==='video'?'Video':'Audio')+' privado · '+name+
+    '. Los códecs no compatibles requieren reproducción en otro software.';
+   if(sourceMime&&element.canPlayType(sourceMime)===''){
+    const fallback=document.createElement('p');fallback.className='ssl-media-empty';
+    fallback.textContent='Este navegador no admite el formato/códec indicado. Descarga el archivo original.';
+    host.append(fallback);return;
+   }
+   element.addEventListener('error',()=>{
+    note.textContent='No fue posible reproducir este códec en el navegador. Descarga el archivo original.';
+   },{once:true});
+   element.src=url(blob);host.append(element,note);return;
+  }
+  if(kind==='image'&&supportedPreview(item)){
    controller=window.YerenaRadiographControls.create();
    const wrap=document.createElement('div');wrap.className='ssl-media-image-canvas';
-   const img=document.createElement('img');img.src=url(blob);img.alt='Estudio radiográfico del paciente';
+   const img=document.createElement('img');img.src=url(blob);img.alt='Imagen clínica privada: '+name;
    wrap.append(img);wrap.insertAdjacentHTML('beforeend',controlsHtml());host.append(wrap);
    wrap.querySelectorAll('[data-image]').forEach(button=>button.addEventListener('click',()=>{
     if(controller.change(button.dataset.image))img.style.transform=controller.cssTransform();
    }));
    return;
   }
-  const a=document.createElement('a');a.textContent='Abrir descarga original';a.href=url(blob);a.download=item.nombre;host.append(a);
+  const note=document.createElement('p');note.className='ssl-media-empty';
+  note.textContent='El visor del navegador no es compatible con este formato. Utiliza Descargar para consultar el archivo original.';
+  host.append(note);
+ }
+ async function previewLocalFile(){
+  const file=$('sslMediaFile')?.files?.[0];
+  if(!file)throw Error('Selecciona primero un archivo.');
+  if(file.size>256*1024*1024)throw Error('Vista local limitada a 256 MB. Abre el archivo en una aplicación especializada.');
+  const inferred=String(file.name||'').toLowerCase();
+  const mime=file.type||(/\.obj$/i.test(inferred)?'model/obj':/\.ply$/i.test(inferred)?'model/ply':'');
+  await previewBlob(file,{nombre:file.name,tipoMime:mime},modeToken);
+ }
+ async function compareImages(ids){
+  if(ids.length!==2)throw Error('Selecciona exactamente dos imágenes para comparar.');
+  const token=modeToken;
+  const items=ids.map(id=>current.items.find(file=>Number(file.idArchivo)===id));
+  if(items.some(item=>!item||classify(item)!=='image'||!supportedPreview(item)))
+   throw Error('Solo se pueden comparar dos fotografías JPG, PNG, GIF o WebP compatibles.');
+  const blobs=await Promise.all(ids.map(blobRequest));
+  if(token!==modeToken)return;
+  if(viewer){viewer.dispose?.();viewer=null}
+  objectUrls.forEach(saved=>URL.revokeObjectURL(saved));objectUrls=[];
+  const host=$('sslMediaViewer');if(!host)return;
+  host.replaceChildren();
+  const wrapper=document.createElement('div');wrapper.className='ssl-media-image-comparison';
+  const toolbar=document.createElement('div');toolbar.className='ssl-media-comparison-controls';
+  const label=document.createElement('label');label.textContent='Zoom conjunto ';
+  const slider=document.createElement('input');
+  slider.type='range';slider.min='100';slider.max='300';slider.value='100';slider.step='10';
+  label.append(slider);toolbar.append(label);
+  const grid=document.createElement('div');grid.className='ssl-media-image-pair';
+  const images=[];
+  items.forEach((item,i)=>{
+   const figure=document.createElement('figure');
+   const image=document.createElement('img');
+   image.src=url(blobs[i]);image.alt='Comparación: '+item.nombre;
+   const caption=document.createElement('figcaption');
+   caption.textContent=item.nombre+' · '+new Date(item.creadoAt||Date.now()).toLocaleDateString('es-MX');
+   figure.append(image,caption);grid.append(figure);images.push(image);
+  });
+  slider.addEventListener('input',()=>images.forEach(img=>{img.style.transform='scale('+(Number(slider.value)/100)+')'}));
+  const note=document.createElement('p');note.className='ssl-media-note';
+  note.textContent='Comparación visual para seguimiento. Imágenes sin registro geométrico; no utilizar para mediciones clínicas.';
+  wrapper.append(toolbar,grid,note);host.append(wrapper);
+  host.scrollIntoView({behavior:'smooth',block:'start'});
  }
  async function viewSavedSeries(uid){
   const items=current.items.filter(item=>item.tipoMime==='application/dicom'&&String(item.descripcion)===uid);
