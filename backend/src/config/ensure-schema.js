@@ -110,9 +110,22 @@ async function asegurarEsquema(pool) {
         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
     await pool.query("INSERT IGNORE INTO recordatorios_config (id) VALUES (1)");
+    // 'citas' puede ser una tabla antigua cuyo id_cita es INT en vez de BIGINT.
+    // MySQL exige que la FK coincida en tipo, tamaño y signo con la columna padre.
+    // Leer el tipo real evita ALTER/DROP sobre las citas existentes de producción.
+    const [citaColumns] = await pool.query(
+        `SELECT COLUMN_TYPE AS tipo
+         FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'citas' AND COLUMN_NAME = 'id_cita'
+         LIMIT 1`
+    );
+    const citaIdType = String(citaColumns[0]?.tipo || '').trim().toUpperCase();
+    if (!/^(?:TINYINT|SMALLINT|MEDIUMINT|INT|INTEGER|BIGINT)(?:\\([0-9]+\\))?(?: UNSIGNED)?$/.test(citaIdType)) {
+        throw new Error('No se pudo validar el tipo de citas.id_cita para crear recordatorios_envios.');
+    }
     await pool.query(`CREATE TABLE IF NOT EXISTS recordatorios_envios (
         id_envio BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        id_cita BIGINT UNSIGNED NOT NULL,
+        id_cita ${citaIdType} NOT NULL,
         canal ENUM('EMAIL','WHATSAPP') NOT NULL,
         ventana VARCHAR(8) NOT NULL,
         cita_inicio DATETIME NOT NULL,
