@@ -176,14 +176,24 @@ router.patch('/:id/resumen', async (req, res, next) => {
             );
         }
         if (hasNote) {
-            // Garantizar que la nota quede guardada aunque el expediente sea de una importación antigua.
-            const numeroExpediente = `EXP-${new Date().getFullYear()}-${String(patientId).padStart(6, '0')}`;
-            await connection.query(
-                `INSERT INTO expedientes_paciente (id_paciente, numero_expediente, nota_general, estado)
-                 VALUES (?, ?, ?, 'ACTIVO')
-                 ON DUPLICATE KEY UPDATE nota_general = VALUES(nota_general)`,
-                [patientId, numeroExpediente, note]
+            // Actualizar el expediente propio, nunca otra vivienda/paciente por coincidencia de un índice UNIQUE.
+            const [existing] = await connection.query(
+                'SELECT id_paciente FROM expedientes_paciente WHERE id_paciente = ? LIMIT 1 FOR UPDATE',
+                [patientId]
             );
+            if (existing.length) {
+                await connection.query(
+                    'UPDATE expedientes_paciente SET nota_general = ? WHERE id_paciente = ?',
+                    [note, patientId]
+                );
+            } else {
+                const numeroExpediente = `EXP-${new Date().getFullYear()}-${String(patientId).padStart(6, '0')}`;
+                await connection.query(
+                    `INSERT INTO expedientes_paciente (id_paciente, numero_expediente, nota_general, estado)
+                     VALUES (?, ?, ?, 'ACTIVO')`,
+                    [patientId, numeroExpediente, note]
+                );
+            }
         }
         await connection.query(
             `INSERT INTO auditoria (entidad, id_entidad, accion, detalle)
