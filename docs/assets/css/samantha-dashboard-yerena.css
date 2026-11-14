@@ -192,3 +192,45 @@ body[data-page="dashboard"] .ssl-home-shortcut-arrow{margin-left:auto;color:#977
  body.samantha-app-page .samantha-sidebar-layout>.dc-header,
  body.samantha-app-page .samantha-sidebar-layout>.app-main{transition:none!important}
 }
+
+
+/* Recordatorios utiliza una página independiente: conserva el menú compartido. */
+.recordatorios-body .ssl-standalone-sidebar{
+ position:fixed;inset:0 auto 0 0;width:260px;z-index:75;
+ padding:24px 13px 20px;overflow-y:auto;overscroll-behavior:contain;
+ border-right:1px solid #e8dced;background:linear-gradient(175deg,#f9f3fc,#fffdfa);
+ box-shadow:0 3px 10px rgba(72,50,91,.06);
+}
+.recordatorios-body .ssl-standalone-brand{
+ display:flex;align-items:center;gap:10px;padding:0 4px 20px;margin-bottom:17px;
+ border-bottom:1px solid #e8dced;text-decoration:none;color:#705589;
+ font:400 18px/1.25 Georgia,serif;
+}
+.recordatorios-body .ssl-standalone-brand img{width:43px;height:43px;flex:none}
+.recordatorios-body .ssl-standalone-sidebar nav{display:grid;gap:3px}
+.recordatorios-body .ssl-standalone-sidebar nav a{
+ display:flex;align-items:center;min-height:43px;padding:10px 13px;border-radius:11px;
+ color:#6a5479;text-decoration:none;font-size:13px;font-weight:700;
+}
+.recordatorios-body .ssl-standalone-sidebar nav a.active{background:#eadcf2;color:#694985}
+.recordatorios-body .ssl-standalone-sidebar nav a:hover{background:#efe4f5}
+.recordatorios-body .ssl-standalone-toggle{
+ position:fixed;top:21px;left:241px;z-index:95;display:grid;place-items:center;
+ width:36px;height:45px;border:1px solid #c9b7d6;border-radius:0 13px 13px 0;
+ background:#eadcf2;color:#664a7e;font-size:23px;cursor:pointer
+}
+.recordatorios-body .ssl-standalone-scrim{display:none}
+@media(min-width:761px){
+ .recordatorios-body .ph-header,.recordatorios-body .ph-reminders-main{margin-left:260px}
+ .recordatorios-body.ssl-side-hidden .ssl-standalone-sidebar{transform:translateX(-100%);visibility:hidden;pointer-events:none}
+ .recordatorios-body.ssl-side-hidden .ph-header,.recordatorios-body.ssl-side-hidden .ph-reminders-main{margin-left:0}
+ .recordatorios-body.ssl-side-hidden .ssl-standalone-toggle{left:0}
+}
+@media(max-width:760px){
+ .recordatorios-body .ssl-standalone-sidebar{width:min(85vw,320px);transform:translateX(-105%);transition:transform .2s ease}
+ .recordatorios-body.ssl-mobile-open .ssl-standalone-sidebar{transform:translateX(0)}
+ .recordatorios-body .ssl-standalone-toggle{top:13px;left:8px;width:38px;height:39px;border-radius:12px;font-size:20px}
+ .recordatorios-body .ph-header{padding-left:54px}
+ .recordatorios-body.ssl-mobile-open .ssl-standalone-scrim{display:block;position:fixed;inset:0;z-index:70;background:#3b2a4b6b;border:0}
+}
+@media(prefers-reduced-motion:reduce){.recordatorios-body .ssl-standalone-sidebar{transition:none}}
