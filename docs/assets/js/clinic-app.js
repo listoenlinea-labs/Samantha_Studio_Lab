@@ -245,7 +245,7 @@
           <button class="dc-menu-button" id="menuButton" aria-label="Abrir navegación" aria-controls="appSidebar" aria-expanded="false">☰</button>
           <nav class="app-nav" id="appSidebar" aria-label="Navegación principal">
             <div class="ssl-mobile-drawer-brand"><img src="assets/img/logo-ssl.svg" alt=""><div><strong>samantha's studio lab</strong><small>ODONTOPEDIATRÍA</small></div><button type="button" id="mobileNavClose" aria-label="Cerrar navegación">×</button></div>
-            <div class="ssl-mobile-drawer-links">${navigation(role)}</div>
+            ${navigation(role)}
             <div class="ssl-mobile-drawer-bottom"><div class="ssl-mobile-drawer-account"><span>SS</span><div><strong>Samantha Studio</strong><small>${esc(role)}</small></div></div><a href="recetas.html">Crear receta PDF →</a></div>
           </nav>
           <div class="dc-header-tools">
