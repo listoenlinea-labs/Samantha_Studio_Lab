@@ -61,6 +61,11 @@
     if (!response.ok || data.ok === false) {
       throw errors.errorFrom(response, data);
     }
+    if (!(response.headers.get('Content-Type') || '').toLowerCase().includes('application/json')) {
+      throw errors.errorFrom({status:502,headers:response.headers},{
+        mensaje:'La API respondió con una página inesperada, no con una confirmación JSON. Comprueba el guardado antes de repetirlo.'
+      });
+    }
     return data;
   }
 
