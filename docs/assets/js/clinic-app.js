@@ -222,11 +222,16 @@
   }
 
   function shell(content) {
+    document.body.classList.add('samantha-app-page');
+    try {
+      document.body.classList.toggle('sidebar-is-collapsed', localStorage.getItem('ssl-sidebar-collapsed') === 'true');
+    } catch (_) { /* Browsers may restrict localStorage. */ }
     const role = currentRole();
     const meta = pageMeta[page] || pageMeta.dashboard;
     const allowed = nav.find((item) => item.id === page)?.permissions?.includes(role) ?? true;
     document.getElementById('app').innerHTML = `
       <div class="app-shell samantha-sidebar-layout">
+        <button type="button" class="sidebar-collapse-toggle" id="sidebarCollapseToggle" aria-controls="appSidebar" aria-label="Ocultar barra lateral" aria-expanded="true" title="Ocultar o mostrar barra lateral"><span class="arrow" aria-hidden="true">‹</span></button>
         <header class="dc-header">
           <a class="brand" href="index.html"><img src="assets/img/logo-ssl.svg" alt="Logo Samantha's Studio Lab"><div><strong>samantha's studio lab</strong><span>odontopediatría</span></div></a>
           <button class="dc-menu-button" id="menuButton" aria-label="Abrir navegación" aria-controls="appSidebar" aria-expanded="false">☰</button>
@@ -1826,6 +1831,19 @@
       menu.setAttribute('aria-expanded',String(expanded));
     });
     document.getElementById('sidebarScrim')?.addEventListener('click', closeMenu);
+    const collapseToggle=document.getElementById('sidebarCollapseToggle');
+    const syncCollapse=()=>{
+      const shown=!body.classList.contains('sidebar-is-collapsed');
+      collapseToggle?.setAttribute('aria-expanded',String(shown));
+      collapseToggle?.setAttribute('aria-label',shown?'Ocultar barra lateral':'Mostrar barra lateral');
+      if(collapseToggle)collapseToggle.title=shown?'Ocultar barra lateral':'Mostrar barra lateral';
+    };
+    collapseToggle?.addEventListener('click',()=>{
+      const collapsed=body.classList.toggle('sidebar-is-collapsed');
+      try{localStorage.setItem('ssl-sidebar-collapsed',String(collapsed));}catch(_){}
+      syncCollapse();
+    });
+    syncCollapse();
     document.addEventListener('keydown',(event)=>{if(event.key==='Escape')closeMenu();});
     document.querySelectorAll('.nav-group-trigger').forEach((trigger) => {
       trigger.addEventListener('click', (event) => {
