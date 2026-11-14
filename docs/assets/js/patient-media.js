@@ -2,7 +2,7 @@
    El visor DICOM/CBCT es de consulta, no un dispositivo de diagnóstico. */
 (function(){
  'use strict';
- let current=null,selection=[],objectUrls=[],viewer=null,modeToken=0,controller=null;
+ let current=null,selection=[],objectUrls=[],viewer=null,modeToken=0,controller=null,processing=false;
  const $=id=>document.getElementById(id);
  const escape=x=>String(x==null?'':x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const bytes=x=>(Number(x||0)/1024/1024).toFixed(1)+' MB';
@@ -49,22 +49,23 @@
  }
  function formHtml(mode){
   const radio=mode==='radiographs';
-  const inputAccept=radio?'.dcm,.dicom,.ima,.pdf,.jpg,.jpeg,.png,.webp,.tif,.tiff,.bmp,application/dicom':'application/pdf,.pdf';
-  return '<section class="ssl-media-card"><h3>'+(radio?'Agregar radiografía 2D':'Agregar documento PDF')+'</h3>'+
+  const inputAccept=radio?'.dcm,.dicom,.ima,.stl,.pdf,.jpg,.jpeg,.png,.webp,.tif,.tiff,.bmp,application/dicom,model/stl':'application/pdf,.pdf';
+  return '<section class="ssl-media-card"><h3>'+(radio?'Agregar radiografía 2D o modelo STL':'Agregar documento PDF')+'</h3>'+
   '<form id="sslMediaUpload" class="ssl-media-form"><label>Seleccionar archivo<input id="sslMediaFile" type="file" accept="'+inputAccept+'" required></label>'+
   '<label>Descripción (opcional)<input id="sslMediaDescription" maxlength="500" placeholder="Tipo de estudio, fecha o anotación"></label>'+
   '<button class="ssl-media-primary" type="submit">Guardar en expediente</button></form>'+
-  '<p class="ssl-media-note">Guardado privado en MySQL · PDF e imágenes hasta 5 MB'+(radio?'; DICOM Part 10 hasta 14 MB.':' · Solo PDF.')+'</p></section>';
+  '<p class="ssl-media-note">Guardado privado en MySQL · PDF e imágenes hasta 5 MB'+(radio?'; DICOM y STL hasta 14 MB.':' · Solo PDF.')+'</p></section>';
  }
  function cbctHtml(){
-  return '<section class="ssl-media-card ssl-media-cbct" id="sslCbctPanel"><h3>Tomografías CBCT · 2D / 3D / Panorámica</h3>'+
-   '<p>Selecciona un archivo ZIP o una serie de 12 a 400 cortes DICOM del mismo estudio. La visualización se procesa en tu navegador.</p>'+
-   '<div class="ssl-cbct-controls"><label>ZIP o cortes DICOM<input id="sslCbctFiles" type="file" accept=".zip,.dcm,.dicom,.ima" multiple></label>'+
+  return '<section class="ssl-media-card ssl-media-cbct" id="sslCbctPanel"><h3>Tomografías CBCT y modelos STL 3D</h3>'+
+   '<p>Importa un ZIP con 12 a 400 cortes DICOM, una carpeta de cortes o un modelo de superficie STL (ASCII o binario). La malla STL se visualiza en 3D, sin convertirla en cortes CBCT.</p>'+
+   '<div class="ssl-cbct-controls"><label>ZIP, DICOM o STL<input id="sslCbctFiles" type="file" accept=".zip,.dcm,.dicom,.ima,.stl,model/stl" multiple></label>'+
    '<label>Carpeta CBCT<input id="sslCbctFolder" type="file" webkitdirectory multiple></label></div>'+
-   '<div id="sslCbctSelected" aria-live="polite">Todavía no has seleccionado un estudio.</div>'+
+   '<div id="sslCbctSelected" role="status" aria-live="polite">Todavía no has seleccionado un estudio.</div>'+
+   '<progress id="sslCbctProgress" class="ssl-cbct-progress" max="100" value="0" aria-label="Progreso de preparación del estudio" hidden></progress>'+
    '<div class="ssl-cbct-actions"><button id="sslCbctPreview" type="button" class="ssl-media-secondary" disabled>Visualizar estudio</button>'+
-   '<button id="sslCbctPersist" type="button" class="ssl-media-primary" disabled>Guardar serie en MySQL</button></div>'+
-   '<p class="ssl-media-note">El ZIP puede consultarse localmente hasta 256 MB. Para guardarlo en MySQL, máximo 14 MB. Las series de cortes se guardan individualmente si cumplen las validaciones.</p></section>';
+   '<button id="sslCbctPersist" type="button" class="ssl-media-primary" disabled>Guardar estudio en MySQL</button></div>'+
+   '<p class="ssl-media-note">Visualización local: ZIP DICOM hasta 256 MB, STL hasta 40 MB. Para guardar un ZIP, STL o DICOM en MySQL: máximo 14 MB por archivo. Visor exploratorio, no diagnóstico.</p></section>';
  }
  function mainHtml(mode){
   const radio=mode==='radiographs';
@@ -90,7 +91,7 @@
     '<button type="button" data-media-series="'+escape(uid)+'">Ver tomografía 2D / 3D / Panorámica</button></article>').join('');
   return '<div class="ssl-media-list">'+series+items.map(item=>{
    const mime=item.tipoMime||'',id=Number(item.idArchivo),isZip=mime==='application/zip',isDicom=mime==='application/dicom';
-   const action=isZip?'Ver tomografía':isDicom?'Ver DICOM':mime==='image/tiff'||mime==='image/bmp'?'Descargar':mime.startsWith('image/')?'Ver imagen':mime==='application/pdf'?'Ver PDF':'Descargar';
+   const action=mime==='model/stl'?'Ver modelo STL 3D':isZip?'Ver estudio ZIP':isDicom?'Ver DICOM':mime==='image/tiff'||mime==='image/bmp'?'Descargar':mime.startsWith('image/')?'Ver imagen':mime==='application/pdf'?'Ver PDF':'Descargar';
    return '<article class="ssl-media-entry" data-file-id="'+id+'"><div><strong>'+escape(item.nombre)+'</strong>'+
     '<small>'+escape(item.descripcion||'Sin descripción')+' · '+bytes(item.bytes)+' · '+escape(new Date(item.creadoAt).toLocaleDateString('es-MX'))+'</small></div>'+
     '<div class="ssl-media-entry-actions"><button type="button" data-media-view="'+id+'">'+action+'</button>'+
@@ -117,9 +118,9 @@
   if(viewer){viewer.dispose?.();viewer=null}
   objectUrls.forEach(saved=>URL.revokeObjectURL(saved));objectUrls=[];
   const mime=item.tipoMime;
-  if(mime==='application/zip'){
+  if(mime==='application/zip'||mime==='model/stl'){
    const file=new File([blob],item.nombre,{type:mime});
-   await openVolume([file],item.nombre);
+   await openSelectedStudy([file],item.nombre);
    return;
   }
   host.replaceChildren();
@@ -174,22 +175,74 @@
   if(status)status.textContent=selection.length===1?selection[0].name:
    selection.length?selection.length+' archivos seleccionados':'Todavía no has seleccionado un estudio.';
   const valid=selection.length>0;
-  if($('sslCbctPreview'))$('sslCbctPreview').disabled=!valid;
-  if($('sslCbctPersist'))$('sslCbctPersist').disabled=!valid;
+  if($('sslCbctPreview'))$('sslCbctPreview').disabled=processing||!valid;
+  if($('sslCbctPersist'))$('sslCbctPersist').disabled=processing||!valid;
+  const bar=$('sslCbctProgress');if(bar)bar.hidden=true;
+ }
+ const isSTLName=name=>/\.stl$/i.test(String(name||''));
+ function showProgress(n,total,label){
+  const status=$('sslCbctSelected'),bar=$('sslCbctProgress');
+  if(status)status.textContent=label+(total?' · '+n+'/'+total:'');
+  if(!bar)return;
+  bar.hidden=false;
+  if(/Normalizando|Calculando contraste|Finalizando/i.test(label)){bar.removeAttribute('value');return}
+  if(total>0)bar.value=Math.max(0,Math.min(100,Math.round(n*100/total)));
+  else bar.removeAttribute('value');
+ }
+ function finishProgress(text){
+  const bar=$('sslCbctProgress');if(bar)bar.hidden=true;
+  const status=$('sslCbctSelected');if(status)status.textContent=text;
+ }
+ function setBusy(value,label){
+  processing=value;
+  $('sslCbctPanel')?.setAttribute('aria-busy',String(value));
+  for(const id of ['sslCbctPreview','sslCbctPersist']){
+   const button=$(id);if(!button)continue;
+   button.disabled=value||!selection.length;
+   button.textContent=value?'Procesando estudio…':id==='sslCbctPreview'?'Visualizar estudio':'Guardar estudio en MySQL';
+  }
+  if(value&&label)showProgress(0,0,label);
+ }
+ async function stlFromSelection(files){
+  if(files.length!==1)return null;
+  const file=files[0];
+  if(!isSTLName(file.name)&&!/\.zip$/i.test(file.name))return null;
+  if(!window.SamanthaSTLViewer)throw Error('No se cargó el visor STL. Actualiza la página.');
+  return window.SamanthaSTLViewer.openStudy(file);
+ }
+ async function openSelectedStudy(files,label){
+  const token=modeToken;
+  if(files.length===1){
+   const study=await stlFromSelection(files);
+   if(token!==modeToken)return null;
+   if(study){
+    const host=$('sslMediaViewer');if(!host)return;
+    viewer?.dispose?.();viewer=null;
+    viewer=window.SamanthaSTLViewer.mount(host,study.mesh,{name:label||study.source});
+    host.scrollIntoView({behavior:'smooth',block:'start'});
+    finishProgress('Modelo STL listo · '+study.mesh.triangles.toLocaleString('es-MX')+' triángulos');
+    return 'STL';
+   }
+  }
+  if(files.some(f=>isSTLName(f.name)))throw Error('Selecciona un STL individual, sin mezclar con cortes DICOM.');
+  await openVolume(files,label);
+  if(token!==modeToken)return null;
+  finishProgress('Tomografía CBCT lista · 2D, 3D y panorámica');
+  return 'CBCT';
  }
  async function volumeFromFiles(files){
   if(!window.YerenaCBCTArchive||!window.YerenaVolume||!window.YerenaCBCTViewer)
    throw Error('El visor CBCT no está disponible. Actualiza la página.');
   const loaded=await window.YerenaCBCTArchive.fromFiles(files,{
-   onProgress:(n,total,label)=>{const el=$('sslCbctSelected');if(el)el.textContent=label+' · '+n+'/'+total}
+   onProgress:showProgress
   });
-  const volume=await window.YerenaVolume.fromFiles(loaded.records,(n,total,label)=>{
-   const el=$('sslCbctSelected');if(el)el.textContent=label+' · '+n+'/'+total;
-  });
+  const volume=await window.YerenaVolume.fromFiles(loaded.records,showProgress);
   return {volume,loaded};
  }
  async function openVolume(files,label){
+  const token=modeToken;
   const {volume}=await volumeFromFiles(files);
+  if(token!==modeToken)return;
   const host=$('sslMediaViewer');
   if(!host)return;
   if(viewer){viewer.dispose?.();viewer=null}
@@ -199,7 +252,22 @@
  }
  async function persistSeries(){
   if(!selection.length)throw Error('Selecciona un estudio.');
+  const token=modeToken;
+  const stl=await stlFromSelection(selection);
+  if(token!==modeToken)throw Error('Cambió el expediente; vuelve a seleccionar el estudio.');
+  if(stl){
+   if(selection[0].size>14*1024*1024)
+    throw Error('El STL o ZIP de modelo supera 14 MB para MySQL. Puedes visualizarlo localmente o reducirlo.');
+   if(!confirm('¿Guardar este modelo STL en el expediente de este paciente?'))return;
+   await uploadFile(selection[0],'Modelo STL 3D','RADIOGRAFIA');
+   finishProgress('Modelo STL guardado en el expediente.');
+   message('Modelo STL guardado correctamente.');
+   await refresh();
+   return;
+  }
+  if(selection.some(f=>isSTLName(f.name)))throw Error('Selecciona un solo STL, sin mezclar modelos con DICOM.');
   const {volume,loaded}=await volumeFromFiles(selection);
+  if(token!==modeToken)throw Error('Cambió el expediente; se canceló el guardado.');
   const zip=loaded.kind==='zip';
   const unit=zip?selection:[...loaded.records.map(r=>r.file)];
   const max=zip?1:unit.length;
@@ -208,6 +276,7 @@
   const uid=loaded.records[0]?window.YerenaDicomViewer.parse(loaded.records[0].buffer).metadata?.seriesUID:'';
   if(!uid)throw Error('Falta identificador SeriesInstanceUID; no se puede guardar una serie sin identificación.');
   for(let i=0;i<unit.length;i++){
+   if(token!==modeToken)throw Error('Cambió el expediente; se detuvo el guardado de cortes.');
    const desc='CBCT:'+uid;
    const src=unit[i];
    await uploadFile(src,desc,'RADIOGRAFIA',()=>{const e=$('sslCbctSelected');if(e)e.textContent='Guardado '+(i+1)+' de '+max;});
@@ -244,18 +313,25 @@
   });
   if(category()!=='RADIOGRAFIA')return;
   $('sslCbctFiles').addEventListener('change',e=>setSelection(e.target.files));
-  $('sslCbctFolder').addEventListener('change',e=>setSelection(Array.from(e.target.files).filter(f=>/\.(dcm|dicom|ima)$/i.test(f.name))));
-  $('sslCbctPreview').addEventListener('click',async e=>{
-   e.currentTarget.disabled=true;try{await openVolume(selection,'CBCT local')}catch(err){message(err.message,true)}
-   finally{e.currentTarget.disabled=false}
+  $('sslCbctFolder').addEventListener('change',e=>setSelection(Array.from(e.target.files).filter(f=>/\.(dcm|dicom|ima|stl)$/i.test(f.name))));
+  $('sslCbctPreview').addEventListener('click',async ()=>{
+   if(processing||!selection.length)return;
+   setBusy(true,'Preparando estudio');
+   try{await openSelectedStudy([...selection],selection[0].name||'Estudio local')}
+   catch(err){finishProgress('No se pudo visualizar el estudio.');message(err.message,true)}
+   finally{setBusy(false)}
   });
-  $('sslCbctPersist').addEventListener('click',async e=>{
-   e.currentTarget.disabled=true;try{await persistSeries()}catch(err){message(err.message,true)}
-   finally{e.currentTarget.disabled=false}
+  $('sslCbctPersist').addEventListener('click',async ()=>{
+   if(processing||!selection.length)return;
+   setBusy(true,'Validando estudio para guardar');
+   try{await persistSeries()}
+   catch(err){finishProgress('No se pudo guardar el estudio.');message(err.message,true)}
+   finally{setBusy(false)}
   });
  }
  async function render(config){
   dispose();
+  processing=false;
   current={...config,items:[]};
   const element=$('phView');if(!element)return;
   element.innerHTML=mainHtml(config.mode);

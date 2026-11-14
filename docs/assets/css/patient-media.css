@@ -68,3 +68,30 @@
  .ssl-media-image-canvas{min-height:260px}
  .ssl-media-image-canvas .clinical-rx-controls{bottom:6px;width:calc(100% - 12px);justify-content:start}
 }
+
+/* CBCT y STL: progreso explícito y visor de mallas 3D responsive. */
+.ssl-cbct-progress{
+ width:100%;height:9px;display:block;accent-color:#987bb1;
+ margin:10px 0 15px;border-radius:12px;overflow:hidden;
+}
+.ssl-cbct-progress[hidden]{display:none!important}
+.ssl-stl-viewer{display:grid;gap:12px;min-width:0}
+.ssl-stl-meta{display:grid;gap:5px;padding:4px 5px 0}
+.ssl-stl-meta strong{font:400 clamp(19px,2.2vw,26px) Georgia,serif;color:#80639b;overflow-wrap:anywhere}
+.ssl-stl-meta small{font-size:11px;line-height:1.5;color:#8d80a0;overflow-wrap:anywhere}
+.ssl-stl-canvas{
+ display:block;width:100%;height:clamp(280px,44vw,560px);border-radius:13px;
+ background:#15202d;touch-action:none;cursor:grab
+}
+.ssl-stl-canvas:active{cursor:grabbing}
+.ssl-stl-tools{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.ssl-stl-tools button{
+ min-height:42px;padding:9px 15px;border:1px solid #d9c8e7;background:#f0e5f7;
+ border-radius:11px;color:#6d5085;font-size:12px;font-weight:750;cursor:pointer
+}
+.ssl-stl-tools button:hover{background:#e6d7f0}
+.ssl-media-cbct[aria-busy="true"] .ssl-cbct-controls input{pointer-events:none;opacity:.68}
+@media(max-width:760px){
+ .ssl-stl-canvas{height:340px}
+ .ssl-stl-tools button{flex:1 1 110px}
+}
