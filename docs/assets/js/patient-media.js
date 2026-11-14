@@ -19,27 +19,39 @@
  }
  function url(blob){const u=URL.createObjectURL(blob);objectUrls.push(u);return u}
  async function jsonRequest(path,options={}){
-  const res=await fetch(path,{...options,credentials:'same-origin',cache:'no-store'});
-  const data=await res.json().catch(()=>({}));
-  if(!res.ok||data.ok===false)throw Error(data.mensaje||'No se pudo consultar el expediente ('+res.status+').');
+  const errors=window.SamanthaRequestErrors;
+  let res;
+  try{res=await fetch(path,{...options,credentials:'same-origin',cache:'no-store'})}
+  catch(_){throw errors.networkError()}
+  const data=await errors.parseJson(res);
+  if(!res.ok||data.ok===false)throw errors.errorFrom(res,data);
+  if(!(res.headers.get('Content-Type')||'').toLowerCase().includes('application/json'))
+   throw errors.errorFrom({status:502,headers:res.headers},{mensaje:'La API devolvió una página inesperada en lugar de JSON. Comprueba el estado antes de repetir.'});
   return data;
  }
  async function blobRequest(fileId){
-  const res=await fetch(apiUrl()+'/'+fileId,{credentials:'same-origin',cache:'no-store'});
-  if(!res.ok){
-   const data=await res.json().catch(()=>({}));
-   throw Error(data.mensaje||'No se pudo abrir el estudio ('+res.status+').');
-  }
-  return res.blob();
+  const errors=window.SamanthaRequestErrors;
+  let res;
+  try{res=await fetch(apiUrl()+'/'+fileId,{credentials:'same-origin',cache:'no-store'})}
+  catch(_){throw errors.networkError()}
+  return errors.expectBlob(res,['application/pdf','application/dicom','application/zip','model/stl','image/*']);
  }
  async function uploadFile(file,description,cat,progress){
+  const errors=window.SamanthaRequestErrors;
+  const limit=/\.(stl|dcm|dicom|ima|zip)$/i.test(file.name)?14:5;
+  if(file.size>limit*1024*1024)
+   throw Error('El archivo pesa '+bytes(file.size)+'; el máximo de almacenamiento para este formato es '+limit+' MB.');
   const query=new URLSearchParams({categoria:cat,nombre:file.name,descripcion:description||''});
-  const res=await fetch(apiUrl()+'?'+query,{
-   method:'POST',headers:{'Content-Type':file.type||'application/octet-stream'},
-   body:file,cache:'no-store',credentials:'same-origin'
-  });
-  const data=await res.json().catch(()=>({}));
-  if(!res.ok||data.ok===false)throw Error(data.mensaje||'No se pudo guardar el archivo ('+res.status+').');
+  let res;
+  try{
+   res=await fetch(apiUrl()+'?'+query,{
+    method:'POST',headers:{'Content-Type':file.type||'application/octet-stream'},
+    body:file,cache:'no-store',credentials:'same-origin'
+   });
+  }catch(_){throw errors.networkError()}
+  const data=await errors.parseJson(res);
+  if(!res.ok||data.ok!==true||!(res.headers.get('Content-Type')||'').toLowerCase().includes('application/json'))
+   throw errors.errorFrom(res,data,'No se recibió confirmación del almacenamiento. Comprueba el expediente antes de repetir la subida.');
   progress?.();
   return data;
  }
@@ -167,7 +179,11 @@
  }
  async function downloadFile(id,name){
   const blob=await blobRequest(id),link=document.createElement('a');
-  const object=url(blob);link.href=object;link.download=name||'archivo-clinico';document.body.append(link);link.click();link.remove();
+  const object=url(blob);
+  link.href=object;link.download=name||'archivo-clinico';
+  document.body.append(link);link.click();link.remove();
+  // Mantener temporalmente el objeto para que navegadores móviles terminen la descarga.
+  setTimeout(()=>{URL.revokeObjectURL(object);objectUrls=objectUrls.filter(item=>item!==object)},60000);
  }
  function setSelection(files){
   selection=Array.from(files||[]);
@@ -290,12 +306,14 @@
    e.preventDefault();
    const file=$('sslMediaFile').files?.[0],button=fileForm.querySelector('button[type=submit]');
    if(!file)return message('Selecciona un archivo.',true);
-   button.disabled=true;
+   if(button.disabled)return;
+   button.disabled=true;button.textContent='Guardando archivo…';
    try{
     await uploadFile(file,$('sslMediaDescription').value.trim(),category());
     fileForm.reset();message('Archivo guardado en el expediente.');
-    await refresh();
-   }catch(err){message(err.message,true)}finally{button.disabled=false}
+    try{await refresh()}catch(_){message('El archivo se guardó, pero no se pudo actualizar el listado. Recarga para consultarlo.',true)}
+   }catch(err){message('No se confirmó el guardado: '+err.message,true)}
+   finally{button.disabled=false;button.textContent='Guardar en expediente'}
   });
   $('sslMediaList').addEventListener('click',async e=>{
    const view=e.target.closest('[data-media-view]'),down=e.target.closest('[data-media-download]'),del=e.target.closest('[data-media-delete]'),series=e.target.closest('[data-media-series]');

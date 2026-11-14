@@ -1205,3 +1205,12 @@
         left: 120px
     }
 }
+
+/* Error visible dentro del editor clínico: conserva el texto si MySQL rechaza el guardado. */
+.ph-modal-card .ph-save-error{
+  display:block;margin:13px 0 0;padding:12px 14px;
+  border-radius:11px;border:1px solid #edd1da;background:#fff5f6;
+  color:#963e55;font-size:12px;line-height:1.55;overflow-wrap:anywhere;
+}
+.ph-modal-card .ph-save-error[hidden]{display:none!important}
+.ph-modal-card button:disabled{opacity:.66;cursor:progress}

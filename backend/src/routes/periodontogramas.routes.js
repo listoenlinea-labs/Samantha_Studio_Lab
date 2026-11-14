@@ -159,8 +159,8 @@ router.patch('/:id', async (req, res, next) => {
         }
         await connection.query(
             `INSERT INTO auditoria (entidad, id_entidad, accion, detalle)
-             VALUES ('periodontogramas', ?, 'ACTUALIZAR_OBSERVACIONES', ?)`,
-            [periodontogramId, JSON.stringify({ observaciones: Boolean(observations) })]
+             VALUES ('periodontogramas', ?, 'ACTUALIZAR', ?)`,
+            [periodontogramId, JSON.stringify({ operacion: 'OBSERVACIONES', observaciones: Boolean(observations) })]
         );
         await connection.commit();
         return res.json({ ok: true, mensaje: 'Observaciones guardadas.' });

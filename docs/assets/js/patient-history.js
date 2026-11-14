@@ -46,13 +46,26 @@
   }[character]));
 
   async function api(path, options = {}) {
-    const response = await fetch(`${API_URL}${path}`, {
-      ...options,
-      headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }
-    });
-    const data = await response.json().catch(() => ({}));
-    // En desarrollo la API incluye detalle; en producción se conserva el mensaje amigable.
-    if (!response.ok) throw new Error(data.detalle || data.mensaje || 'No fue posible completar la solicitud.');
+    const errors = window.SamanthaRequestErrors;
+    let response;
+    try {
+      response = await fetch(`${API_URL}${path}`, {
+        ...options,
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }
+      });
+    } catch (_) {
+      throw errors.networkError();
+    }
+    const data = await errors.parseJson(response);
+    if (!response.ok || data.ok === false) {
+      throw errors.errorFrom(response, data);
+    }
+    if (!(response.headers.get('Content-Type') || '').toLowerCase().includes('application/json')) {
+      throw errors.errorFrom({status:502,headers:response.headers},{
+        mensaje:'La API respondió con una página inesperada, no con una confirmación JSON. Comprueba el guardado antes de repetirlo.'
+      });
+    }
     return data;
   }
 
@@ -228,14 +241,36 @@
     } else {
       const isNote = type === 'note';
       const value = isNote ? state.patient.notaGeneral : state.patient.alergias;
-      modal.innerHTML = `<form class="ph-modal-card" id="summaryForm"><header><h2>${isNote ? 'Nota general' : 'Alergias'}</h2><button type="button" data-close-modal>×</button></header><label>${isNote ? 'Información visible en el expediente' : 'Alergias y reacciones importantes'}<textarea name="value" rows="6" maxlength="4000">${escapeHtml(value || '')}</textarea></label><footer><button type="button" data-close-modal>Cancelar</button><button class="ph-primary">Guardar</button></footer></form>`;
+      modal.innerHTML = `<form class="ph-modal-card" id="summaryForm"><header><h2>${isNote ? 'Nota general' : 'Alergias'}</h2><button type="button" data-close-modal>×</button></header><label>${isNote ? 'Información visible en el expediente' : 'Alergias y reacciones importantes'}<textarea name="value" rows="6" maxlength="4000">${escapeHtml(value || '')}</textarea></label><p id="summarySaveError" class="ph-save-error" role="alert" hidden></p><footer><button type="button" data-close-modal>Cancelar</button><button class="ph-primary">Guardar</button></footer></form>`;
       modal.querySelector('form').onsubmit = async (event) => {
         event.preventDefault();
+        const form = event.currentTarget;
+        const button = form.querySelector('[type=submit]');
+        if (button?.disabled) return;
+        const field = isNote ? 'notaGeneral' : 'alergias';
+        const payload = { [field]: new FormData(form).get('value') };
+        const inlineError = form.querySelector('#summarySaveError');
+        if (inlineError) { inlineError.hidden = true; inlineError.textContent = ''; }
+        if (button) { button.disabled = true; button.textContent = 'Guardando…'; }
         try {
-          const payload = { [isNote ? 'notaGeneral' : 'alergias']: new FormData(event.currentTarget).get('value') };
           await api(`/pacientes/${patientId}/resumen`, { method: 'PATCH', body: JSON.stringify(payload) });
-          closeModal(); notify('Información clínica guardada.'); await refreshPatientSummary();
-        } catch (error) { notify(error.message, true); }
+          state.patient[field] = payload[field];
+          closeModal();
+          try {
+            await refreshPatientSummary();
+            notify('Información clínica guardada correctamente.');
+          } catch (reloadError) {
+            notify('El servidor confirmó el guardado, pero no se pudo actualizar la vista. Recarga el expediente para verificarlo.', true);
+          }
+        } catch (error) {
+          // Conservar formulario y contenido: nunca cerrar un editor cuyo guardado falló.
+          notify('No se confirmó el guardado: ' + error.message, true);
+          if (inlineError && form.isConnected) {
+            inlineError.hidden = false;
+            inlineError.textContent = 'No se confirmó el guardado. ' + error.message;
+          }
+          if (form.isConnected && button) { button.disabled = false; button.textContent = 'Guardar'; }
+        }
       };
     }
     modal.querySelectorAll('[data-close-modal]').forEach((button) => button.onclick = closeModal);
@@ -335,12 +370,21 @@
   }
 
   async function saveHistory() {
+    const form = document.getElementById('historyForm');
+    const button = document.getElementById('saveHistory');
+    if (!form || button?.disabled) return;
+    if (button) { button.disabled = true; button.textContent = 'Guardando…'; }
     try {
-      const payload = Object.fromEntries(new FormData(document.getElementById('historyForm')));
+      const payload = Object.fromEntries(new FormData(form));
       await api(`/pacientes/${patientId}/historia-clinica`, { method: 'PUT', body: JSON.stringify(payload) });
-      notify('Historia clínica guardada y versionada.');
-      await renderHistory();
-    } catch (error) { notify(error.message, true); }
+    } catch (error) {
+      notify('No se confirmó el guardado de la historia. ' + error.message, true);
+      if (button?.isConnected) { button.disabled = false; button.textContent = 'Guardar cambios'; }
+      return;
+    }
+    notify('Historia clínica guardada y versionada.');
+    try { await renderHistory(); }
+    catch (_) { notify('Historia guardada. Vuelve a abrir la sección para actualizar la vista.', true); }
   }
 
   async function saveSession(event) {

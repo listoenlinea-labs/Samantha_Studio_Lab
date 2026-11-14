@@ -128,17 +128,23 @@ router.get('/:id/resumen', async (req, res, next) => {
 });
 
 router.patch('/:id/resumen', async (req, res, next) => {
-    const connection = await pool.getConnection();
+    let connection;
     try {
+        connection = await pool.getConnection();
         const patientId = parsePositiveId(req.params.id);
         if (!patientId) return invalidId(res);
-        const hasAllergies = Object.prototype.hasOwnProperty.call(req.body, 'alergias');
-        const hasNote = Object.prototype.hasOwnProperty.call(req.body, 'notaGeneral');
+        const body = req.body && typeof req.body === 'object' && !Array.isArray(req.body) ? req.body : {};
+        const hasAllergies = Object.prototype.hasOwnProperty.call(body, 'alergias');
+        const hasNote = Object.prototype.hasOwnProperty.call(body, 'notaGeneral');
         if (!hasAllergies && !hasNote) {
             return res.status(400).json({ ok: false, mensaje: 'Envía alergias o notaGeneral para actualizar.' });
         }
-        const allergies = String(req.body.alergias || '').trim() || null;
-        const note = String(req.body.notaGeneral || '').trim() || null;
+        if ((hasAllergies && typeof body.alergias !== 'string') ||
+            (hasNote && typeof body.notaGeneral !== 'string')) {
+            return res.status(400).json({ ok: false, mensaje: 'Las alergias y la nota deben enviarse como texto.' });
+        }
+        const allergies = hasAllergies ? body.alergias.trim() || null : null;
+        const note = hasNote ? body.notaGeneral.trim() || null : null;
         if ((allergies && allergies.length > 4000) || (note && note.length > 4000)) {
             return res.status(400).json({ ok: false, mensaje: 'El texto no puede superar 4000 caracteres.' });
         }
@@ -175,20 +181,39 @@ router.patch('/:id/resumen', async (req, res, next) => {
             );
         }
         if (hasNote) {
-            await connection.query('UPDATE expedientes_paciente SET nota_general = ? WHERE id_paciente = ?', [note, patientId]);
+            // Actualizar el expediente propio, nunca otra vivienda/paciente por coincidencia de un índice UNIQUE.
+            const [existing] = await connection.query(
+                'SELECT id_paciente FROM expedientes_paciente WHERE id_paciente = ? LIMIT 1 FOR UPDATE',
+                [patientId]
+            );
+            if (existing.length) {
+                await connection.query(
+                    'UPDATE expedientes_paciente SET nota_general = ? WHERE id_paciente = ?',
+                    [note, patientId]
+                );
+            } else {
+                const numeroExpediente = `EXP-${new Date().getFullYear()}-${String(patientId).padStart(6, '0')}`;
+                await connection.query(
+                    `INSERT INTO expedientes_paciente (id_paciente, numero_expediente, nota_general, estado)
+                     VALUES (?, ?, ?, 'ACTIVO')`,
+                    [patientId, numeroExpediente, note]
+                );
+            }
         }
         await connection.query(
             `INSERT INTO auditoria (entidad, id_entidad, accion, detalle)
-             VALUES ('pacientes', ?, 'ACTUALIZAR_RESUMEN_CLINICO', ?)`,
-            [patientId, JSON.stringify({ alergias: hasAllergies, notaGeneral: hasNote })]
+             VALUES ('pacientes', ?, 'ACTUALIZAR', ?)`,
+            [patientId, JSON.stringify({ apartado: 'RESUMEN_CLINICO', alergias: hasAllergies, notaGeneral: hasNote })]
         );
         await connection.commit();
         return res.json({ ok: true, alergias: allergies, notaGeneral: note });
     } catch (error) {
-        await connection.rollback();
+        if (connection) {
+            try { await connection.rollback(); } catch (_) { /* connection already lost */ }
+        }
         next(error);
     } finally {
-        connection.release();
+        connection?.release();
     }
 });
 

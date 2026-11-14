@@ -34,9 +34,12 @@
    '<div class="preview-actions"><strong>Vista previa · Receta</strong><button type="button" id="phRxPrint">Imprimir</button><button type="button" id="phRxClose">Cerrar</button></div>'+
    '<iframe title="Vista previa PDF de receta"></iframe></section></div>';
   async function blobFor(id){
-   const resp=await fetch(API_URL+'/recetas/'+id+'/pdf',{credentials:'same-origin'});
-   if(!resp.ok)throw Error('No fue posible cargar el PDF de esta receta.');
-   return URL.createObjectURL(await resp.blob());
+   const errors=window.SamanthaRequestErrors;
+   let resp;
+   try{resp=await fetch(API_URL+'/recetas/'+id+'/pdf',{credentials:'same-origin',cache:'no-store'})}
+   catch(_){throw errors.networkError()}
+   const blob=await errors.expectBlob(resp,['application/pdf']);
+   return URL.createObjectURL(blob);
   }
   function closePreview(){
    const modal=document.getElementById('phRxPreview');
@@ -59,7 +62,7 @@
     if(b.dataset.rxDownload){
      const url=await blobFor(b.dataset.rxDownload),a=document.createElement('a');
      a.href=url;a.download=(b.dataset.folio||'receta')+'.pdf';document.body.appendChild(a);a.click();a.remove();
-     setTimeout(()=>URL.revokeObjectURL(url),1000);return;
+     setTimeout(()=>URL.revokeObjectURL(url),60000);return;
     }
     if(b.dataset.rxDelete&&confirm('¿Eliminar la receta y el PDF de este expediente?')){
      await api('/recetas/'+b.dataset.rxDelete,{method:'DELETE'});
@@ -69,14 +72,24 @@
   };
   document.getElementById('phRxForm').onsubmit=async function(e){
    e.preventDefault();const form=e.currentTarget,b=form.querySelector('[type=submit]');
+   if(b.disabled)return;
    b.disabled=true;b.textContent='Guardando…';
+   let saved;
    try{
     const payload=Object.fromEntries(new FormData(form));
-    const saved=await api('/recetas/pacientes/'+patientId,{method:'POST',body:JSON.stringify(payload)});
-    notify('Receta guardada con folio '+saved.folio);
+    saved=await api('/recetas/pacientes/'+patientId,{method:'POST',body:JSON.stringify(payload)});
+   }catch(err){
+    notify('No se confirmó el guardado de la receta: '+err.message,true);
+    b.disabled=false;b.textContent='Guardar y generar PDF';
+    return;
+   }
+   notify('Receta guardada con folio '+saved.folio);
+   try{
     await show(context);
     const first=document.querySelector('[data-rx-view="'+Number(saved.idReceta)+'"]');if(first)first.click();
-   }catch(err){notify(err.message,true);b.disabled=false;b.textContent='Guardar y generar PDF';}
+   }catch(err){
+    notify('La receta se guardó, pero no se pudo actualizar el historial. Vuelve a abrir Prescripciones.',true);
+   }
   };
  }
  window.SamanthaPrescriptions={render:show};
