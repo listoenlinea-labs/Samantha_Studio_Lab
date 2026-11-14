@@ -7,6 +7,92 @@ const appointmentStates = ['PROGRAMADA', 'POR_CONFIRMAR', 'CONFIRMADA', 'EN_SALA
 const validDateTime = (value) => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)
     && !Number.isNaN(Date.parse(`${value}:00Z`));
 
+// Se obtiene un catálogo de sugerencias a partir de doctores ya utilizados.
+// Samantha almacena al profesional por nombre en citas.doctor (sin tabla medicos).
+router.get('/doctores', async (_req, res, next) => {
+    try {
+        const [rows] = await pool.query(
+            "SELECT DISTINCT TRIM(doctor) AS nombre FROM citas " +
+            "WHERE doctor IS NOT NULL AND TRIM(doctor) <> '' ORDER BY nombre LIMIT 100"
+        );
+        res.json({ ok: true, doctores: rows.map(row => row.nombre) });
+    } catch (error) { next(error); }
+});
+
+// Crear citas reales; no cerrar la ventana hasta que MySQL confirme el INSERT.
+router.post('/citas', async (req, res, next) => {
+    const data = req.body || {};
+    const patientId = Number(data.idPaciente);
+    const date = String(data.fecha || '');
+    const time = String(data.hora || '');
+    const duration = Number(data.duracionMinutos);
+    const professional = String(data.doctor || '').trim();
+    const reason = String(data.tratamiento || '').trim();
+    const type = String(data.tipoCita || 'general');
+    const chair = String(data.silla || '');
+    const note = String(data.notaRoja || '').trim();
+    const startText = date + 'T' + time;
+    const startMillis = Date.parse(startText + ':00Z');
+    if (!Number.isSafeInteger(patientId) || patientId < 1 ||
+        !validDateTime(startText) || !Number.isFinite(startMillis) ||
+        ![30,45,60,90].includes(duration) ||
+        !professional || professional.length > 160 ||
+        !reason || reason.length > 255 || note.length > 3500 ||
+        !['general','camitas'].includes(type) ||
+        !['A','B','C'].includes(chair) ||
+        (type === 'camitas' ? chair !== 'A' : chair === 'A')) {
+        return res.status(400).json({ ok: false, mensaje: 'Revisa paciente, doctor, fecha, hora, tratamiento, duración y silla.' });
+    }
+    const endDate = new Date(startMillis + duration * 60000);
+    const endText = endDate.toISOString().slice(0,19).replace('T',' ');
+    const startSql = startText.replace('T',' ') + ':00';
+    const comment = [
+        'Tipo de cita: ' + (type === 'camitas' ? 'Camitas' : 'Atención general'),
+        'Silla: ' + chair,
+        note ? 'Complejidad / nota roja: ' + note : ''
+    ].filter(Boolean).join('\n');
+
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
+        const [patients] = await connection.query(
+            'SELECT id_paciente FROM pacientes WHERE id_paciente = ? AND activo = 1 LIMIT 1',
+            [patientId]
+        );
+        if (!patients.length) {
+            await connection.rollback();
+            return res.status(404).json({ ok:false, mensaje:'El paciente ya no está disponible. Busca o registra uno nuevo.' });
+        }
+        const [conflicts] = await connection.query(
+            "SELECT id_cita FROM citas WHERE doctor = ? AND inicio_at < ? " +
+            "AND COALESCE(fin_at, DATE_ADD(inicio_at, INTERVAL 30 MINUTE)) > ? " +
+            "AND estado NOT IN ('CANCELADA','NO_ASISTIO') LIMIT 1",
+            [professional, endText, startSql]
+        );
+        if (conflicts.length) {
+            await connection.rollback();
+            return res.status(409).json({ ok:false, mensaje:'Este doctor ya tiene una cita en ese horario. Elige otra hora.' });
+        }
+        const [result] = await connection.query(
+            "INSERT INTO citas (id_paciente, inicio_at, fin_at, doctor, motivo, estado, comentario) " +
+            "VALUES (?,?,?,?,?,'PROGRAMADA',?)",
+            [patientId, startSql, endText, professional, reason, comment]
+        );
+        await connection.query(
+            "INSERT INTO auditoria (entidad,id_entidad,accion,detalle) VALUES ('pacientes',?,'CREAR',?)",
+            [patientId, JSON.stringify({ apartado:'CITA',idCita:result.insertId,doctor:professional })]
+        );
+        await connection.commit();
+        res.status(201).json({ ok:true, idCita:result.insertId, mensaje:'Cita registrada en MySQL.' });
+    } catch (error) {
+        if (connection) {
+            try { await connection.rollback(); } catch (_) {}
+        }
+        next(error);
+    } finally { connection?.release(); }
+});
+
 router.patch('/citas/:id', async (req, res, next) => {
     const id = Number(req.params.id);
     const { inicioAt, finAt, doctor, motivo, estado, comentario } = req.body || {};

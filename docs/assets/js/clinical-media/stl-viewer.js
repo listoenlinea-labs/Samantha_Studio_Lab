@@ -106,67 +106,251 @@
   return {mesh:parse(data),source:entry.name};
  }
  function mount(host,mesh,{name='Modelo STL'}={}){
-  if(!host||!mesh||!(mesh.positions instanceof Float32Array)||!mesh.triangles)fail('Malla STL no válida.');
+  if(!host||!mesh||!(mesh.positions instanceof Float32Array)||!mesh.triangles)fail('La malla STL no es válida.');
   host.replaceChildren();
-  const wrap=document.createElement('section');wrap.className='ssl-stl-viewer';
-  const title=document.createElement('div');title.className='ssl-stl-meta';
-  const heading=document.createElement('strong');heading.textContent=name;title.append(heading);
-  const detail=document.createElement('small');
+  const wrapper=document.createElement('section');wrapper.className='ssl-stl-premium';
+  const header=document.createElement('header');header.className='ssl-stl-premium-header';
+  const meta=document.createElement('div');meta.className='ssl-stl-premium-meta';
+  const eyebrow=document.createElement('span');eyebrow.textContent='MODELO DENTAL 3D · ARCHIVO STL';
+  const title=document.createElement('h3');title.textContent=name;
+  const detail=document.createElement('p');
   detail.textContent=mesh.triangles.toLocaleString('es-MX')+' triángulos · '+mesh.format+
-   ' · dimensiones '+mesh.bounds.lengths.map(n=>Number(n.toFixed(2))).join(' × ')+' (unidades STL sin calibrar)';
-  title.append(detail);
-  const canvas=document.createElement('canvas');canvas.className='ssl-stl-canvas';
-  canvas.setAttribute('aria-label','Modelo STL 3D giratorio. Arrastra para rotar, usa el zoom para acercar.');
-  const controls=document.createElement('div');controls.className='ssl-stl-tools';
-  const btn=(label,fn)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.addEventListener('click',fn);controls.append(b);return b};
-  const hint=document.createElement('p');hint.className='ssl-media-note';
-  hint.textContent='Modelo superficial STL en 3D: gira arrastrando, amplía con la rueda o los botones. No contiene cortes radiográficos ni permite vistas CBCT 2D o panorámicas.';
-  wrap.append(title,canvas,controls,hint);host.append(wrap);
-  const gl=canvas.getContext('webgl',{alpha:false,antialias:true,preserveDrawingBuffer:false})||canvas.getContext('experimental-webgl');
-  if(!gl){const msg=document.createElement('p');msg.textContent='WebGL no está disponible en este navegador; puedes descargar el STL original.';canvas.replaceWith(msg);return {dispose(){host.replaceChildren()}}}
-  const shader=(type,source)=>{const obj=gl.createShader(type);gl.shaderSource(obj,source);gl.compileShader(obj);
-   if(!gl.getShaderParameter(obj,gl.COMPILE_STATUS))fail('WebGL STL: '+gl.getShaderInfoLog(obj));return obj};
-  const vert=shader(gl.VERTEX_SHADER,
-   'attribute vec3 aPos;attribute vec3 aNormal;uniform mat3 uRotate;uniform float uZoom;uniform float uAspect;varying vec3 vNormal;void main(){vec3 p=uRotate*aPos;gl_Position=vec4(p.x*uZoom*uAspect,p.y*uZoom,p.z*0.65,1.0);vNormal=normalize(uRotate*aNormal);}');
-  const frag=shader(gl.FRAGMENT_SHADER,
-   'precision mediump float;varying vec3 vNormal;void main(){vec3 n=normalize(vNormal);float light=max(.15,dot(n,normalize(vec3(.4,.7,1.))));vec3 c=mix(vec3(.42,.34,.63),vec3(.79,.71,.9),light);gl_FragColor=vec4(c,1.0);}');
-  const program=gl.createProgram();gl.attachShader(program,vert);gl.attachShader(program,frag);gl.linkProgram(program);
-  if(!gl.getProgramParameter(program,gl.LINK_STATUS))fail('No pudo iniciarse el visor STL WebGL.');
-  gl.deleteShader(vert);gl.deleteShader(frag);
-  const pos=gl.createBuffer(),nor=gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER,pos);gl.bufferData(gl.ARRAY_BUFFER,mesh.positions,gl.STATIC_DRAW);
-  gl.bindBuffer(gl.ARRAY_BUFFER,nor);gl.bufferData(gl.ARRAY_BUFFER,mesh.normals,gl.STATIC_DRAW);
-  const ap=gl.getAttribLocation(program,'aPos'),an=gl.getAttribLocation(program,'aNormal');
-  const rotate=gl.getUniformLocation(program,'uRotate'),zoomUniform=gl.getUniformLocation(program,'uZoom'),aspect=gl.getUniformLocation(program,'uAspect');
-  let yaw=.45,pitch=-.4,zoom=1,disposed=false,drag=null;
-  const redraw=()=>{
-   if(disposed)return;
-   const box=canvas.getBoundingClientRect(),scale=Math.min(window.devicePixelRatio||1,1.75);
-   canvas.width=Math.max(100,Math.floor(box.width*scale));canvas.height=Math.max(100,Math.floor(box.height*scale));
-   gl.viewport(0,0,canvas.width,canvas.height);gl.clearColor(.07,.105,.14,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
-   gl.enable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);
-   gl.useProgram(program);
-   gl.bindBuffer(gl.ARRAY_BUFFER,pos);gl.enableVertexAttribArray(ap);gl.vertexAttribPointer(ap,3,gl.FLOAT,false,0,0);
-   gl.bindBuffer(gl.ARRAY_BUFFER,nor);gl.enableVertexAttribArray(an);gl.vertexAttribPointer(an,3,gl.FLOAT,false,0,0);
-   const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
-   gl.uniformMatrix3fv(rotate,false,new Float32Array([cy,-sp*sy,cp*sy,0,cp,sp,-sy,-sp*cy,cp*cy]));
-   gl.uniform1f(zoomUniform,zoom);gl.uniform1f(aspect,Math.min(1,canvas.height/canvas.width));
-   gl.drawArrays(gl.TRIANGLES,0,mesh.triangles*3);
+    ' · dimensiones originales '+mesh.bounds.lengths.map(x=>Number(x.toFixed(2))).join(' × ');
+  meta.append(eyebrow,title,detail);
+  const tag=document.createElement('span');tag.className='ssl-stl-label';tag.textContent='Visor exploratorio 3D';
+  header.append(meta,tag);
+  const toolbar=document.createElement('div');toolbar.className='ssl-stl-premium-toolbar';
+  toolbar.innerHTML=
+    '<label>Material<select data-stl-setting="material">'+
+      '<option value="ivory">Marfil dental</option><option value="lilac">Lavanda clínica</option>'+
+      '<option value="mint">Menta pastel</option><option value="blue">Azul hielo</option>'+
+      '<option value="rose">Rosa porcelana</option><option value="graphite">Grafito</option></select></label>'+
+    '<label>Ambiente<select data-stl-setting="background">'+
+      '<option value="navy">Azul noche</option><option value="pearl">Blanco perla</option>'+
+      '<option value="lavender">Lila tenue</option><option value="slate">Gris clínica</option></select></label>'+
+    '<label>Luz <input data-stl-setting="light" type="range" min="65" max="180" value="115" aria-label="Intensidad de luz"></label>'+
+    '<label class="ssl-stl-toggle"><input data-stl-setting="smooth" type="checkbox" checked> Suavizar</label>'+
+    '<label class="ssl-stl-toggle"><input data-stl-setting="wire" type="checkbox"> Malla</label>'+
+    '<label class="ssl-stl-toggle"><input data-stl-setting="transparent" type="checkbox"> Translúcido</label>';
+  const viewbar=document.createElement('div');viewbar.className='ssl-stl-premium-views';
+  viewbar.innerHTML='<span>ENFOQUE</span>'+
+    '<button type="button" data-stl-view="front">Frontal</button>'+
+    '<button type="button" data-stl-view="back">Posterior</button>'+
+    '<button type="button" data-stl-view="top">Oclusal</button>'+
+    '<button type="button" data-stl-view="bottom">Inferior</button>'+
+    '<button type="button" data-stl-view="left">Izquierda</button>'+
+    '<button type="button" data-stl-view="right">Derecha</button>'+
+    '<button type="button" data-stl-view="reset">Restablecer</button>'+
+    '<button type="button" data-stl-view="zoom-in">＋</button>'+
+    '<button type="button" data-stl-view="zoom-out">−</button>'+
+    '<button type="button" data-stl-view="image">Capturar PNG</button>';
+  const stage=document.createElement('div');stage.className='ssl-stl-premium-stage';stage.dataset.environment='navy';
+  const canvas=document.createElement('canvas');canvas.className='ssl-stl-premium-canvas';canvas.tabIndex=0;
+  canvas.setAttribute('aria-label','Modelo STL odontológico. Arrastra para girar, usa zoom, o cambia las vistas en la barra superior.');
+  const hint=document.createElement('p');hint.className='ssl-stl-premium-hint';
+  hint.textContent='Arrastra para girar · rueda para acercar · doble clic para restablecer';
+  stage.append(canvas,hint);
+  const footer=document.createElement('p');footer.className='ssl-stl-premium-disclaimer';
+  footer.textContent='Las orientaciones siguen los ejes del archivo original. Visor de consulta; no certificado para diagnóstico, análisis de oclusión o mediciones clínicas.';
+  wrapper.append(header,toolbar,viewbar,stage,footer);host.append(wrapper);
+
+  const gl=canvas.getContext('webgl',{antialias:true,alpha:true,preserveDrawingBuffer:true})
+    ||canvas.getContext('experimental-webgl',{antialias:true,alpha:true,preserveDrawingBuffer:true});
+  if(!gl){
+   const error=document.createElement('p');error.className='ssl-stl-premium-error';
+   error.textContent='El navegador no admite WebGL. Descarga el STL original para abrirlo en un visor compatible.';
+   canvas.replaceWith(error);
+   return {dispose(){host.replaceChildren()}};
+  }
+  const compile=(type,src)=>{
+   const sh=gl.createShader(type);gl.shaderSource(sh,src);gl.compileShader(sh);
+   if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS))fail('No se pudo preparar el visor STL: '+gl.getShaderInfoLog(sh));
+   return sh;
   };
-  canvas.addEventListener('pointerdown',e=>{drag=[e.clientX,e.clientY];canvas.setPointerCapture?.(e.pointerId)});
-  canvas.addEventListener('pointermove',e=>{if(!drag)return;
-   yaw+=(e.clientX-drag[0])*.01;pitch=Math.max(-1.55,Math.min(1.55,pitch+(e.clientY-drag[1])*.01));
-   drag=[e.clientX,e.clientY];redraw()});
-  canvas.addEventListener('pointerup',()=>drag=null);
-  canvas.addEventListener('pointercancel',()=>drag=null);
-  canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(.5,Math.min(3,zoom*(e.deltaY<0?1.1:.9)));redraw()},{passive:false});
-  btn('− Alejar',()=>{zoom=Math.max(.5,zoom/1.2);redraw()});
-  btn('+ Acercar',()=>{zoom=Math.min(3,zoom*1.2);redraw()});
-  btn('↻ Restablecer',()=>{yaw=.45;pitch=-.4;zoom=1;redraw()});
-  let resize;
-  if(typeof ResizeObserver==='function'){resize=new ResizeObserver(redraw);resize.observe(canvas)}
-  redraw();
-  return {dispose(){disposed=true;resize?.disconnect();gl.deleteBuffer(pos);gl.deleteBuffer(nor);gl.deleteProgram(program);host.replaceChildren()}};
+  function program(vertex,fragment){
+   const vs=compile(gl.VERTEX_SHADER,vertex),fs=compile(gl.FRAGMENT_SHADER,fragment);
+   const p=gl.createProgram();gl.attachShader(p,vs);gl.attachShader(p,fs);gl.linkProgram(p);
+   gl.deleteShader(vs);gl.deleteShader(fs);
+   if(!gl.getProgramParameter(p,gl.LINK_STATUS))fail('No se pudo iniciar el programa gráfico 3D.');
+   return p;
+  }
+  const vertex='attribute vec3 aPosition;attribute vec3 aNormal;uniform mat3 uRotation;uniform vec2 uScreen;uniform float uZoom;varying vec3 vNormal;varying vec3 vPosition;void main(){vec3 q=uRotation*aPosition;vPosition=q;vNormal=normalize(uRotation*aNormal);gl_Position=vec4(q.x*uScreen.x*uZoom,q.y*uScreen.y*uZoom,-q.z*.65,1.0);}';
+  const fragment='precision mediump float;varying vec3 vNormal;varying vec3 vPosition;uniform vec3 uColor;uniform float uLight;uniform float uAlpha;uniform float uGloss;void main(){vec3 n=normalize(vNormal);if(!gl_FrontFacing)n=-n;vec3 key=normalize(vec3(.44,.66,1.0));vec3 fill=normalize(vec3(-.65,.24,.6));float a=max(dot(n,key),0.0);float b=max(dot(n,fill),0.0);float rim=pow(1.0-abs(dot(n,vec3(0.,0.,1.))),2.0);vec3 h=normalize(key+vec3(0.,0.,1.));float spec=pow(max(dot(n,h),0.0),uGloss);vec3 c=uColor*(.42+.61*a+.22*b)+vec3(.45,.40,.5)*spec*.39+uColor*rim*.15;c*=uLight;c=c/(c+vec3(.28));c=pow(c,vec3(.85));gl_FragColor=vec4(c,uAlpha);}';
+  const edgeVertex='attribute vec3 aPosition;uniform mat3 uRotation;uniform vec2 uScreen;uniform float uZoom;void main(){vec3 q=uRotation*aPosition;gl_Position=vec4(q.x*uScreen.x*uZoom,q.y*uScreen.y*uZoom,-q.z*.65,1.0);}';
+  const edgeFragment='precision mediump float;void main(){gl_FragColor=vec4(.33,.30,.41,.25);}';
+  const meshProgram=program(vertex,fragment),wireProgram=program(edgeVertex,edgeFragment);
+  const positions=gl.createBuffer(),facetNormals=gl.createBuffer(),smoothNormals=gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER,positions);gl.bufferData(gl.ARRAY_BUFFER,mesh.positions,gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ARRAY_BUFFER,facetNormals);gl.bufferData(gl.ARRAY_BUFFER,mesh.normals,gl.STATIC_DRAW);
+  let smoothingReady=false,wireBuffer=null,wireCount=0,disposed=false;
+  function makeSmoothNormals(){
+   if(smoothingReady)return;
+   // Mantener superficies redondeadas como gingiva, sin aumentar la cantidad de triángulos.
+   const table=new Map(),p=mesh.positions,n=mesh.normals;
+   for(let i=0;i<p.length;i+=3){
+    const key=p[i].toFixed(4)+','+p[i+1].toFixed(4)+','+p[i+2].toFixed(4);
+    const existing=table.get(key)||[0,0,0];
+    existing[0]+=n[i];existing[1]+=n[i+1];existing[2]+=n[i+2];
+    table.set(key,existing);
+   }
+   const output=new Float32Array(n.length);
+   for(let i=0;i<p.length;i+=3){
+    const sum=table.get(p[i].toFixed(4)+','+p[i+1].toFixed(4)+','+p[i+2].toFixed(4));
+    const length=Math.hypot(...sum)||1;
+    output[i]=sum[0]/length;output[i+1]=sum[1]/length;output[i+2]=sum[2]/length;
+   }
+   gl.bindBuffer(gl.ARRAY_BUFFER,smoothNormals);gl.bufferData(gl.ARRAY_BUFFER,output,gl.STATIC_DRAW);
+   smoothingReady=true;
+  }
+  function makeWireframe(){
+   if(wireBuffer)return;
+   const every=Math.max(1,Math.ceil(mesh.triangles/24000)),p=mesh.positions,points=[];
+   for(let tri=0;tri<mesh.triangles;tri+=every){
+    const offset=tri*9;
+    for(const [a,b] of [[0,3],[3,6],[6,0]]){
+     points.push(p[offset+a],p[offset+a+1],p[offset+a+2],
+       p[offset+b],p[offset+b+1],p[offset+b+2]);
+    }
+   }
+   wireCount=points.length/3;wireBuffer=gl.createBuffer();
+   gl.bindBuffer(gl.ARRAY_BUFFER,wireBuffer);
+   gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(points),gl.STATIC_DRAW);
+  }
+  const palette={
+   ivory:[.94,.88,.75],lilac:[.64,.49,.78],mint:[.53,.83,.73],
+   blue:[.56,.76,.91],rose:[.9,.65,.71],graphite:[.40,.46,.55]
+  };
+  let material='ivory',environment='navy',light=1.15,showWire=false,
+      smooth=true,alpha=1,yaw=.28,pitch=-.4,zoom=1,panX=0,panY=0,drag=null,frame=null;
+  const attr=(program,name)=>gl.getAttribLocation(program,name);
+  const uniform=(program,name)=>gl.getUniformLocation(program,name);
+  const rotate=()=>{
+   const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+   return new Float32Array([cy,-sp*sy,cp*sy,0,cp,sp,-sy,-sp*cy,cp*cy]);
+  };
+  function draw(){
+   frame=null;if(disposed)return;
+   const rect=stage.getBoundingClientRect(),scale=Math.min(window.devicePixelRatio||1,1.8);
+   const width=Math.max(1,Math.round(rect.width*scale)),height=Math.max(1,Math.round(rect.height*scale));
+   if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height}
+   gl.viewport(0,0,width,height);gl.clearColor(0,0,0,0);
+   gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+   gl.enable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);
+   gl.useProgram(meshProgram);
+   const ratio=Math.min(1,width/height),inverse=Math.min(1,height/width);
+   const screen=new Float32Array([ratio,inverse]);
+   gl.uniformMatrix3fv(uniform(meshProgram,'uRotation'),false,rotate());
+   gl.uniform2fv(uniform(meshProgram,'uScreen'),screen);
+   gl.uniform1f(uniform(meshProgram,'uZoom'),zoom);
+   gl.uniform3fv(uniform(meshProgram,'uColor'),new Float32Array(palette[material]));
+   gl.uniform1f(uniform(meshProgram,'uLight'),light);
+   gl.uniform1f(uniform(meshProgram,'uAlpha'),alpha);
+   gl.uniform1f(uniform(meshProgram,'uGloss'),material==='graphite'?30:55);
+   gl.bindBuffer(gl.ARRAY_BUFFER,positions);
+   const ap=attr(meshProgram,'aPosition');
+   gl.enableVertexAttribArray(ap);gl.vertexAttribPointer(ap,3,gl.FLOAT,false,0,0);
+   if(smooth&&!smoothingReady)makeSmoothNormals();
+   gl.bindBuffer(gl.ARRAY_BUFFER,smooth?smoothNormals:facetNormals);
+   const an=attr(meshProgram,'aNormal');
+   gl.enableVertexAttribArray(an);gl.vertexAttribPointer(an,3,gl.FLOAT,false,0,0);
+   if(alpha<1){gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA)}
+   gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(1,1);
+   gl.drawArrays(gl.TRIANGLES,0,mesh.triangles*3);
+   gl.disable(gl.POLYGON_OFFSET_FILL);gl.disable(gl.BLEND);
+   if(showWire){
+    makeWireframe();gl.useProgram(wireProgram);
+    gl.uniformMatrix3fv(uniform(wireProgram,'uRotation'),false,rotate());
+    gl.uniform2fv(uniform(wireProgram,'uScreen'),screen);
+    gl.uniform1f(uniform(wireProgram,'uZoom'),zoom);
+    gl.bindBuffer(gl.ARRAY_BUFFER,wireBuffer);
+    const wirePos=attr(wireProgram,'aPosition');
+    gl.enableVertexAttribArray(wirePos);gl.vertexAttribPointer(wirePos,3,gl.FLOAT,false,0,0);
+    gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+    gl.drawArrays(gl.LINES,0,wireCount);gl.disable(gl.BLEND);
+   }
+  }
+  const repaint=()=>{if(!disposed&&frame===null)frame=requestAnimationFrame(draw)};
+  function reset(){yaw=.28;pitch=-.4;zoom=1;panX=0;panY=0;repaint()}
+  canvas.addEventListener('pointerdown',event=>{
+   drag=[event.clientX,event.clientY,event.pointerId];
+   canvas.setPointerCapture?.(event.pointerId);
+  });
+  canvas.addEventListener('pointermove',event=>{
+   if(!drag||event.pointerId!==drag[2])return;
+   yaw+=(event.clientX-drag[0])*.009;
+   pitch=Math.max(-1.57,Math.min(1.57,pitch+(event.clientY-drag[1])*.009));
+   drag=[event.clientX,event.clientY,event.pointerId];repaint();
+  });
+  canvas.addEventListener('pointerup',()=>{drag=null});
+  canvas.addEventListener('pointercancel',()=>{drag=null});
+  canvas.addEventListener('dblclick',reset);
+  canvas.addEventListener('wheel',event=>{
+   event.preventDefault();zoom=Math.max(.35,Math.min(3,zoom*(event.deltaY<0?1.1:.9)));repaint();
+  },{passive:false});
+  canvas.addEventListener('keydown',event=>{
+   if(event.key==='ArrowLeft')yaw-=.12;
+   else if(event.key==='ArrowRight')yaw+=.12;
+   else if(event.key==='ArrowUp')pitch-=.12;
+   else if(event.key==='ArrowDown')pitch+=.12;
+   else if(event.key==='+'||event.key==='=')zoom=Math.min(3,zoom*1.12);
+   else if(event.key==='-')zoom=Math.max(.35,zoom/1.12);
+   else return;
+   event.preventDefault();repaint();
+  });
+  toolbar.addEventListener('input',event=>{
+   const target=event.target,setting=target?.dataset.stlSetting;
+   if(setting==='material')material=target.value;
+   else if(setting==='background'){environment=target.value;stage.dataset.environment=environment}
+   else if(setting==='light')light=Number(target.value)/100;
+   else if(setting==='smooth')smooth=target.checked;
+   else if(setting==='wire')showWire=target.checked;
+   else if(setting==='transparent')alpha=target.checked?.60:1;
+   repaint();
+  });
+  toolbar.addEventListener('change',event=>{
+   if(event.target.dataset.stlSetting==='material')material=event.target.value;
+   if(event.target.dataset.stlSetting==='background'){
+    environment=event.target.value;stage.dataset.environment=environment;
+   }
+   repaint();
+  });
+  viewbar.addEventListener('click',event=>{
+   const key=event.target.closest('[data-stl-view]')?.dataset.stlView;
+   if(!key)return;
+   if(key==='front'){yaw=0;pitch=0}
+   else if(key==='back'){yaw=Math.PI;pitch=0}
+   else if(key==='top'){yaw=0;pitch=-Math.PI/2}
+   else if(key==='bottom'){yaw=0;pitch=Math.PI/2}
+   else if(key==='left'){yaw=-Math.PI/2;pitch=0}
+   else if(key==='right'){yaw=Math.PI/2;pitch=0}
+   else if(key==='zoom-in')zoom=Math.min(3,zoom*1.2);
+   else if(key==='zoom-out')zoom=Math.max(.35,zoom/1.2);
+   else if(key==='reset')reset();
+   else if(key==='image'){
+    repaint();
+    requestAnimationFrame(()=>{
+     canvas.toBlob(blob=>{
+      if(!blob)return;
+      const url=URL.createObjectURL(blob),a=document.createElement('a');
+      a.href=url;a.download='vista-stl-odontologica.png';document.body.append(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),60000);
+     },'image/png');
+    });
+   }
+   repaint();
+  });
+  let resize=null;
+  if(typeof ResizeObserver==='function'){resize=new ResizeObserver(repaint);resize.observe(stage)}
+  repaint();
+  return {dispose(){
+   disposed=true;
+   if(frame!==null)cancelAnimationFrame(frame);
+   resize?.disconnect();
+   gl.deleteBuffer(positions);gl.deleteBuffer(facetNormals);gl.deleteBuffer(smoothNormals);
+   if(wireBuffer)gl.deleteBuffer(wireBuffer);
+   gl.deleteProgram(meshProgram);gl.deleteProgram(wireProgram);
+   host.replaceChildren();
+  }};
  }
  return {parse,readSTL,openStudy,mount,extSTL,MAX_BYTES,MAX_TRIANGLES};
 });

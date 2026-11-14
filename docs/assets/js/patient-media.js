@@ -34,7 +34,7 @@
   let res;
   try{res=await fetch(apiUrl()+'/'+fileId,{credentials:'same-origin',cache:'no-store'})}
   catch(_){throw errors.networkError()}
-  return errors.expectBlob(res,['application/pdf','application/dicom','application/zip','model/stl','image/*']);
+  return errors.expectBlob(res,['application/pdf','application/dicom','application/zip','model/stl','application/octet-stream','image/*']);
  }
  async function uploadFile(file,description,cat,progress){
   const errors=window.SamanthaRequestErrors;
@@ -102,8 +102,11 @@
     '<article class="ssl-media-series"><strong>Serie CBCT guardada · '+entries.length+' cortes</strong>'+
     '<button type="button" data-media-series="'+escape(uid)+'">Ver tomografía 2D / 3D / Panorámica</button></article>').join('');
   return '<div class="ssl-media-list">'+series+items.map(item=>{
-   const mime=item.tipoMime||'',id=Number(item.idArchivo),isZip=mime==='application/zip',isDicom=mime==='application/dicom';
-   const action=mime==='model/stl'?'Ver modelo STL 3D':isZip?'Ver estudio ZIP':isDicom?'Ver DICOM':mime==='image/tiff'||mime==='image/bmp'?'Descargar':mime.startsWith('image/')?'Ver imagen':mime==='application/pdf'?'Ver PDF':'Descargar';
+   const mime=item.tipoMime||'',id=Number(item.idArchivo),isZip=mime==='application/zip'||/\.zip$/i.test(item.nombre||''),isDicom=mime==='application/dicom';
+   // Compatibilidad con STL antiguos que MySQL guardó como application/octet-stream.
+   const isStl=mime==='model/stl'||/\.stl$/i.test(item.nombre||'');
+   const action=isStl?'Visualizar':isZip?'Ver tomografía':isDicom?'Ver DICOM':
+     mime==='image/tiff'||mime==='image/bmp'?'Descargar':mime.startsWith('image/')?'Ver imagen':mime==='application/pdf'?'Ver PDF':'Descargar';
    return '<article class="ssl-media-entry" data-file-id="'+id+'"><div><strong>'+escape(item.nombre)+'</strong>'+
     '<small>'+escape(item.descripcion||'Sin descripción')+' · '+bytes(item.bytes)+' · '+escape(new Date(item.creadoAt).toLocaleDateString('es-MX'))+'</small></div>'+
     '<div class="ssl-media-entry-actions"><button type="button" data-media-view="'+id+'">'+action+'</button>'+
@@ -130,7 +133,7 @@
   if(viewer){viewer.dispose?.();viewer=null}
   objectUrls.forEach(saved=>URL.revokeObjectURL(saved));objectUrls=[];
   const mime=item.tipoMime;
-  if(mime==='application/zip'||mime==='model/stl'){
+  if(mime==='application/zip'||mime==='model/stl'||/\.(stl|zip)$/i.test(item.nombre||'')){
    const file=new File([blob],item.nombre,{type:mime});
    await openSelectedStudy([file],item.nombre);
    return;
