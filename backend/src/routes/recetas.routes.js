@@ -37,7 +37,10 @@ function pdfOf({folio,paciente,texto,profesional,cedula,fecha}){
   for(let i=0;i<pageRange.count;i++){
     doc.switchToPage(pageRange.start+i);
     const max=doc.page.height;
-    doc.font('Helvetica').fontSize(7).fillColor('#96859d').text('Documento del expediente clínico · Validar firma y cédula del profesional antes de su uso.',34,max-31,{width:328,align:'center',lineBreak:false});
+    const savedBottom=doc.page.margins.bottom;
+    doc.page.margins.bottom=0;
+    doc.font('Helvetica').fontSize(7).fillColor('#96859d').text('Documento clínico · Validar firma y cédula antes de entregar.',34,max-31,{width:328,align:'center',lineBreak:false});
+    doc.page.margins.bottom=savedBottom;
   }
   doc.end();
  });
@@ -55,7 +58,7 @@ router.post('/pacientes/:id',async(req,res,next)=>{
   const texto=validateText(req.body?.texto);
   const profesional=clean(req.body?.profesional),cedula=clean(req.body?.cedula);
   if(!texto||profesional.length>160||cedula.length>60)return res.status(400).json({ok:false,mensaje:'Revisa el contenido de la receta (máximo 12,000 caracteres) y los datos profesionales.'});
-  const [rows]=await pool.query('SELECT CONCAT_WS(" ", nombres, apellido_paterno, apellido_materno) AS nombre FROM pacientes WHERE id_paciente=? LIMIT 1',[req.params.id]);
+  const [rows]=await pool.query("SELECT CONCAT_WS(' ', nombres, apellido_paterno, apellido_materno) AS nombre FROM pacientes WHERE id_paciente=? LIMIT 1",[req.params.id]);
   if(!rows.length)return res.status(404).json({ok:false,mensaje:'Paciente no encontrado.'});
   const fecha=new Date();
   const stamp=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Mexico_City',year:'numeric',month:'2-digit',day:'2-digit'}).format(fecha).replace(/-/g,'');
