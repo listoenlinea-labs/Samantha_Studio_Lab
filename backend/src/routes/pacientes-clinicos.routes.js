@@ -129,6 +129,7 @@ router.get('/:id/resumen', async (req, res, next) => {
 
 router.patch('/:id/resumen', async (req, res, next) => {
     let connection;
+    let stage = 'preparar';
     try {
         connection = await pool.getConnection();
         const patientId = parsePositiveId(req.params.id);
@@ -148,11 +149,13 @@ router.patch('/:id/resumen', async (req, res, next) => {
         if ((allergies && allergies.length > 4000) || (note && note.length > 4000)) {
             return res.status(400).json({ ok: false, mensaje: 'El texto no puede superar 4000 caracteres.' });
         }
+        stage = 'abrir_transaccion';
         await connection.beginTransaction();
         // Bloquea exclusivamente este paciente durante el cambio de resumen.
         // No crear una versión de historia clínica al editar un resumen pequeño:
         // algunas bases existentes mantienen índices UNIQUE legados sobre
         // historias_clinicas.id_paciente y el INSERT devolvía ER_DUP_ENTRY (409).
+        stage = 'bloquear_paciente';
         const [patientRows] = await connection.query(
             'SELECT id_paciente FROM pacientes WHERE id_paciente = ? LIMIT 1 FOR UPDATE',
             [patientId]
@@ -162,6 +165,7 @@ router.patch('/:id/resumen', async (req, res, next) => {
             return res.status(404).json({ ok: false, mensaje: 'Paciente no encontrado.' });
         }
         if (hasAllergies) {
+            stage = 'actualizar_alergias';
             // pacientes.alergias es la fuente actual; las versiones clínicas
             // anteriores permanecen intactas para conservar la trazabilidad.
             await connection.query(
@@ -170,6 +174,7 @@ router.patch('/:id/resumen', async (req, res, next) => {
             );
         }
         if (hasNote) {
+            stage = 'actualizar_nota_general';
             // Actualizar el expediente propio, nunca otra vivienda/paciente por coincidencia de un índice UNIQUE.
             const [existing] = await connection.query(
                 'SELECT id_paciente FROM expedientes_paciente WHERE id_paciente = ? LIMIT 1 FOR UPDATE',
@@ -189,14 +194,26 @@ router.patch('/:id/resumen', async (req, res, next) => {
                 );
             }
         }
+        stage = 'registrar_auditoria';
         await connection.query(
             `INSERT INTO auditoria (entidad, id_entidad, accion, detalle)
              VALUES ('pacientes', ?, 'ACTUALIZAR', ?)`,
             [patientId, JSON.stringify({ apartado: 'RESUMEN_CLINICO', alergias: hasAllergies, notaGeneral: hasNote })]
         );
+        stage = 'confirmar_transaccion';
         await connection.commit();
         return res.json({ ok: true, alergias: allergies, notaGeneral: note });
     } catch (error) {
+        // Diagnóstico mínimo en Hostinger; nunca registrar alergias, nombres ni
+        // contenido clínico. La referencia permite distinguir un índice UNIQUE
+        // legado de otro posible error de MySQL.
+        console.error('[PATIENT_SUMMARY_SAVE_FAILURE]', JSON.stringify({
+            requestId: req.requestId || null,
+            stage,
+            code: error?.code || 'UNKNOWN',
+            errno: Number(error?.errno) || null,
+            sqlState: error?.sqlState || null
+        }));
         if (connection) {
             try { await connection.rollback(); } catch (_) { /* connection already lost */ }
         }
