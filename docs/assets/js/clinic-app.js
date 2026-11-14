@@ -34,6 +34,13 @@
     permissions: ['Administrador', 'Asistente', 'Recepcionista']
   },
   {
+    id: 'recordatorios',
+    label: 'Recordatorios',
+    href: 'recordatorios.html',
+    icon: '✉',
+    permissions: ['Administrador', 'Asistente', 'Recepcionista']
+  },
+  {
     id: 'pacientes',
     label: 'Pacientes',
     href: 'pacientes.html',
